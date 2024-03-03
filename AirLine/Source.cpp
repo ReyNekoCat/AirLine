@@ -12,6 +12,7 @@
 
 using namespace std;
 
+// Hola mundo.
 // Estructuras
 #pragma region Structs
 struct usuario
