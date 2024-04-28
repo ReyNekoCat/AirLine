@@ -33,7 +33,7 @@ usuario* iniUsuario, * auxUsuario, * auxUsuario2, * auxUsuario3, * miUsuario = n
 
 struct Vuelo
 {
-	char usuario[30];
+	char usuarioRegistro[30];
 	char origen[30];
 	char destino[30];
 	int num;
@@ -47,23 +47,16 @@ Vuelo* iniVuelo, * auxVuelo, * auxVuelo2, * auxVuelo3 = nullptr;
 
 struct boleto
 {
-	char nombreMed[30];
-	char apellidoPM[30];
-	char apellidoMM[30];
-	char nombreCompM[60];
-	int cedulaNum;
-	char cedulaChar[20];
-	char especialidad[30];
-	int numConsultorioNum;
-	char numConsultorioChar[20];
-	int hoararioNum;
-	char hoararioChar[20];
-	int telefonoNum;
-	char telefonoChar[20];
-	int diasNum;
-	char diasChar[30];
-	char foto[100];
-	char nombreUsuM[30];
+	char nombrePasajero[30];			//C
+	char apellidoPPasajero[30];			//C
+	char apellidoMPasajero[30];			//C
+	char nombreCompPasajero[60];		//C
+	char vuelo[50];						//C
+	int clase;                          //C
+	int pase;							//C
+	int estado;							//C
+	//char diasChar[30];
+	char usuarioRegistro[30];			//C
 	boleto* ant;
 	boleto* sig;
 };
@@ -71,7 +64,7 @@ boleto* pivote, * iniMed, * auxMed, * auxMed2, * auxMed3 = nullptr;
 
 struct pasajero
 {
-	char usuario[30];
+	char usuarioRegistro[30];
 	char nombre[30];
 	char apellidoP[30];
 	char apellidoM[30];
@@ -902,7 +895,7 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				GetDlgItemText(hwnd, IDC_EDIT2, temp->origen, sizeof(temp->origen));
 				GetDlgItemText(hwnd, IDC_EDIT4, temp->destino, sizeof(temp->destino));
 				//GetDlgItemText(hwnd, IDC_EDIT3, temp->claveChar, sizeof(temp->claveChar));
-				strcpy_s(temp->usuario, miUsuario->nick);
+				strcpy_s(temp->usuarioRegistro, miUsuario->nick);
 				nuevaEsp(temp);
 				SetDlgItemText(hwnd, IDC_EDIT2, "");
 				SetDlgItemText(hwnd, IDC_EDIT3, "");
@@ -1422,68 +1415,70 @@ BOOL CALLBACK cDialog7(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			// Campos
 			boleto* temp = new boleto;
 
-			GetDlgItemText(hwnd, IDC_EDIT2, temp->nombreMed, sizeof(temp->nombreMed));
-			GetDlgItemText(hwnd, IDC_EDIT3, temp->apellidoPM, sizeof(temp->apellidoPM));
-			GetDlgItemText(hwnd, IDC_EDIT4, temp->apellidoMM, sizeof(temp->apellidoMM));
-			GetDlgItemText(hwnd, IDC_EDIT5, temp->cedulaChar, sizeof(temp->cedulaChar));
-			GetDlgItemText(hwnd, IDC_EDIT8, temp->telefonoChar, sizeof(temp->telefonoChar));
-			GetDlgItemText(hwnd, IDC_EDIT14, temp->numConsultorioChar, sizeof(temp->numConsultorioChar));
-			GetDlgItemText(hwnd, IDC_EDIT15, temp->hoararioChar, sizeof(temp->hoararioChar));
-			GetDlgItemText(hwnd, IDC_EDIT16, temp->diasChar, sizeof(temp->diasChar));
-			GetDlgItemText(hwnd, IDC_EDIT17, temp->especialidad, sizeof(temp->especialidad));
-			strcpy_s(temp->foto, zFile);
+			GetDlgItemText(hwnd, IDC_EDIT2, temp->nombrePasajero, sizeof(temp->nombrePasajero));
+			GetDlgItemText(hwnd, IDC_EDIT3, temp->apellidoPPasajero, sizeof(temp->apellidoPPasajero));
+			GetDlgItemText(hwnd, IDC_EDIT4, temp->apellidoMPasajero, sizeof(temp->apellidoMPasajero));
+			//GetDlgItemText(hwnd, IDC_EDIT5, temp->cedulaChar, sizeof(temp->cedulaChar));
+			//GetDlgItemText(hwnd, IDC_EDIT8, temp->telefonoChar, sizeof(temp->telefonoChar));
+			//GetDlgItemText(hwnd, IDC_EDIT14, temp->numConsultorioChar, sizeof(temp->numConsultorioChar));
+			//GetDlgItemText(hwnd, IDC_EDIT15, temp->hoararioChar, sizeof(temp->hoararioChar));
+			//GetDlgItemText(hwnd, IDC_EDIT16, temp->diasChar, sizeof(temp->diasChar));
+			GetDlgItemText(hwnd, IDC_EDIT17, temp->vuelo, sizeof(temp->vuelo));
+			//strcpy_s(temp->foto, zFile);
 
-			if (strcmp(temp->foto, "") != 0 &
-				strcmp(temp->nombreMed, "") != 0 &
-				strcmp(temp->apellidoPM, "") != 0 &
-				strcmp(temp->apellidoMM, "") != 0 &
-				strcmp(temp->cedulaChar, "") != 0 &
-				strcmp(temp->telefonoChar, "") != 0 &
-				strcmp(temp->numConsultorioChar, "") != 0 &
-				strcmp(temp->hoararioChar, "") != 0 &
-				strcmp(temp->diasChar, "") != 0 &
-				strcmp(temp->especialidad, "") != 0)
+			if (//strcmp(temp->foto, "") != 0 &
+				strcmp(temp->nombrePasajero, "") != 0 &
+				strcmp(temp->apellidoPPasajero, "") != 0 &
+				strcmp(temp->apellidoMPasajero, "") != 0 &
+				//strcmp(temp->cedulaChar, "") != 0 &
+				//strcmp(temp->telefonoChar, "") != 0 &
+				//strcmp(temp->numConsultorioChar, "") != 0 &
+				//strcmp(temp->hoararioChar, "") != 0 &
+				//strcmp(temp->diasChar, "") != 0 &
+				strcmp(temp->vuelo, "") != 0)
 			{
-				while (auxMed2/*->sig*/ != nullptr && strcmp(medBuscar, auxMed2->cedulaChar) != 0)
+				//while (auxMed2/*->sig*/ != nullptr && strcmp(medBuscar, auxMed2->cedulaChar) != 0)
 				{
 					auxMed2 = auxMed2->sig;
 				}
 
-				if (auxMed2/*->sig*/ == nullptr || strcmp(medBuscar, auxMed2->cedulaChar) != 0)
+				//if (auxMed2/*->sig*/ == nullptr || strcmp(medBuscar, auxMed2->cedulaChar) != 0)
 				{
 					/*medico* temp = new medico;*/
 
-					GetDlgItemText(hwnd, IDC_EDIT2, temp->nombreMed, sizeof(temp->nombreMed));
-					GetDlgItemText(hwnd, IDC_EDIT3, temp->apellidoPM, sizeof(temp->apellidoPM));
-					GetDlgItemText(hwnd, IDC_EDIT4, temp->apellidoMM, sizeof(temp->apellidoMM));
-					GetDlgItemText(hwnd, IDC_EDIT5, temp->cedulaChar, sizeof(temp->cedulaChar));
-					GetDlgItemText(hwnd, IDC_EDIT8, temp->telefonoChar, sizeof(temp->telefonoChar));
-					GetDlgItemText(hwnd, IDC_EDIT14, temp->numConsultorioChar, sizeof(temp->numConsultorioChar));
-					GetDlgItemText(hwnd, IDC_EDIT15, temp->hoararioChar, sizeof(temp->hoararioChar));
-					GetDlgItemText(hwnd, IDC_EDIT16, temp->diasChar, sizeof(temp->diasChar));
-					GetDlgItemText(hwnd, IDC_EDIT17, temp->especialidad, sizeof(temp->especialidad));
+					GetDlgItemText(hwnd, IDC_EDIT2, temp->nombrePasajero, sizeof(temp->nombrePasajero));
+					GetDlgItemText(hwnd, IDC_EDIT3, temp->apellidoPPasajero, sizeof(temp->apellidoPPasajero));
+					GetDlgItemText(hwnd, IDC_EDIT4, temp->apellidoMPasajero, sizeof(temp->apellidoMPasajero));
+					//GetDlgItemText(hwnd, IDC_EDIT5, temp->cedulaChar, sizeof(temp->cedulaChar));
+					//GetDlgItemText(hwnd, IDC_EDIT8, temp->telefonoChar, sizeof(temp->telefonoChar));
+					//GetDlgItemText(hwnd, IDC_EDIT14, temp->numConsultorioChar, sizeof(temp->numConsultorioChar));
+					//GetDlgItemText(hwnd, IDC_EDIT15, temp->hoararioChar, sizeof(temp->hoararioChar));
+					//GetDlgItemText(hwnd, IDC_EDIT16, temp->diasChar, sizeof(temp->diasChar));
+					GetDlgItemText(hwnd, IDC_EDIT17, temp->vuelo, sizeof(temp->vuelo));
 
 					// Horario
-
-					if (strcmp(temp->hoararioChar, "6am - 6pm") == 0)
+					/*
+					* if (strcmp(temp->hoararioChar, "6am - 6pm") == 0)
 					{
-						temp->hoararioNum = 1;
+						temp->pase = 1;
 					}
 					else if (strcmp(temp->hoararioChar, "6pm - 12am") == 0)
 					{
-						temp->hoararioNum = 2;
+						temp->pase = 2;
 					}
 					else if (strcmp(temp->hoararioChar, "6am - 3pm") == 0)
 					{
-						temp->hoararioNum = 3;
+						temp->pase = 3;
 					}
 					else
 					{
-						temp->hoararioNum = 4;
+						temp->pase = 4;
 					}
+					*/
+					
 
 					// Días
-
+					/*
 					if (strcmp(temp->diasChar, "Lunes - Viernes (M)") == 0)
 					{
 						temp->diasNum = 1;
@@ -1500,9 +1495,10 @@ BOOL CALLBACK cDialog7(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					{
 						temp->diasNum = 4;
 					}
-
-					strcpy_s(temp->foto, zFile);
-					strcpy_s(temp->nombreUsuM, miUsuario->nick);
+					*/
+					
+					//strcpy_s(temp->foto, zFile);
+					strcpy_s(temp->usuarioRegistro, miUsuario->nick);
 
 					nuevoMed(temp);
 
@@ -1524,7 +1520,7 @@ BOOL CALLBACK cDialog7(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					ShowWindow(hDialog7, SW_SHOW);
 					UpdateWindow(hDialog7);
 				}
-				else
+				//else
 				{
 					MessageBox(NULL, "Es posible que este medico ya este registrado.", "AVISO", MB_OK | MB_ICONEXCLAMATION);
 				}
@@ -1572,13 +1568,13 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		while (auxMed3->sig != nullptr)
 		{
-			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompM/*nombreCompM*/);
+			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
 			auxMed3 = auxMed3->sig;
 		}
 
 		if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
 		{
-			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompM/*nombreCompM*/);
+			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
 			auxMed3 = auxMed3->sig;
 		}
 
@@ -1797,30 +1793,30 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 				auxMed3 = iniMed;
 
-				while (auxMed3->sig != nullptr && strcmp(auxMed3->nombreCompM, num) != 0)
+				while (auxMed3->sig != nullptr && strcmp(auxMed3->nombreCompPasajero, num) != 0)
 				{
 					auxMed3 = auxMed3->sig;
 
 				}
 
-				SetDlgItemText(hwnd, IDC_EDIT2, auxMed3->nombreMed);
-				SetDlgItemText(hwnd, IDC_EDIT3, auxMed3->apellidoPM);
-				SetDlgItemText(hwnd, IDC_EDIT4, auxMed3->apellidoMM);
+				SetDlgItemText(hwnd, IDC_EDIT2, auxMed3->nombrePasajero);
+				SetDlgItemText(hwnd, IDC_EDIT3, auxMed3->apellidoPPasajero);
+				SetDlgItemText(hwnd, IDC_EDIT4, auxMed3->apellidoMPasajero);
 
-				SetDlgItemText(hwnd, IDC_EDIT5, auxMed3->cedulaChar);
-				SetDlgItemText(hwnd, IDC_EDIT18, auxMed3->especialidad);
+				//SetDlgItemText(hwnd, IDC_EDIT5, auxMed3->cedulaChar);
+				SetDlgItemText(hwnd, IDC_EDIT18, auxMed3->vuelo);
 
-				SetDlgItemText(hwnd, IDC_EDIT8, auxMed3->telefonoChar);
+				//SetDlgItemText(hwnd, IDC_EDIT8, auxMed3->telefonoChar);
 
-				SetDlgItemText(hwnd, IDC_EDIT17, auxMed3->numConsultorioChar);
-				SetDlgItemText(hwnd, IDC_EDIT15, auxMed3->hoararioChar);
-				SetDlgItemText(hwnd, IDC_EDIT16, auxMed3->diasChar);
+				//SetDlgItemText(hwnd, IDC_EDIT17, auxMed3->numConsultorioChar);
+				//SetDlgItemText(hwnd, IDC_EDIT15, auxMed3->hoararioChar);
+				//SetDlgItemText(hwnd, IDC_EDIT16, auxMed3->diasChar);
 
-				strcpy_s(zFile, auxMed3->foto); //Inicializar zfile con la dirección de memoria del puntero foto
+				//strcpy_s(zFile, auxMed3->foto); //Inicializar zfile con la dirección de memoria del puntero foto
 
 				HBITMAP bmp; //1
-				bmp = (HBITMAP)LoadImage(NULL, auxMed3->foto, IMAGE_BITMAP, 120, 120, LR_LOADFROMFILE); //2
-				SendDlgItemMessage(hwnd, IDC_BMP2, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3 
+				//bmp = (HBITMAP)LoadImage(NULL, auxMed3->foto, IMAGE_BITMAP, 120, 120, LR_LOADFROMFILE); //2
+				//SendDlgItemMessage(hwnd, IDC_BMP2, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3 
 
 				break;
 			}
@@ -1836,41 +1832,43 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		case IDC_BUTTON1: // Editar
 		{
-			GetDlgItemText(hwnd, IDC_EDIT2, auxMed3->nombreMed, sizeof(auxMed3->nombreMed));
-			GetDlgItemText(hwnd, IDC_EDIT3, auxMed3->apellidoPM, sizeof(auxMed3->apellidoPM));
-			GetDlgItemText(hwnd, IDC_EDIT4, auxMed3->apellidoPM, sizeof(auxMed3->apellidoPM));
+			GetDlgItemText(hwnd, IDC_EDIT2, auxMed3->nombrePasajero, sizeof(auxMed3->nombrePasajero));
+			GetDlgItemText(hwnd, IDC_EDIT3, auxMed3->apellidoPPasajero, sizeof(auxMed3->apellidoPPasajero));
+			GetDlgItemText(hwnd, IDC_EDIT4, auxMed3->apellidoPPasajero, sizeof(auxMed3->apellidoPPasajero));
 
-			GetDlgItemText(hwnd, IDC_EDIT5, auxMed3->cedulaChar, sizeof(auxMed3->cedulaChar));
-			auxMed3->cedulaNum = atoi(auxMed3->cedulaChar);
-			GetDlgItemText(hwnd, IDC_EDIT18, auxMed3->especialidad, sizeof(auxMed3->especialidad));
+			//GetDlgItemText(hwnd, IDC_EDIT5, auxMed3->cedulaChar, sizeof(auxMed3->cedulaChar));
+			//auxMed3->cedulaNum = atoi(auxMed3->cedulaChar);
+			GetDlgItemText(hwnd, IDC_EDIT18, auxMed3->vuelo, sizeof(auxMed3->vuelo));
 			
-			GetDlgItemText(hwnd, IDC_EDIT8, auxMed3->telefonoChar, sizeof(auxMed3->telefonoChar));
-			auxMed3->telefonoNum = atoi(auxMed3->telefonoChar);
+			//GetDlgItemText(hwnd, IDC_EDIT8, auxMed3->telefonoChar, sizeof(auxMed3->telefonoChar));
+			//auxMed3->estado = atoi(auxMed3->telefonoChar);
 
-			GetDlgItemText(hwnd, IDC_EDIT17, auxMed3->numConsultorioChar, sizeof(auxMed3->numConsultorioChar));
-			auxMed3->numConsultorioNum = atoi(auxMed3->numConsultorioChar);
-			GetDlgItemText(hwnd, IDC_EDIT15, auxMed3->hoararioChar, sizeof(auxMed3->hoararioChar));
+			//GetDlgItemText(hwnd, IDC_EDIT17, auxMed3->numConsultorioChar, sizeof(auxMed3->numConsultorioChar));
+			//auxMed3->clase = atoi(auxMed3->numConsultorioChar);
+			//GetDlgItemText(hwnd, IDC_EDIT15, auxMed3->hoararioChar, sizeof(auxMed3->hoararioChar));
 			// Horario
-
-			if (strcmp(auxMed3->hoararioChar, "6am - 6pm") == 0)
+			/*
+			* if (strcmp(auxMed3->hoararioChar, "6am - 6pm") == 0)
 			{
-				auxMed3->hoararioNum = 1;
+				auxMed3->pase = 1;
 			}
 			else if (strcmp(auxMed3->hoararioChar, "6pm - 12am") == 0)
 			{
-				auxMed3->hoararioNum = 2;
+				auxMed3->pase = 2;
 			}
 			else if (strcmp(auxMed3->hoararioChar, "6am - 3pm") == 0)
 			{
-				auxMed3->hoararioNum = 3;
+				auxMed3->pase = 3;
 			}
 			else
 			{
-				auxMed3->hoararioNum = 4;
+				auxMed3->pase = 4;
 			}
 			GetDlgItemText(hwnd, IDC_EDIT16, auxMed3->diasChar, sizeof(auxMed3->diasChar));
+			*/
+			
 			// Días
-
+			/*
 			if (strcmp(auxMed3->diasChar, "Lunes - Viernes (M)") == 0)
 			{
 				auxMed3->diasNum = 1;
@@ -1887,15 +1885,16 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 				auxMed3->diasNum = 4;
 			}
+			*/
 
 			// Concatenación
-			strcpy_s(auxMed3->nombreCompM, auxMed3->nombreMed);
-			strcat_s(auxMed3->nombreCompM, " ");
-			strcat_s(auxMed3->nombreCompM, auxMed3->apellidoPM);
-			strcat_s(auxMed3->nombreCompM, " ");
-			strcat_s(auxMed3->nombreCompM, auxMed3->apellidoPM);
+			strcpy_s(auxMed3->nombreCompPasajero, auxMed3->nombrePasajero);
+			strcat_s(auxMed3->nombreCompPasajero, " ");
+			strcat_s(auxMed3->nombreCompPasajero, auxMed3->apellidoPPasajero);
+			strcat_s(auxMed3->nombreCompPasajero, " ");
+			strcat_s(auxMed3->nombreCompPasajero, auxMed3->apellidoPPasajero);
 
-			strcpy_s(auxMed3->foto,zFile);
+			//strcpy_s(auxMed3->foto,zFile);
 
 			MessageBox(NULL, "Cambios guardados.", "AVISO", MB_OK | MB_ICONINFORMATION);
 
@@ -2032,13 +2031,13 @@ BOOL CALLBACK cDialog9(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		while (auxMed3->sig != nullptr)
 		{
-			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompM/*nombreCompM*/);
+			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
 			auxMed3 = auxMed3->sig;
 		}
 
 		if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
 		{
-			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompM/*nombreCompM*/);
+			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
 			auxMed3 = auxMed3->sig;
 		}
 
@@ -2101,13 +2100,13 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		while (auxMed3->sig != nullptr)
 		{
-			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompM/*nombreCompM*/);
+			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
 			auxMed3 = auxMed3->sig;
 		}
 
 		if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
 		{
-			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompM/*nombreCompM*/);
+			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
 			auxMed3 = auxMed3->sig;
 		}
 
@@ -2175,13 +2174,13 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 				auxMed3 = iniMed;
 
-				while (auxMed3->sig != nullptr && strcmp(auxMed3->nombreCompM, num) != 0)
+				while (auxMed3->sig != nullptr && strcmp(auxMed3->nombreCompPasajero, num) != 0)
 				{
 					auxMed3 = auxMed3->sig;
 
 				}
 
-				SetDlgItemText(hwnd, IDC_EDIT8, auxMed3->nombreCompM);
+				SetDlgItemText(hwnd, IDC_EDIT8, auxMed3->nombreCompPasajero);
 
 				break;
 			}
@@ -2236,7 +2235,7 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				//GetDlgItemText(hwnd, IDC_EDIT7, temp->edadChar, sizeof(temp->edadChar));
 				//GetDlgItemText(hwnd, IDC_EDIT8, temp->pMedicoP, sizeof(temp->pMedicoP));
 
-				strcpy_s(temp->usuario, miUsuario->nick);
+				strcpy_s(temp->usuarioRegistro, miUsuario->nick);
 
 				nuevoPas(temp);
 
@@ -2296,13 +2295,13 @@ BOOL CALLBACK cDialog11(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		while (auxMed3->sig != nullptr)
 		{
-			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompM/*nombreCompM*/);
+			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
 			auxMed3 = auxMed3->sig;
 		}
 
 		if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
 		{
-			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompM/*nombreCompM*/);
+			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
 			auxMed3 = auxMed3->sig;
 		}
 
@@ -3035,7 +3034,7 @@ void nuevaEsp(Vuelo* nueva)
 		//strcpy_s(iniEsp->claveChar, nueva->claveChar);
 		//iniEsp->num = atoi(iniEsp->claveChar);
 
-		strcpy_s(iniVuelo->usuario, nueva->usuario);
+		strcpy_s(iniVuelo->usuarioRegistro, nueva->usuarioRegistro);
 
 		iniVuelo->sig = nullptr;
 		iniVuelo->ant = nullptr;
@@ -3065,7 +3064,7 @@ void nuevaEsp(Vuelo* nueva)
 		//strcpy_s(auxEsp->claveChar, nueva->claveChar);
 		//auxEsp->num = atoi(auxEsp->claveChar);
 
-		strcpy_s(auxVuelo->usuario, nueva->usuario);
+		strcpy_s(auxVuelo->usuarioRegistro, nueva->usuarioRegistro);
 
 		auxVuelo2 = auxVuelo;
 		auxVuelo3 = auxVuelo;
@@ -3262,34 +3261,34 @@ void nuevoMed(boleto* nuevoMed)
 	{ //Si 'inicio->sig es igual a nullptr, o sea, apunta a nada, la lista esta vacia
 		pivote = new boleto;
 
-		strcpy_s(pivote->nombreMed, nuevoMed->nombreMed);
-		strcpy_s(pivote->apellidoPM, nuevoMed->apellidoPM);
-		strcpy_s(pivote->apellidoMM, nuevoMed->apellidoMM);
+		strcpy_s(pivote->nombrePasajero, nuevoMed->nombrePasajero);
+		strcpy_s(pivote->apellidoPPasajero, nuevoMed->apellidoPPasajero);
+		strcpy_s(pivote->apellidoMPasajero, nuevoMed->apellidoMPasajero);
 
 		// Concatenación
-		strcpy_s(pivote->nombreCompM, nuevoMed->nombreMed);
-		strcat_s(pivote->nombreCompM, " ");
-		strcat_s(pivote->nombreCompM, pivote->apellidoPM);
-		strcat_s(pivote->nombreCompM, " ");
-		strcat_s(pivote->nombreCompM, pivote->apellidoMM);
+		strcpy_s(pivote->nombreCompPasajero, nuevoMed->nombrePasajero);
+		strcat_s(pivote->nombreCompPasajero, " ");
+		strcat_s(pivote->nombreCompPasajero, pivote->apellidoPPasajero);
+		strcat_s(pivote->nombreCompPasajero, " ");
+		strcat_s(pivote->nombreCompPasajero, pivote->apellidoMPasajero);
 
-		strcpy_s(pivote->cedulaChar, nuevoMed->cedulaChar);
-		pivote->cedulaNum = atoi(pivote->cedulaChar);
-		strcpy_s(pivote->numConsultorioChar, nuevoMed->numConsultorioChar);
-		pivote->numConsultorioNum = atoi(pivote->numConsultorioChar);
-		strcpy_s(pivote->telefonoChar, nuevoMed->telefonoChar);
-		pivote->telefonoNum = atoi(pivote->telefonoChar);
+		//strcpy_s(pivote->cedulaChar, nuevoMed->cedulaChar);
+		//pivote->cedulaNum = atoi(pivote->cedulaChar);
+		//strcpy_s(pivote->numConsultorioChar, nuevoMed->numConsultorioChar);
+		//pivote->clase = atoi(pivote->numConsultorioChar);
+		//strcpy_s(pivote->telefonoChar, nuevoMed->telefonoChar);
+		//pivote->estado = atoi(pivote->telefonoChar);
 
-		strcpy_s(pivote->hoararioChar, nuevoMed->hoararioChar);
-		pivote->hoararioNum = nuevoMed->hoararioNum;
-		strcpy_s(pivote->diasChar, nuevoMed->diasChar);
-		pivote->diasNum = nuevoMed->diasNum;
+		//strcpy_s(pivote->hoararioChar, nuevoMed->hoararioChar);
+		pivote->pase = nuevoMed->pase;
+		//strcpy_s(pivote->diasChar, nuevoMed->diasChar);
+		//pivote->diasNum = nuevoMed->diasNum;
 
-		strcpy_s(pivote->especialidad, nuevoMed->especialidad);
+		strcpy_s(pivote->vuelo, nuevoMed->vuelo);
 
-		strcpy_s(pivote->foto, nuevoMed->foto);
+		//strcpy_s(pivote->foto, nuevoMed->foto);
 
-		strcpy_s(pivote->nombreUsuM, nuevoMed->nombreUsuM);
+		strcpy_s(pivote->usuarioRegistro, nuevoMed->usuarioRegistro);
 
 		pivote->sig = nullptr;
 		pivote->ant = nullptr;
@@ -3301,19 +3300,22 @@ void nuevoMed(boleto* nuevoMed)
 	}
 	else
 	{
-		auxMed = pivote;
+		// ::: ANTERIOR ::: //
+		/*
+		 		auxMed = pivote;	
 		nuevoMed->cedulaNum = atoi(nuevoMed->cedulaChar);
 
-		/*if (nuevoMed->cedulaNum == auxMed->cedulaNum)
-		{
-			auxMed2 = auxMed->ant;
-			auxMed->ant = new medico;
-			auxMed->ant->ant = auxMed2;
-			auxMed->ant->sig = auxMed;
-			auxMed = auxMed->ant;
-			auxMed2->sig = auxMed;
-		}
-		else */if (nuevoMed->cedulaNum > auxMed->cedulaNum)
+		//if (nuevoMed->cedulaNum == auxMed->cedulaNum)
+		//{
+		//	auxMed2 = auxMed->ant;
+		//	auxMed->ant = new medico;
+		//	auxMed->ant->ant = auxMed2;
+		//	auxMed->ant->sig = auxMed;
+		//	auxMed = auxMed->ant;
+		//	auxMed2->sig = auxMed;
+		//}
+		//else 
+		if (nuevoMed->cedulaNum > auxMed->cedulaNum)
 		{
 			while (auxMed->sig != nullptr && nuevoMed->cedulaNum > auxMed->cedulaNum)
 			{
@@ -3323,16 +3325,17 @@ void nuevoMed(boleto* nuevoMed)
 			if (auxMed->ant != nullptr && auxMed->sig != nullptr)
 			{
 
-				/*if (nuevoMed->cedulaNum == auxMed->cedulaNum)
-				{
-					auxMed2 = auxMed->ant;
-					auxMed->ant = new medico;
-					auxMed->ant->ant = auxMed2;
-					auxMed->ant->sig = auxMed;
-					auxMed = auxMed->ant;
-					auxMed2->sig = auxMed;
-				}
-				else */if (nuevoMed->cedulaNum > auxMed->cedulaNum)
+				//if (nuevoMed->cedulaNum == auxMed->cedulaNum)
+				//{
+				//	auxMed2 = auxMed->ant;
+				//	auxMed->ant = new medico;
+				//	auxMed->ant->ant = auxMed2;
+				//	auxMed->ant->sig = auxMed;
+				//	auxMed = auxMed->ant;
+				//	auxMed2->sig = auxMed;
+				//}
+				//else
+				if (nuevoMed->cedulaNum > auxMed->cedulaNum)
 				{
 					auxMed2 = auxMed->sig;
 					auxMed->sig = new boleto;
@@ -3353,16 +3356,17 @@ void nuevoMed(boleto* nuevoMed)
 			}
 			else
 			{
-				/*if (nuevoMed->cedulaNum == auxMed->cedulaNum)
-				{
-					auxMed2 = auxMed->ant;
-					auxMed->ant = new medico;
-					auxMed->ant->ant = auxMed2;
-					auxMed->ant->sig = auxMed;
-					auxMed = auxMed->ant;
-					auxMed2->sig = auxMed;
-				}
-				else */if (nuevoMed->cedulaNum > auxMed->cedulaNum)
+				//if (nuevoMed->cedulaNum == auxMed->cedulaNum)
+				//{
+				//	auxMed2 = auxMed->ant;
+				//	auxMed->ant = new medico;
+				//	auxMed->ant->ant = auxMed2;
+				//	auxMed->ant->sig = auxMed;
+				//	auxMed = auxMed->ant;
+				//	auxMed2->sig = auxMed;
+				//}
+				//else
+				if (nuevoMed->cedulaNum > auxMed->cedulaNum)
 				{
 					auxMed->sig = new boleto;
 					auxMed->sig->sig = nullptr;
@@ -3390,16 +3394,17 @@ void nuevoMed(boleto* nuevoMed)
 			if (auxMed->ant != nullptr && auxMed->sig != nullptr)
 			{
 
-				/*if (nuevoMed->cedulaNum == auxMed->cedulaNum)
-				{
-					auxMed2 = auxMed->ant;
-					auxMed->ant = new medico;
-					auxMed->ant->ant = auxMed2;
-					auxMed->ant->sig = auxMed;
-					auxMed = auxMed->ant;
-					auxMed2->sig = auxMed;
-				}
-				else */if (nuevoMed->cedulaNum < auxMed->cedulaNum)
+				//if (nuevoMed->cedulaNum == auxMed->cedulaNum)
+				//{
+				//	auxMed2 = auxMed->ant;
+				//	auxMed->ant = new medico;
+				//	auxMed->ant->ant = auxMed2;
+				//	auxMed->ant->sig = auxMed;
+				//	auxMed = auxMed->ant;
+				//	auxMed2->sig = auxMed;
+				//}
+				//else 
+				if (nuevoMed->cedulaNum < auxMed->cedulaNum)
 				{
 					auxMed2 = auxMed->ant;
 					auxMed->ant = new boleto;
@@ -3420,16 +3425,17 @@ void nuevoMed(boleto* nuevoMed)
 			}
 			else
 			{
-				/*if (nuevoMed->cedulaNum == auxMed->cedulaNum)
-				{
-					auxMed2 = auxMed->ant;
-					auxMed->ant = new medico;
-					auxMed->ant->ant = auxMed2;
-					auxMed->ant->sig = auxMed;
-					auxMed = auxMed->ant;
-					auxMed2->sig = auxMed;
-				}
-				else */if (nuevoMed->cedulaNum < auxMed->cedulaNum)
+				//if (nuevoMed->cedulaNum == auxMed->cedulaNum)
+				//{
+				//	auxMed2 = auxMed->ant;
+				//	auxMed->ant = new medico;
+				//	auxMed->ant->ant = auxMed2;
+				//	auxMed->ant->sig = auxMed;
+				//	auxMed = auxMed->ant;
+				//	auxMed2->sig = auxMed;
+				//}
+				//else 
+				if (nuevoMed->cedulaNum < auxMed->cedulaNum)
 				{
 					auxMed->ant = new boleto;
 					auxMed->ant->ant = nullptr;
@@ -3446,37 +3452,39 @@ void nuevoMed(boleto* nuevoMed)
 					auxMed2->ant = auxMed;
 				}
 			}
-			
-		}
 
-		strcpy_s(auxMed->nombreMed, nuevoMed->nombreMed);
-		strcpy_s(auxMed->apellidoPM, nuevoMed->apellidoPM);
-		strcpy_s(auxMed->apellidoMM, nuevoMed->apellidoMM);
+		}
+		*/
+
+
+		strcpy_s(auxMed->nombrePasajero, nuevoMed->nombrePasajero);
+		strcpy_s(auxMed->apellidoPPasajero, nuevoMed->apellidoPPasajero);
+		strcpy_s(auxMed->apellidoMPasajero, nuevoMed->apellidoMPasajero);
 
 		// Concatenación
-		strcpy_s(auxMed->nombreCompM, nuevoMed->nombreMed);
-		strcat_s(auxMed->nombreCompM, " ");
-		strcat_s(auxMed->nombreCompM, auxMed->apellidoPM);
-		strcat_s(auxMed->nombreCompM, " ");
-		strcat_s(auxMed->nombreCompM, auxMed->apellidoMM);
+		strcpy_s(auxMed->nombreCompPasajero, nuevoMed->nombrePasajero);
+		strcat_s(auxMed->nombreCompPasajero, " ");
+		strcat_s(auxMed->nombreCompPasajero, auxMed->apellidoPPasajero);
+		strcat_s(auxMed->nombreCompPasajero, " ");
+		strcat_s(auxMed->nombreCompPasajero, auxMed->apellidoMPasajero);
 
-		strcpy_s(auxMed->cedulaChar, nuevoMed->cedulaChar);
-		auxMed->cedulaNum = atoi(auxMed->cedulaChar);
-		strcpy_s(auxMed->numConsultorioChar, nuevoMed->numConsultorioChar);
-		auxMed->numConsultorioNum = atoi(auxMed->numConsultorioChar);
-		strcpy_s(auxMed->telefonoChar, nuevoMed->telefonoChar);
-		auxMed->telefonoNum = atoi(auxMed->telefonoChar);
+		//strcpy_s(auxMed->cedulaChar, nuevoMed->cedulaChar);
+		//auxMed->cedulaNum = atoi(auxMed->cedulaChar);
+		//strcpy_s(auxMed->numConsultorioChar, nuevoMed->numConsultorioChar);
+		//auxMed->clase = atoi(auxMed->numConsultorioChar);
+		//strcpy_s(auxMed->telefonoChar, nuevoMed->telefonoChar);
+		//auxMed->estado = atoi(auxMed->telefonoChar);
 
-		strcpy_s(auxMed->hoararioChar, nuevoMed->hoararioChar);
-		auxMed->hoararioNum = nuevoMed->hoararioNum;
-		strcpy_s(auxMed->diasChar, nuevoMed->diasChar);
-		auxMed->diasNum = nuevoMed->diasNum;
+		//strcpy_s(auxMed->hoararioChar, nuevoMed->hoararioChar);
+		auxMed->pase = nuevoMed->pase;
+		//strcpy_s(auxMed->diasChar, nuevoMed->diasChar);
+		//auxMed->diasNum = nuevoMed->diasNum;
 
-		strcpy_s(auxMed->especialidad, nuevoMed->especialidad);
+		strcpy_s(auxMed->vuelo, nuevoMed->vuelo);
 
-		strcpy_s(auxMed->foto, nuevoMed->foto);
+		//strcpy_s(auxMed->foto, nuevoMed->foto);
 
-		strcpy_s(auxMed->nombreUsuM, nuevoMed->nombreUsuM);
+		strcpy_s(auxMed->usuarioRegistro, nuevoMed->usuarioRegistro);
 
 		while (auxMed->ant != nullptr)
 		{
@@ -3505,13 +3513,13 @@ void eliminarMed(char medicoNom[60])
 	}
 	else
 	{
-		while (auxMed->sig != nullptr && strcmp(auxMed->nombreCompM, medicoNom) != 0)
+		while (auxMed->sig != nullptr && strcmp(auxMed->nombreCompPasajero, medicoNom) != 0)
 		{ //Nos movemos en el arreglo para buscar el usuario
 
 			auxMed = auxMed->sig;
 		}
 
-		if (auxMed->sig == nullptr || strcmp(auxMed->nombreCompM, medicoNom) != 0)
+		if (auxMed->sig == nullptr || strcmp(auxMed->nombreCompPasajero, medicoNom) != 0)
 		{
 			MessageBox(0, "Medico no encontrado", "AVISO", MB_OK);
 		}
@@ -3769,7 +3777,7 @@ void nuevoPas(pasajero* nuevoPas)
 		//iniPas->edadNum = atoi(iniPas->edadChar);
 		//strcpy_s(iniPas->pMedicoP, nuevoPas->pMedicoP);
 
-		strcpy_s(iniPasajero->usuario, nuevoPas->usuario);
+		strcpy_s(iniPasajero->usuarioRegistro, nuevoPas->usuarioRegistro);
 
 		iniPasajero->sig = nullptr;
 		iniPasajero->ant = nullptr;
@@ -3960,7 +3968,7 @@ void nuevoPas(pasajero* nuevoPas)
 		//strcpy_s(auxPas->ref, nuevoPas->ref);
 		//strcpy_s(auxPas->pMedicoP, nuevoPas->pMedicoP);
 
-		strcpy_s(auxPasajero->usuario, nuevoPas->usuario);
+		strcpy_s(auxPasajero->usuarioRegistro, nuevoPas->usuarioRegistro);
 
 		while (auxPasajero->ant != nullptr)
 		{
