@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Archivo de inclusión generado de Microsoft Visual C++.
-// Usado por Proyecto_Clinica.rc
+// Usado por AirLine.rc
 //
 #define IDR_MENU1                       101
 #define IDD_DIALOG1                     102
@@ -31,14 +31,22 @@
 #define IDC_EDIT5                       1008
 #define IDC_LIST2                       1008
 #define IDC_LIST5                       1008
+#define IDC_BUTTON8                     1008
+#define IDC_EDIT24                      1008
 #define IDC_LIST3                       1009
 #define IDC_EDIT14                      1009
 #define IDC_LIST6                       1010
+#define IDC_EDIT21                      1010
 #define IDC_EDIT17                      1011
+#define IDC_BUTTON9                     1011
+#define IDC_EDIT22                      1011
 #define IDC_LIST9                       1012
 #define IDC_EDIT18                      1012
+#define IDC_BUTTON10                    1012
 #define IDC_LIST10                      1013
+#define IDC_EDIT25                      1013
 #define IDC_EDIT8                       1014
+#define IDC_EDIT26                      1015
 #define IDC_RADIO1                      1018
 #define IDC_RADIO2                      1019
 #define IDC_RADIO3                      1020
@@ -49,9 +57,13 @@
 #define IDC_EDIT6                       1028
 #define IDC_EDIT7                       1029
 #define IDC_EDIT9                       1030
+#define IDC_EDIT20                      1031
 #define IDC_DATETIMEPICKER1             1032
+#define IDC_EDIT23                      1033
 #define IDC_EDIT10                      1034
 #define IDC_EDIT11                      1035
+#define IDC_EDIT19                      1036
+#define IDC_EDIT27                      1037
 #define IDC_BUTTON4                     1039
 #define IDC_BUTTON5                     1040
 #define IDC_BUTTON6                     1041
@@ -61,6 +73,7 @@
 #define IDC_EDIT15                      1054
 #define IDC_EDIT16                      1055
 #define IDC_BMP2                        1056
+#define IDC_CHECK1                      1057
 #define ID_PERFIL                       40001
 #define ID_SALIR_INICIO                 40002
 #define ID_SALIR_CERRAR                 40003
@@ -84,14 +97,25 @@
 #define ID_LISTA_PORSEMANA              40021
 #define ID_LISTA_PORMES                 40022
 #define ID_ESPECIALIDADES_LISTA         40023
+#define ID_VUELOS_REPORTE               40024
+#define ID_USUARIOS_LISTA               40025
+#define ID_USUARIOS_REGISTRO            40026
+#define ID_VUELOS_REGISTRO              40027
+#define ID_VUELOS_LISTA                 40028
+#define ID_VUELOS_MANIFIESTO            40029
+#define ID_PASAJEROS_REGISTRO           40030
+#define ID_PASAJEROS_LISTA              40031
+#define ID_BOLETOS_REGISTRO             40032
+#define ID_BOLETOS_ABORDAJE             40033
+#define ID_PASES                        40034
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        133
-#define _APS_NEXT_COMMAND_VALUE         40024
-#define _APS_NEXT_CONTROL_VALUE         1057
+#define _APS_NEXT_COMMAND_VALUE         40035
+#define _APS_NEXT_CONTROL_VALUE         1059
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
