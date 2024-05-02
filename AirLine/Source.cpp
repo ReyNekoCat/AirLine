@@ -47,16 +47,17 @@ Vuelo* iniVuelo, * auxVuelo, * auxVuelo2, * auxVuelo3 = nullptr;
 
 struct boleto
 {
-	char nombrePasajero[30];			//C
-	char apellidoPPasajero[30];			//C
-	char apellidoMPasajero[30];			//C
-	char nombreCompPasajero[60];		//C
-	char vuelo[50];						//C
-	int clase;                          //C
-	int pase;							//C
-	int estado;							//C
+	char nombrePasajero[30];			
+	char apellidoPPasajero[30];			
+	char apellidoMPasajero[30];			
+	char nombreCompPasajero[60];		
+	char vuelo[50];	
+	int num;
+	int clase;                          
+	int pase;							
+	int estado;							
 	//char diasChar[30];
-	char usuarioRegistro[30];			//C
+	char usuarioRegistro[30];			
 	boleto* ant;
 	boleto* sig;
 };
