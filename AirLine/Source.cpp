@@ -16,78 +16,70 @@ using namespace std;
 #pragma region Structs
 struct usuario
 {
-	usuario* ant;
-	char nombreUsu[30];
+	int type;
+	char nick[30];
 	char nombre[30];
 	char apellidoP[30];
 	char apellidoM[30];
 	char nombreComp[60];
-	char clave[30];
-	char foto[300];
+	char password[30];
+	float nacimiento;
+	int genero;
+	char foto[500];
+	usuario* ant;
 	usuario* sig;
 };
+usuario* iniUsuario, * auxUsuario, * auxUsuario2, * auxUsuario3, * miUsuario = nullptr;
 
-usuario* iniUsu, * auxUsu, * auxUsu2, * auxUsu3, * miUsuario = nullptr;
-
-struct especialidad
+struct Vuelo
 {
-	especialidad* ant;
-	char nombreEsp[30];
-	char descripcion[200];
-	int claveNum;
-	char claveChar[20];
-	char nombreUsuE[30];
-	especialidad* sig;
+	char usuarioRegistro[30];
+	char origen[30];
+	char destino[30];
+	int num;
+	float fecha;
+	float registro;
+	//char claveChar[20];
+	Vuelo* ant;
+	Vuelo* sig;
 };
+Vuelo* iniVuelo, * auxVuelo, * auxVuelo2, * auxVuelo3 = nullptr;
 
-especialidad* iniEsp, * auxEsp, * auxEsp2, * auxEsp3 = nullptr;
-
-struct medico
+struct boleto
 {
-	medico* ant;
-	char nombreMed[30];
-	char apellidoPM[30];
-	char apellidoMM[30];
-	char nombreCompM[60];
-	int cedulaNum;
-	char cedulaChar[20];
-	char especialidad[30];
-	int numConsultorioNum;
-	char numConsultorioChar[20];
-	int hoararioNum;
-	char hoararioChar[20];
-	int telefonoNum;
-	char telefonoChar[20];
-	int diasNum;
-	char diasChar[30];
-	char foto[100];
-	char nombreUsuM[30];
-	medico* sig;
+	char nombrePasajero[30];			
+	char apellidoPPasajero[30];			
+	char apellidoMPasajero[30];			
+	char nombreCompPasajero[60];		
+	char vuelo[50];	
+	int num;
+	int clase;                          
+	int pase;							
+	int estado;							
+	//char diasChar[30];
+	char usuarioRegistro[30];			
+	boleto* ant;
+	boleto* sig;
 };
+boleto* pivote, * iniMed, * auxMed, * auxMed2, * auxMed3 = nullptr;
 
-medico* pivote, * iniMed, * auxMed, * auxMed2, * auxMed3 = nullptr;
-
-struct paciente
+struct pasajero
 {
-	paciente* ant;
-	char nombrePas[30];
-	char apellidoPP[30];
-	char apellidoMP[30];
-	char nombreCompP[60];
-	char genero[20];
-	int telefonoNumP;
-	char telefonoCharP[20];
-	char ref[100];
-	char fecha[100];
-	int edadNum;
-	char edadChar[10];
-	char pMedicoP[60];
-	char nombreUsuP[30];
-	paciente* sig;
+	char usuarioRegistro[30];
+	char nombre[30];
+	char apellidoP[30];
+	char apellidoM[30];
+	char nombreComp[60];
+	char nacionalidad[20];
+	int genero;
+	float nacimiento;
+	float registro;
+	//char genero[20];
+	//char fecha[100];
+	pasajero* ant;
+	pasajero* sig;
 };
-
-paciente* iniPas, * auxPas, * auxPas2, * auxPas3 = nullptr;
-
+pasajero* iniPasajero, * auxPasajero, * auxPasajero2, * auxPasajero3 = nullptr;
 
 #pragma region Structs Fijos
 
@@ -99,7 +91,6 @@ struct consultorio
 	char num[10];
 	consultorio* sig;
 };
-
 consultorio* ini, * aux = nullptr;
 
 struct horario
@@ -108,7 +99,6 @@ struct horario
 	char hor[30];
 	horario* sig;
 };
-
 horario* ini2, * aux2 = nullptr;
 
 struct dias
@@ -117,7 +107,6 @@ struct dias
 	char dia[30];
 	dias* sig;
 };
-
 dias* ini3, * aux3 = nullptr;
 
 #pragma endregion
@@ -158,14 +147,14 @@ void leerUsuario();
 #pragma endregion
 
 #pragma region Funciones de Listas Especialidades
-void nuevaEsp(especialidad* nueva);
+void nuevaEsp(Vuelo* nueva);
 void eliminarEsp(char nomEsp[30]);
 void escribirEsp();
 void leerEsp();
 #pragma endregion
 
 #pragma region Funciones de Listas Medicos
-void nuevoMed(medico* nuevoMed);
+void nuevoMed(boleto* nuevoMed);
 void eliminarMed(char medicoNom[60]);
 void escribirMed();
 void leerMed();
@@ -173,7 +162,7 @@ void reporteMed();
 #pragma endregion
 
 #pragma region Funciones de Listas Pacientes
-void nuevoPas(paciente* nuevoPas);
+void nuevoPas(pasajero* nuevoPas);
 void eliminarPas(char paciente[60]);
 void escribirPas();
 void leerPas();
@@ -340,7 +329,6 @@ int WINAPI WinMain(
 
 	}
 
-
 	// Pivotes
 	if (iniMed != nullptr)
 	{
@@ -384,7 +372,6 @@ int WINAPI WinMain(
 		DispatchMessage(&msg); // Envía el evento traducido a mi dialogo
 	}
 
-
 	escribirUsuario();
 	escribirEsp();
 	escribirMed();
@@ -422,26 +409,26 @@ BOOL CALLBACK cDialog1(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			GetDlgItemText(hwnd, IDC_EDIT1, usuBuscar, sizeof(usuBuscar));
 			GetDlgItemText(hwnd, IDC_EDIT2, claveBuscar, sizeof(claveBuscar));
 
-			auxUsu3 = iniUsu;
+			auxUsuario3 = iniUsuario;
 
-			if (iniUsu == nullptr)
+			if (iniUsuario == nullptr)
 			{
 				MessageBox(NULL, "No hay usuarios registrados", "AVISO", MB_OK | MB_ICONERROR);
 			}
 			else {
-				while (auxUsu3->sig != nullptr && strcmp(usuBuscar, auxUsu3->nombreUsu) != 0)
+				while (auxUsuario3->sig != nullptr && strcmp(usuBuscar, auxUsuario3->nick) != 0)
 				{
-					auxUsu3 = auxUsu3->sig;
+					auxUsuario3 = auxUsuario3->sig;
 				}
-				if (auxUsu3->sig == nullptr && strcmp(usuBuscar, auxUsu3->nombreUsu) != 0)
+				if (auxUsuario3->sig == nullptr && strcmp(usuBuscar, auxUsuario3->nick) != 0)
 				{
 					MessageBox(NULL, "No se encontró el usuario.", "AVISO", MB_OK | MB_ICONERROR);
 				}
 				else
 				{
-					if (strcmp(claveBuscar, auxUsu3->clave) == 0)
+					if (strcmp(claveBuscar, auxUsuario3->password) == 0)
 					{
-						miUsuario = auxUsu3;
+						miUsuario = auxUsuario3;
 						inicio = true;
 
 						/*EndDialog(hwnd, 0);
@@ -551,20 +538,21 @@ BOOL CALLBACK cDialog2(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 			GetDlgItemText(hwnd, IDC_EDIT1, usuBuscar, sizeof(usuBuscar));
 
-			auxUsu3 = iniUsu;
+			auxUsuario3 = iniUsuario;
 
-			while (auxUsu3/*->sig*/ != nullptr && strcmp(usuBuscar, auxUsu3->nombreUsu) != 0)
+			while (auxUsuario3/*->sig*/ != nullptr && strcmp(usuBuscar, auxUsuario3->nick) != 0)
 			{
-				auxUsu3 = auxUsu3->sig;
+				auxUsuario3 = auxUsuario3->sig;
 			}
-			if (auxUsu3/*->sig*/ == nullptr || strcmp(usuBuscar, auxUsu3->nombreUsu) != 0)
+			if (auxUsuario3/*->sig*/ == nullptr || strcmp(usuBuscar, auxUsuario3->nick) != 0)
 			{
 				usuario* temp = new usuario;
 
-				GetDlgItemText(hwnd, IDC_EDIT1, temp->nombreUsu, sizeof(temp->nombreUsu));
+				GetDlgItemText(hwnd, IDC_EDIT1, temp->nick, sizeof(temp->nick));
 				GetDlgItemText(hwnd, IDC_EDIT2, temp->nombre, sizeof(temp->nombre));
 				GetDlgItemText(hwnd, IDC_EDIT3, temp->apellidoP, sizeof(temp->apellidoP));
 				GetDlgItemText(hwnd, IDC_EDIT4, temp->apellidoM, sizeof(temp->apellidoM));
+				GetDlgItemText(hwnd, IDC_EDIT5, temp->password, sizeof(temp->password));
 				/*GetDlgItemText(hwnd, IDC_EDIT5, temp->clave, sizeof(temp->clave));*/
 				/*GetDlgItemText(hwnd, IDC_EDIT6, temp->clave, sizeof(temp->clave));*/
 				GetDlgItemText(hwnd, IDC_EDIT7, temp->clave, sizeof(temp->clave));
@@ -581,13 +569,14 @@ BOOL CALLBACK cDialog2(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				SetDlgItemText(hwnd, IDC_EDIT6, "");
 				SetDlgItemText(hwnd, IDC_EDIT7, "");
 
-				auxUsu3 = iniUsu;
+				auxUsuario3 = iniUsuario;
 
-				while (auxUsu3->sig != nullptr && strcmp(usuBuscar, auxUsu3->nombreUsu) != 0)
+				while (auxUsuario3->sig != nullptr && strcmp(usuBuscar, auxUsuario3->nick) != 0)
 				{
-					auxUsu3 = auxUsu3->sig;
+					auxUsuario3 = auxUsuario3->sig;
 				}
 
+				miUsuario = auxUsuario3;
 				inicio = true;
 
 				if (miUsuario == nullptr)
@@ -667,10 +656,11 @@ BOOL CALLBACK cDialog3(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		if (miUsuario != nullptr)
 		{
-			SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nombreUsu);
+			SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nick);
 			SetDlgItemText(hwnd, IDC_EDIT2, miUsuario->nombre);
 			SetDlgItemText(hwnd, IDC_EDIT3, miUsuario->apellidoP);
 			SetDlgItemText(hwnd, IDC_EDIT4, miUsuario->apellidoM);
+			SetDlgItemText(hwnd, IDC_EDIT5, miUsuario->password);
 			SetDlgItemText(hwnd, IDC_EDIT7, miUsuario->clave);
 		}
 		if (/*strcmp(miUsuario->foto, "") == 0 ||*/ miUsuario->foto != nullptr)
@@ -693,12 +683,14 @@ BOOL CALLBACK cDialog3(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 		case IDC_BUTTON1: // Guardar
 		{
+			GetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nick, sizeof(miUsuario->nick));
 			strcpy_s(miUsuario->foto, zFile);
 
 			GetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nombreUsu, sizeof(miUsuario->nombreUsu));
 			GetDlgItemText(hwnd, IDC_EDIT2, miUsuario->nombre, sizeof(miUsuario->nombre));
 			GetDlgItemText(hwnd, IDC_EDIT3, miUsuario->apellidoP, sizeof(miUsuario->apellidoP));
 			GetDlgItemText(hwnd, IDC_EDIT4, miUsuario->apellidoM, sizeof(miUsuario->apellidoM));
+			GetDlgItemText(hwnd, IDC_EDIT5, miUsuario->password, sizeof(miUsuario->password));
 			GetDlgItemText(hwnd, IDC_EDIT7, miUsuario->clave, sizeof(miUsuario->clave));
 
 			// Concatenación
@@ -773,6 +765,7 @@ BOOL CALLBACK cDialog4(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			strcpy_s(zFile, miUsuario->foto); //Inicializar zfile con la dirección de memoria del puntero foto
 
+		auxUsuario2 = iniUsuario;
 			HBITMAP bmp; //1
 			bmp = (HBITMAP)LoadImage(NULL, miUsuario->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 			SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
@@ -780,16 +773,16 @@ BOOL CALLBACK cDialog4(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		auxUsu2 = iniUsu;
 
-		while (auxUsu2->sig != nullptr)
+		while (auxUsuario2->sig != nullptr)
 		{
-			SendDlgItemMessage(hwnd, IDC_LIST1, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxUsu2->nombreUsu);
-			auxUsu2 = auxUsu2->sig;
+			SendDlgItemMessage(hwnd, IDC_LIST1, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxUsuario2->nick);
+			auxUsuario2 = auxUsuario2->sig;
 		}
 
-		if (auxUsu2->sig == nullptr/* || auxUsu2->ant == nullptr*/)
+		if (auxUsuario2->sig == nullptr/* || auxUsu2->ant == nullptr*/)
 		{
-			SendDlgItemMessage(hwnd, IDC_LIST1, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxUsu2->nombreUsu);
-			auxUsu2 = auxUsu2->sig;
+			SendDlgItemMessage(hwnd, IDC_LIST1, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxUsuario2->nick);
+			auxUsuario2 = auxUsuario2->sig;
 		}
 
 		break;
@@ -812,15 +805,15 @@ BOOL CALLBACK cDialog4(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				indice = SendDlgItemMessage(hwnd, IDC_LIST1, LB_GETCURSEL, 0, 0);
 				SendDlgItemMessage(hwnd, IDC_LIST1, LB_GETTEXT, indice, (LPARAM)nombre);
 
-				auxUsu2 = iniUsu;
+				auxUsuario2 = iniUsuario;
 
-				while (auxUsu2->sig != nullptr && strcmp(auxUsu2->nombreUsu, nombre) != 0)
+				while (auxUsuario2->sig != nullptr && strcmp(auxUsuario2->nick, nombre) != 0)
 				{
-					auxUsu2 = auxUsu2->sig;
+					auxUsuario2 = auxUsuario2->sig;
 				}
 
-				SetDlgItemText(hwnd, IDC_EDIT2, auxUsu2->nombreUsu);
-				SetDlgItemText(hwnd, IDC_EDIT4, auxUsu2->nombreComp);
+				SetDlgItemText(hwnd, IDC_EDIT2, auxUsuario2->nick);
+				SetDlgItemText(hwnd, IDC_EDIT4, auxUsuario2->nombreComp);
 
 				break;
 			}
@@ -836,7 +829,7 @@ BOOL CALLBACK cDialog4(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		case IDC_BUTTON1: // Eliminar
 		{
-			if (auxUsu2 == nullptr)
+			if (auxUsuario2 == nullptr)
 			{
 				MessageBox(NULL, "No se ha seleccionado un usuario, seleccione uno de la lista con doble click.", "AVISO", MB_OK | MB_ICONERROR);
 			}
@@ -853,7 +846,7 @@ BOOL CALLBACK cDialog4(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					indice = SendDlgItemMessage(hwnd, IDC_LIST1, LB_GETCURSEL, 0, 0);
 					SendDlgItemMessage(hwnd, IDC_LIST1, LB_GETTEXT, indice, (LPARAM)usuario);
 
-					if (strcmp(miUsuario->nombreUsu, usuario) == 0)
+					if (strcmp(miUsuario->nick, usuario) == 0)
 					{
 						MessageBox(NULL, "El usuario que inicio sesion será eliminado, se cerrará la sesion.", "AVISO", MB_OK | MB_ICONINFORMATION);
 
@@ -870,7 +863,7 @@ BOOL CALLBACK cDialog4(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						SetDlgItemText(hwnd, IDC_EDIT2, "");
 						SetDlgItemText(hwnd, IDC_EDIT4, "");
 
-						auxUsu2 = nullptr;
+						auxUsuario2 = nullptr;
 					}
 
 					break;
@@ -881,7 +874,7 @@ BOOL CALLBACK cDialog4(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					SetDlgItemText(hwnd, IDC_EDIT2, "");
 					SetDlgItemText(hwnd, IDC_EDIT4, "");
 
-					auxUsu2 = nullptr;
+					auxUsuario2 = nullptr;
 
 					break;
 				}
@@ -946,29 +939,29 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 		case IDC_BUTTON1: // Número
 		{
-			if (iniEsp == nullptr)
+			if (iniVuelo == nullptr)
 			{
 				SetDlgItemText(hwnd, IDC_EDIT3, "1");
 			}
 			else
 			{
-				especialidad* tempNum = new especialidad;
-				auxEsp3 = iniEsp;
+				Vuelo* tempNum = new Vuelo;
+				auxVuelo3 = iniVuelo;
 
-				while (auxEsp3->sig != nullptr)
+				while (auxVuelo3->sig != nullptr)
 				{
-					auxEsp3 = auxEsp3->sig;
+					auxVuelo3 = auxVuelo3->sig;
 				}
 
 				/*auxEsp3 = auxEsp3->ant;*/
 
-				tempNum->claveNum = auxEsp3->claveNum;
+				tempNum->num = auxVuelo3->num;
 
-				tempNum->claveNum = tempNum->claveNum + 1;
+				tempNum->num = tempNum->num + 1;
 
-				_itoa_s(tempNum->claveNum, tempNum->claveChar, 10);
-
-				SetDlgItemText(hwnd, IDC_EDIT3, tempNum->claveChar);
+				// ::: ANTERIOR ::: // 
+				//_itoa_s(tempNum->num, tempNum->claveChar, 10);
+				//SetDlgItemText(hwnd, IDC_EDIT3, tempNum->claveChar);
 			}
 
 			break;
@@ -980,25 +973,22 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 			GetDlgItemText(hwnd, IDC_EDIT1, espBuscar, sizeof(espBuscar));
 
-			auxEsp2 = iniEsp;
+			auxVuelo2 = iniVuelo;
 
-			while (auxEsp2/*->sig*/ != nullptr && strcmp(espBuscar, auxEsp2->nombreEsp) != 0)
+			while (auxVuelo2/*->sig*/ != nullptr && strcmp(espBuscar, auxVuelo2->origen) != 0)
 			{
-				auxEsp2 = auxEsp2->sig;
+				auxVuelo2 = auxVuelo2->sig;
 			}
 
-			if (auxEsp2/*->sig*/ == nullptr || strcmp(espBuscar, auxEsp2->nombreEsp) != 0)
+			if (auxVuelo2/*->sig*/ == nullptr || strcmp(espBuscar, auxVuelo2->origen) != 0)
 			{
-				especialidad* temp = new especialidad;
+				Vuelo* temp = new Vuelo;
 
-				GetDlgItemText(hwnd, IDC_EDIT2, temp->nombreEsp, sizeof(temp->nombreEsp));
-				GetDlgItemText(hwnd, IDC_EDIT3, temp->claveChar, sizeof(temp->claveChar));
-				GetDlgItemText(hwnd, IDC_EDIT4, temp->descripcion, sizeof(temp->descripcion));
-
-				strcpy_s(temp->nombreUsuE, miUsuario->nombreUsu);
-
+				GetDlgItemText(hwnd, IDC_EDIT2, temp->origen, sizeof(temp->origen));
+				GetDlgItemText(hwnd, IDC_EDIT4, temp->destino, sizeof(temp->destino));
+				//GetDlgItemText(hwnd, IDC_EDIT3, temp->claveChar, sizeof(temp->claveChar));
+				strcpy_s(temp->usuarioRegistro, miUsuario->nick);
 				nuevaEsp(temp);
-
 				SetDlgItemText(hwnd, IDC_EDIT2, "");
 				SetDlgItemText(hwnd, IDC_EDIT3, "");
 				SetDlgItemText(hwnd, IDC_EDIT4, "");
@@ -1063,19 +1053,20 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 
 		auxEsp2 = iniEsp;
+		auxVuelo2 = iniVuelo;
 
-		if (iniEsp != nullptr)
+		if (iniVuelo != nullptr)
 		{
-			while (auxEsp2->sig != nullptr)
+			while (auxVuelo2->sig != nullptr)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST2, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxEsp2->nombreEsp);
-				auxEsp2 = auxEsp2->sig;
+				SendDlgItemMessage(hwnd, IDC_LIST2, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo2->origen);
+				auxVuelo2 = auxVuelo2->sig;
 			}
 
-			if (auxEsp2->sig == nullptr/* || auxEsp2->ant == nullptr*/)
+			if (auxVuelo2->sig == nullptr/* || auxEsp2->ant == nullptr*/)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST2, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxEsp2->nombreEsp);
-				auxEsp2 = auxEsp2->sig;
+				SendDlgItemMessage(hwnd, IDC_LIST2, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo2->origen);
+				auxVuelo2 = auxVuelo2->sig;
 			}
 		}
 		else
@@ -1104,17 +1095,16 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				indice2 = SendDlgItemMessage(hwnd, IDC_LIST2, LB_GETCURSEL, 0, 0);
 				SendDlgItemMessage(hwnd, IDC_LIST2, LB_GETTEXT, indice2, (LPARAM)nombreEspC);
 
-				auxEsp2 = iniEsp;
+				auxVuelo2 = iniVuelo;
 
-				while (auxEsp2->sig != nullptr && strcmp(auxEsp2->nombreEsp, nombreEspC) != 0)
+				while (auxVuelo2->sig != nullptr && strcmp(auxVuelo2->origen, nombreEspC) != 0)
 				{
-					auxEsp2 = auxEsp2->sig;
+					auxVuelo2 = auxVuelo2->sig;
 				}
 
-				SetDlgItemText(hwnd, IDC_EDIT2, auxEsp2->nombreEsp);
-				SetDlgItemText(hwnd, IDC_EDIT3, auxEsp2->claveChar);
-				SetDlgItemText(hwnd, IDC_EDIT4, auxEsp2->descripcion);
-
+				SetDlgItemText(hwnd, IDC_EDIT2, auxVuelo2->origen);
+				SetDlgItemText(hwnd, IDC_EDIT4, auxVuelo2->destino);
+				//SetDlgItemText(hwnd, IDC_EDIT3, auxEsp2->claveChar);
 				break;
 			}
 
@@ -1129,7 +1119,7 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		case IDC_BUTTON1: // Editar
 		{
-			if (auxEsp2 == nullptr)
+			if (auxVuelo2 == nullptr)
 			{
 				MessageBox(NULL, "No se ha seleccionado una especialidad, seleccione una de la lista con doble click.", "AVISO", MB_OK | MB_ICONERROR);
 			}
@@ -1164,6 +1154,11 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					indice2 = SendDlgItemMessage(hwnd, IDC_LIST2, LB_GETCURSEL, 0, 0);
 					SendDlgItemMessage(hwnd, IDC_LIST2, LB_GETTEXT, indice2, (LPARAM)especialidad);
 
+					GetDlgItemText(hwnd, IDC_EDIT2, auxVuelo2->origen, sizeof(auxVuelo2->origen));
+					GetDlgItemText(hwnd, IDC_EDIT4, auxVuelo2->destino, sizeof(auxVuelo2->destino));
+					//GetDlgItemText(hwnd, IDC_EDIT3, auxEsp2->claveChar, sizeof(auxEsp2->claveChar));
+					//auxEsp2->num = atoi(auxEsp2->claveChar);
+					MessageBox(NULL, "Cambios guardados.", "AVISO", MB_OK | MB_ICONINFORMATION);
 					eliminarEsp(especialidad);
 
 					SendMessage(GetDlgItem(hwnd, IDC_LIST2), LB_DELETESTRING, indice2, 0);
@@ -1171,7 +1166,7 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					SetDlgItemText(hwnd, IDC_EDIT3, "");
 					SetDlgItemText(hwnd, IDC_EDIT4, "");*/
 
-					auxEsp2 = nullptr;
+					auxVuelo2 = nullptr;
 
 					break;
 				}
@@ -1182,7 +1177,7 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					SetDlgItemText(hwnd, IDC_EDIT3, "");
 					SetDlgItemText(hwnd, IDC_EDIT4, "");
 
-					auxEsp2 = nullptr;
+					auxVuelo2 = nullptr;
 
 					break;
 				}
@@ -1199,7 +1194,7 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		case IDC_BUTTON3: // Confirmar
 		{
-			if (auxEsp2 == nullptr)
+			if (auxVuelo2 == nullptr)
 			{
 				MessageBox(NULL, "No se ha seleccionado una especialidad, seleccione una de la lista con doble click.", "AVISO", MB_OK | MB_ICONERROR);
 			}
@@ -1212,6 +1207,14 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				case IDYES:
 				{
 
+					eliminarEsp(especialidad);
+
+					SendMessage(GetDlgItem(hwnd, IDC_LIST2), LB_DELETESTRING, indice2, 0);
+					SetDlgItemText(hwnd, IDC_EDIT2, "");
+					SetDlgItemText(hwnd, IDC_EDIT3, "");
+					SetDlgItemText(hwnd, IDC_EDIT4, "");
+
+					auxVuelo2 = nullptr;
 					auxEsp2 = nullptr;
 
 					break;
@@ -1223,7 +1226,7 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					SetDlgItemText(hwnd, IDC_EDIT3, "");
 					SetDlgItemText(hwnd, IDC_EDIT4, "");
 
-					auxEsp2 = nullptr;
+					auxVuelo2 = nullptr;
 
 					break;
 				}
@@ -1238,17 +1241,34 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			//especialidad* tempNum = new especialidad;
 			//auxEsp3 = iniEsp;
 
+			break;
+		}
+		case IDC_BUTTON3: // Clave
+		{
+			Vuelo* tempNum = new Vuelo;
+			auxVuelo3 = iniVuelo;
 			//while (auxEsp3->sig != nullptr)
 			//{
 			//	auxEsp3 = auxEsp3->sig;
 			//}
 
+			while (auxVuelo3->sig != nullptr)
+			{
+				auxVuelo3 = auxVuelo3->sig;
+			}
 			//tempNum->claveNum = auxEsp3->claveNum;
 
+			tempNum->num = auxVuelo3->num;
+			tempNum->num = tempNum->num + 1;
 			//tempNum->claveNum = tempNum->claveNum + 1;
 
+			// ::: ANTERIOR 
+			//_itoa_s(tempNum->num, tempNum->claveChar, 10);
+			//SetDlgItemText(hwnd, IDC_EDIT3, tempNum->claveChar);
 			//_itoa_s(tempNum->claveNum, tempNum->claveChar, 10);
 
+			/*especialidad* tempNum = new especialidad;
+			auxEsp3 = auxEsp2;
 			//SetDlgItemText(hwnd, IDC_EDIT3, tempNum->claveChar);
 
 			///*especialidad* tempNum = new especialidad;
@@ -1345,20 +1365,20 @@ BOOL CALLBACK cDialog7(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			aux3 = aux3->sig;
 		}
 
-		auxEsp3 = iniEsp; // Especialidades
+		auxVuelo3 = iniVuelo; // Especialidades
 
-		if (iniEsp != nullptr)
+		if (iniVuelo != nullptr)
 		{
-			while (auxEsp3->sig != nullptr)
+			while (auxVuelo3->sig != nullptr)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST9, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxEsp3->nombreEsp);
-				auxEsp3 = auxEsp3->sig;
+				SendDlgItemMessage(hwnd, IDC_LIST9, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo3->origen);
+				auxVuelo3 = auxVuelo3->sig;
 			}
 
-			if (auxEsp3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
+			if (auxVuelo3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST9, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxEsp3->nombreEsp);
-				auxEsp3 = auxEsp3->sig;
+				SendDlgItemMessage(hwnd, IDC_LIST9, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo3->origen);
+				auxVuelo3 = auxVuelo3->sig;
 			}
 		}
 		else
@@ -1491,15 +1511,15 @@ BOOL CALLBACK cDialog7(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				indice5 = SendDlgItemMessage(hwnd, IDC_LIST9, LB_GETCURSEL, 0, 0);
 				SendDlgItemMessage(hwnd, IDC_LIST9, LB_GETTEXT, indice5, (LPARAM)num5);
 
-				auxEsp3 = iniEsp;
+				auxVuelo3 = iniVuelo;
 
-				while (auxEsp3->sig != nullptr && strcmp(auxEsp3->nombreEsp, num5) != 0)
+				while (auxVuelo3->sig != nullptr && strcmp(auxVuelo3->origen, num5) != 0)
 				{
-					auxEsp3 = auxEsp3->sig;
+					auxVuelo3 = auxVuelo3->sig;
 
 				}
 
-				SetDlgItemText(hwnd, IDC_EDIT17, auxEsp3->nombreEsp);
+				SetDlgItemText(hwnd, IDC_EDIT17, auxVuelo3->origen);
 
 				break;
 			}
@@ -1546,70 +1566,72 @@ BOOL CALLBACK cDialog7(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			auxMed2 = pivote;
 
 			// Campos
-			medico* temp = new medico;
+			boleto* temp = new boleto;
 
-			GetDlgItemText(hwnd, IDC_EDIT2, temp->nombreMed, sizeof(temp->nombreMed));
-			GetDlgItemText(hwnd, IDC_EDIT3, temp->apellidoPM, sizeof(temp->apellidoPM));
-			GetDlgItemText(hwnd, IDC_EDIT4, temp->apellidoMM, sizeof(temp->apellidoMM));
-			GetDlgItemText(hwnd, IDC_EDIT5, temp->cedulaChar, sizeof(temp->cedulaChar));
-			GetDlgItemText(hwnd, IDC_EDIT8, temp->telefonoChar, sizeof(temp->telefonoChar));
-			GetDlgItemText(hwnd, IDC_EDIT14, temp->numConsultorioChar, sizeof(temp->numConsultorioChar));
-			GetDlgItemText(hwnd, IDC_EDIT15, temp->hoararioChar, sizeof(temp->hoararioChar));
-			GetDlgItemText(hwnd, IDC_EDIT16, temp->diasChar, sizeof(temp->diasChar));
-			GetDlgItemText(hwnd, IDC_EDIT17, temp->especialidad, sizeof(temp->especialidad));
-			strcpy_s(temp->foto, zFile);
+			GetDlgItemText(hwnd, IDC_EDIT2, temp->nombrePasajero, sizeof(temp->nombrePasajero));
+			GetDlgItemText(hwnd, IDC_EDIT3, temp->apellidoPPasajero, sizeof(temp->apellidoPPasajero));
+			GetDlgItemText(hwnd, IDC_EDIT4, temp->apellidoMPasajero, sizeof(temp->apellidoMPasajero));
+			//GetDlgItemText(hwnd, IDC_EDIT5, temp->cedulaChar, sizeof(temp->cedulaChar));
+			//GetDlgItemText(hwnd, IDC_EDIT8, temp->telefonoChar, sizeof(temp->telefonoChar));
+			//GetDlgItemText(hwnd, IDC_EDIT14, temp->numConsultorioChar, sizeof(temp->numConsultorioChar));
+			//GetDlgItemText(hwnd, IDC_EDIT15, temp->hoararioChar, sizeof(temp->hoararioChar));
+			//GetDlgItemText(hwnd, IDC_EDIT16, temp->diasChar, sizeof(temp->diasChar));
+			GetDlgItemText(hwnd, IDC_EDIT17, temp->vuelo, sizeof(temp->vuelo));
+			//strcpy_s(temp->foto, zFile);
 
-			if (strcmp(temp->foto, "") != 0 &
-				strcmp(temp->nombreMed, "") != 0 &
-				strcmp(temp->apellidoPM, "") != 0 &
-				strcmp(temp->apellidoMM, "") != 0 &
-				strcmp(temp->cedulaChar, "") != 0 &
-				strcmp(temp->telefonoChar, "") != 0 &
-				strcmp(temp->numConsultorioChar, "") != 0 &
-				strcmp(temp->hoararioChar, "") != 0 &
-				strcmp(temp->diasChar, "") != 0 &
-				strcmp(temp->especialidad, "") != 0)
+			if (//strcmp(temp->foto, "") != 0 &
+				strcmp(temp->nombrePasajero, "") != 0 &
+				strcmp(temp->apellidoPPasajero, "") != 0 &
+				strcmp(temp->apellidoMPasajero, "") != 0 &
+				//strcmp(temp->cedulaChar, "") != 0 &
+				//strcmp(temp->telefonoChar, "") != 0 &
+				//strcmp(temp->numConsultorioChar, "") != 0 &
+				//strcmp(temp->hoararioChar, "") != 0 &
+				//strcmp(temp->diasChar, "") != 0 &
+				strcmp(temp->vuelo, "") != 0)
 			{
-				while (auxMed2/*->sig*/ != nullptr && strcmp(medBuscar, auxMed2->cedulaChar) != 0)
+				//while (auxMed2/*->sig*/ != nullptr && strcmp(medBuscar, auxMed2->cedulaChar) != 0)
 				{
 					auxMed2 = auxMed2->sig;
 				}
 
-				if (auxMed2/*->sig*/ == nullptr || strcmp(medBuscar, auxMed2->cedulaChar) != 0)
+				//if (auxMed2/*->sig*/ == nullptr || strcmp(medBuscar, auxMed2->cedulaChar) != 0)
 				{
 					/*medico* temp = new medico;*/
 
-					GetDlgItemText(hwnd, IDC_EDIT2, temp->nombreMed, sizeof(temp->nombreMed));
-					GetDlgItemText(hwnd, IDC_EDIT3, temp->apellidoPM, sizeof(temp->apellidoPM));
-					GetDlgItemText(hwnd, IDC_EDIT4, temp->apellidoMM, sizeof(temp->apellidoMM));
-					GetDlgItemText(hwnd, IDC_EDIT5, temp->cedulaChar, sizeof(temp->cedulaChar));
-					GetDlgItemText(hwnd, IDC_EDIT8, temp->telefonoChar, sizeof(temp->telefonoChar));
-					GetDlgItemText(hwnd, IDC_EDIT14, temp->numConsultorioChar, sizeof(temp->numConsultorioChar));
-					GetDlgItemText(hwnd, IDC_EDIT15, temp->hoararioChar, sizeof(temp->hoararioChar));
-					GetDlgItemText(hwnd, IDC_EDIT16, temp->diasChar, sizeof(temp->diasChar));
-					GetDlgItemText(hwnd, IDC_EDIT17, temp->especialidad, sizeof(temp->especialidad));
+					GetDlgItemText(hwnd, IDC_EDIT2, temp->nombrePasajero, sizeof(temp->nombrePasajero));
+					GetDlgItemText(hwnd, IDC_EDIT3, temp->apellidoPPasajero, sizeof(temp->apellidoPPasajero));
+					GetDlgItemText(hwnd, IDC_EDIT4, temp->apellidoMPasajero, sizeof(temp->apellidoMPasajero));
+					//GetDlgItemText(hwnd, IDC_EDIT5, temp->cedulaChar, sizeof(temp->cedulaChar));
+					//GetDlgItemText(hwnd, IDC_EDIT8, temp->telefonoChar, sizeof(temp->telefonoChar));
+					//GetDlgItemText(hwnd, IDC_EDIT14, temp->numConsultorioChar, sizeof(temp->numConsultorioChar));
+					//GetDlgItemText(hwnd, IDC_EDIT15, temp->hoararioChar, sizeof(temp->hoararioChar));
+					//GetDlgItemText(hwnd, IDC_EDIT16, temp->diasChar, sizeof(temp->diasChar));
+					GetDlgItemText(hwnd, IDC_EDIT17, temp->vuelo, sizeof(temp->vuelo));
 
 					// Horario
-
-					if (strcmp(temp->hoararioChar, "6am - 6pm") == 0)
+					/*
+					* if (strcmp(temp->hoararioChar, "6am - 6pm") == 0)
 					{
-						temp->hoararioNum = 1;
+						temp->pase = 1;
 					}
 					else if (strcmp(temp->hoararioChar, "6pm - 12am") == 0)
 					{
-						temp->hoararioNum = 2;
+						temp->pase = 2;
 					}
 					else if (strcmp(temp->hoararioChar, "6am - 3pm") == 0)
 					{
-						temp->hoararioNum = 3;
+						temp->pase = 3;
 					}
 					else
 					{
-						temp->hoararioNum = 4;
+						temp->pase = 4;
 					}
+					*/
+					
 
 					// Días
-
+					/*
 					if (strcmp(temp->diasChar, "Lunes - Viernes (M)") == 0)
 					{
 						temp->diasNum = 1;
@@ -1626,9 +1648,10 @@ BOOL CALLBACK cDialog7(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					{
 						temp->diasNum = 4;
 					}
-
-					strcpy_s(temp->foto, zFile);
-					strcpy_s(temp->nombreUsuM, miUsuario->nombreUsu);
+					*/
+					
+					//strcpy_s(temp->foto, zFile);
+					strcpy_s(temp->usuarioRegistro, miUsuario->nick);
 
 					nuevoMed(temp);
 
@@ -1650,7 +1673,7 @@ BOOL CALLBACK cDialog7(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					ShowWindow(hDialog7, SW_SHOW);
 					UpdateWindow(hDialog7);
 				}
-				else
+				//else
 				{
 					MessageBox(NULL, "Es posible que este medico ya este registrado.", "AVISO", MB_OK | MB_ICONEXCLAMATION);
 				}
@@ -1723,13 +1746,13 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		while (auxMed3->sig != nullptr)
 		{
-			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompM/*nombreCompM*/);
+			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
 			auxMed3 = auxMed3->sig;
 		}
 
 		if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
 		{
-			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompM/*nombreCompM*/);
+			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
 			auxMed3 = auxMed3->sig;
 		}
 
@@ -1775,20 +1798,20 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			aux3 = aux3->sig;
 		}
 
-		auxEsp3 = iniEsp; // Especialidades
+		auxVuelo3 = iniVuelo; // Especialidades
 
-		if (iniEsp != nullptr)
+		if (iniVuelo != nullptr)
 		{
-			while (auxEsp3->sig != nullptr)
+			while (auxVuelo3->sig != nullptr)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST10, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxEsp3->nombreEsp);
-				auxEsp3 = auxEsp3->sig;
+				SendDlgItemMessage(hwnd, IDC_LIST10, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo3->origen);
+				auxVuelo3 = auxVuelo3->sig;
 			}
 
-			if (auxEsp3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
+			if (auxVuelo3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST10, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxEsp3->nombreEsp);
-				auxEsp3 = auxEsp3->sig;
+				SendDlgItemMessage(hwnd, IDC_LIST10, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo3->origen);
+				auxVuelo3 = auxVuelo3->sig;
 			}
 		}
 		else
@@ -1913,15 +1936,15 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				indice5 = SendDlgItemMessage(hwnd, IDC_LIST10, LB_GETCURSEL, 0, 0);
 				SendDlgItemMessage(hwnd, IDC_LIST10, LB_GETTEXT, indice5, (LPARAM)num5);
 
-				auxEsp3 = iniEsp;
+				auxVuelo3 = iniVuelo;
 
-				while (auxEsp3->sig != nullptr && strcmp(auxEsp3->nombreEsp, num5) != 0)
+				while (auxVuelo3->sig != nullptr && strcmp(auxVuelo3->origen, num5) != 0)
 				{
-					auxEsp3 = auxEsp3->sig;
+					auxVuelo3 = auxVuelo3->sig;
 
 				}
 
-				SetDlgItemText(hwnd, IDC_EDIT18, auxEsp3->nombreEsp);
+				SetDlgItemText(hwnd, IDC_EDIT18, auxVuelo3->origen);
 
 				break;
 			}
@@ -1948,30 +1971,30 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 				auxMed3 = iniMed;
 
-				while (auxMed3->sig != nullptr && strcmp(auxMed3->nombreCompM, num) != 0)
+				while (auxMed3->sig != nullptr && strcmp(auxMed3->nombreCompPasajero, num) != 0)
 				{
 					auxMed3 = auxMed3->sig;
 
 				}
 
-				SetDlgItemText(hwnd, IDC_EDIT2, auxMed3->nombreMed);
-				SetDlgItemText(hwnd, IDC_EDIT3, auxMed3->apellidoPM);
-				SetDlgItemText(hwnd, IDC_EDIT4, auxMed3->apellidoMM);
+				SetDlgItemText(hwnd, IDC_EDIT2, auxMed3->nombrePasajero);
+				SetDlgItemText(hwnd, IDC_EDIT3, auxMed3->apellidoPPasajero);
+				SetDlgItemText(hwnd, IDC_EDIT4, auxMed3->apellidoMPasajero);
 
-				SetDlgItemText(hwnd, IDC_EDIT5, auxMed3->cedulaChar);
-				SetDlgItemText(hwnd, IDC_EDIT18, auxMed3->especialidad);
+				//SetDlgItemText(hwnd, IDC_EDIT5, auxMed3->cedulaChar);
+				SetDlgItemText(hwnd, IDC_EDIT18, auxMed3->vuelo);
 
-				SetDlgItemText(hwnd, IDC_EDIT8, auxMed3->telefonoChar);
+				//SetDlgItemText(hwnd, IDC_EDIT8, auxMed3->telefonoChar);
 
-				SetDlgItemText(hwnd, IDC_EDIT17, auxMed3->numConsultorioChar);
-				SetDlgItemText(hwnd, IDC_EDIT15, auxMed3->hoararioChar);
-				SetDlgItemText(hwnd, IDC_EDIT16, auxMed3->diasChar);
+				//SetDlgItemText(hwnd, IDC_EDIT17, auxMed3->numConsultorioChar);
+				//SetDlgItemText(hwnd, IDC_EDIT15, auxMed3->hoararioChar);
+				//SetDlgItemText(hwnd, IDC_EDIT16, auxMed3->diasChar);
 
-				strcpy_s(zFile, auxMed3->foto); //Inicializar zfile con la dirección de memoria del puntero foto
+				//strcpy_s(zFile, auxMed3->foto); //Inicializar zfile con la dirección de memoria del puntero foto
 
 				HBITMAP bmp; //1
-				bmp = (HBITMAP)LoadImage(NULL, auxMed3->foto, IMAGE_BITMAP, 120, 120, LR_LOADFROMFILE); //2
-				SendDlgItemMessage(hwnd, IDC_BMP2, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3 
+				//bmp = (HBITMAP)LoadImage(NULL, auxMed3->foto, IMAGE_BITMAP, 120, 120, LR_LOADFROMFILE); //2
+				//SendDlgItemMessage(hwnd, IDC_BMP2, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3 
 
 				break;
 			}
@@ -1987,41 +2010,43 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		case IDC_BUTTON1: // Editar
 		{
-			GetDlgItemText(hwnd, IDC_EDIT2, auxMed3->nombreMed, sizeof(auxMed3->nombreMed));
-			GetDlgItemText(hwnd, IDC_EDIT3, auxMed3->apellidoPM, sizeof(auxMed3->apellidoPM));
-			GetDlgItemText(hwnd, IDC_EDIT4, auxMed3->apellidoPM, sizeof(auxMed3->apellidoPM));
+			GetDlgItemText(hwnd, IDC_EDIT2, auxMed3->nombrePasajero, sizeof(auxMed3->nombrePasajero));
+			GetDlgItemText(hwnd, IDC_EDIT3, auxMed3->apellidoPPasajero, sizeof(auxMed3->apellidoPPasajero));
+			GetDlgItemText(hwnd, IDC_EDIT4, auxMed3->apellidoPPasajero, sizeof(auxMed3->apellidoPPasajero));
 
-			GetDlgItemText(hwnd, IDC_EDIT5, auxMed3->cedulaChar, sizeof(auxMed3->cedulaChar));
-			auxMed3->cedulaNum = atoi(auxMed3->cedulaChar);
-			GetDlgItemText(hwnd, IDC_EDIT18, auxMed3->especialidad, sizeof(auxMed3->especialidad));
+			//GetDlgItemText(hwnd, IDC_EDIT5, auxMed3->cedulaChar, sizeof(auxMed3->cedulaChar));
+			//auxMed3->cedulaNum = atoi(auxMed3->cedulaChar);
+			GetDlgItemText(hwnd, IDC_EDIT18, auxMed3->vuelo, sizeof(auxMed3->vuelo));
 			
-			GetDlgItemText(hwnd, IDC_EDIT8, auxMed3->telefonoChar, sizeof(auxMed3->telefonoChar));
-			auxMed3->telefonoNum = atoi(auxMed3->telefonoChar);
+			//GetDlgItemText(hwnd, IDC_EDIT8, auxMed3->telefonoChar, sizeof(auxMed3->telefonoChar));
+			//auxMed3->estado = atoi(auxMed3->telefonoChar);
 
-			GetDlgItemText(hwnd, IDC_EDIT17, auxMed3->numConsultorioChar, sizeof(auxMed3->numConsultorioChar));
-			auxMed3->numConsultorioNum = atoi(auxMed3->numConsultorioChar);
-			GetDlgItemText(hwnd, IDC_EDIT15, auxMed3->hoararioChar, sizeof(auxMed3->hoararioChar));
+			//GetDlgItemText(hwnd, IDC_EDIT17, auxMed3->numConsultorioChar, sizeof(auxMed3->numConsultorioChar));
+			//auxMed3->clase = atoi(auxMed3->numConsultorioChar);
+			//GetDlgItemText(hwnd, IDC_EDIT15, auxMed3->hoararioChar, sizeof(auxMed3->hoararioChar));
 			// Horario
-
-			if (strcmp(auxMed3->hoararioChar, "6am - 6pm") == 0)
+			/*
+			* if (strcmp(auxMed3->hoararioChar, "6am - 6pm") == 0)
 			{
-				auxMed3->hoararioNum = 1;
+				auxMed3->pase = 1;
 			}
 			else if (strcmp(auxMed3->hoararioChar, "6pm - 12am") == 0)
 			{
-				auxMed3->hoararioNum = 2;
+				auxMed3->pase = 2;
 			}
 			else if (strcmp(auxMed3->hoararioChar, "6am - 3pm") == 0)
 			{
-				auxMed3->hoararioNum = 3;
+				auxMed3->pase = 3;
 			}
 			else
 			{
-				auxMed3->hoararioNum = 4;
+				auxMed3->pase = 4;
 			}
 			GetDlgItemText(hwnd, IDC_EDIT16, auxMed3->diasChar, sizeof(auxMed3->diasChar));
+			*/
+			
 			// Días
-
+			/*
 			if (strcmp(auxMed3->diasChar, "Lunes - Viernes (M)") == 0)
 			{
 				auxMed3->diasNum = 1;
@@ -2038,15 +2063,16 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 				auxMed3->diasNum = 4;
 			}
+			*/
 
 			// Concatenación
-			strcpy_s(auxMed3->nombreCompM, auxMed3->nombreMed);
-			strcat_s(auxMed3->nombreCompM, " ");
-			strcat_s(auxMed3->nombreCompM, auxMed3->apellidoPM);
-			strcat_s(auxMed3->nombreCompM, " ");
-			strcat_s(auxMed3->nombreCompM, auxMed3->apellidoPM);
+			strcpy_s(auxMed3->nombreCompPasajero, auxMed3->nombrePasajero);
+			strcat_s(auxMed3->nombreCompPasajero, " ");
+			strcat_s(auxMed3->nombreCompPasajero, auxMed3->apellidoPPasajero);
+			strcat_s(auxMed3->nombreCompPasajero, " ");
+			strcat_s(auxMed3->nombreCompPasajero, auxMed3->apellidoPPasajero);
 
-			strcpy_s(auxMed3->foto,zFile);
+			//strcpy_s(auxMed3->foto,zFile);
 
 			MessageBox(NULL, "Cambios guardados.", "AVISO", MB_OK | MB_ICONINFORMATION);
 
@@ -2246,6 +2272,63 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nombreComp);
 		}
+
+
+		auxMed3 = iniMed; // Medicos
+
+		while (auxMed3->sig != nullptr)
+		{
+			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
+			auxMed3 = auxMed3->sig;
+		}
+
+		if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
+		{
+			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
+			auxMed3 = auxMed3->sig;
+		}
+
+		break;
+	}
+	case WM_COMMAND:
+	{
+		long opcion = LOWORD(wParam);
+		cMenu(hwnd, opcion);
+
+		switch (LOWORD(wParam))
+		{
+		case IDC_BUTTON1: // Generar
+		{
+			if (iniMed == nullptr)
+			{
+				MessageBox(NULL, "No hay medicos registrados.", "AVISO", MB_OK | MB_ICONERROR);
+			}
+			else
+			{
+				reporteMed();
+				MessageBox(NULL, "Reporte fue guardado en C:-Users-hp-Documents-UANL-Universidad 7-ED-Proyecto_Clinica-Proyecto_Clinica.", "AVISO", MB_OK | MB_ICONERROR);
+			}
+
+			break;
+		}
+		default:
+		{
+			break;
+		}
+
+		}
+
+		break;
+	}
+	default:
+	{
+		break;
+	}
+
+	}
+
+	return false;  // Un callback siempre retorna falso
+}
 		if (miUsuario->foto != nullptr)
 		{
 			strcpy_s(zFile, miUsuario->foto); //Inicializar zfile con la dirección de memoria del puntero foto
@@ -2259,13 +2342,13 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		while (auxMed3->sig != nullptr)
 		{
-			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompM/*nombreCompM*/);
+			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
 			auxMed3 = auxMed3->sig;
 		}
 
 		if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
 		{
-			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompM/*nombreCompM*/);
+			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
 			auxMed3 = auxMed3->sig;
 		}
 
@@ -2333,13 +2416,13 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 				auxMed3 = iniMed;
 
-				while (auxMed3->sig != nullptr && strcmp(auxMed3->nombreCompM, num) != 0)
+				while (auxMed3->sig != nullptr && strcmp(auxMed3->nombreCompPasajero, num) != 0)
 				{
 					auxMed3 = auxMed3->sig;
 
 				}
 
-				SetDlgItemText(hwnd, IDC_EDIT8, auxMed3->nombreCompM);
+				SetDlgItemText(hwnd, IDC_EDIT8, auxMed3->nombreCompPasajero);
 
 				break;
 			}
@@ -2361,39 +2444,40 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 			GetDlgItemText(hwnd, IDC_EDIT2, pasBuscar, sizeof(pasBuscar));
 
-			auxPas2 = iniPas;
+			auxPasajero2 = iniPasajero;
 
-			while (auxPas2/*->sig*/ != nullptr && strcmp(pasBuscar, auxPas2->nombreCompP) != 0)
+			while (auxPasajero2/*->sig*/ != nullptr && strcmp(pasBuscar, auxPasajero2->nombreComp) != 0)
 			{
-				auxPas2 = auxPas2->sig;
+				auxPasajero2 = auxPasajero2->sig;
 			}
 
-			if (auxPas2/*->sig*/ == nullptr || strcmp(pasBuscar, auxPas2->nombreCompP) != 0)
+			if (auxPasajero2/*->sig*/ == nullptr || strcmp(pasBuscar, auxPasajero2->nombreComp) != 0)
 			{
-				paciente* temp = new paciente;
+				pasajero* temp = new pasajero;
 
-				GetDlgItemText(hwnd, IDC_EDIT2, temp->nombrePas, sizeof(temp->nombrePas));
-				GetDlgItemText(hwnd, IDC_EDIT3, temp->apellidoPP, sizeof(temp->apellidoPP));
-				GetDlgItemText(hwnd, IDC_EDIT4, temp->apellidoMP, sizeof(temp->apellidoMP));
+				GetDlgItemText(hwnd, IDC_EDIT2, temp->nombre, sizeof(temp->nombre));
+				GetDlgItemText(hwnd, IDC_EDIT3, temp->apellidoP, sizeof(temp->apellidoP));
+				GetDlgItemText(hwnd, IDC_EDIT4, temp->apellidoM, sizeof(temp->apellidoM));
 
-				// Genero
-
+				// Genero 
 				if (IsDlgButtonChecked(hwnd, IDC_RADIO1))
 				{
-					strcpy_s(temp->genero, "Masculino");
+					//strcpy_s(temp->genero, "Masculino");
 				}
 				else
 				{
-					strcpy_s(temp->genero, "Femenino");
+					//strcpy_s(temp->genero, "Femenino");
 				}
 
-				GetDlgItemText(hwnd, IDC_EDIT5, temp->telefonoCharP, sizeof(temp->telefonoCharP));
-				GetDlgItemText(hwnd, IDC_EDIT6, temp->ref, sizeof(temp->ref));
-				GetDlgItemText(hwnd, IDC_DATETIMEPICKER1, temp->fecha, sizeof(temp->fecha));
-				GetDlgItemText(hwnd, IDC_EDIT7, temp->edadChar, sizeof(temp->edadChar));
-				GetDlgItemText(hwnd, IDC_EDIT8, temp->pMedicoP, sizeof(temp->pMedicoP));
+				GetDlgItemText(hwnd, IDC_EDIT5, temp->nacionalidad, sizeof(temp->nacionalidad));
+				//GetDlgItemText(hwnd, IDC_DATETIMEPICKER1, temp->fecha, sizeof(temp->fecha));
+				
+				// ::: PASADOS ::: //
+				//GetDlgItemText(hwnd, IDC_EDIT6, temp->ref, sizeof(temp->ref));				
+				//GetDlgItemText(hwnd, IDC_EDIT7, temp->edadChar, sizeof(temp->edadChar));
+				//GetDlgItemText(hwnd, IDC_EDIT8, temp->pMedicoP, sizeof(temp->pMedicoP));
 
-				strcpy_s(temp->nombreUsuP, miUsuario->nombreUsu);
+				strcpy_s(temp->usuarioRegistro, miUsuario->nick);
 
 				nuevoPas(temp);
 
@@ -2460,13 +2544,13 @@ BOOL CALLBACK cDialog11(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		while (auxMed3->sig != nullptr)
 		{
-			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompM/*nombreCompM*/);
+			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
 			auxMed3 = auxMed3->sig;
 		}
 
 		if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
 		{
-			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompM/*nombreCompM*/);
+			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
 			auxMed3 = auxMed3->sig;
 		}
 
@@ -2578,14 +2662,25 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 		}
 
+		auxPasajero3 = iniPasajero;
 		//auxPas3 = iniPas;
 
+		while (auxPasajero3->sig != nullptr)
+		{
+			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxPasajero3->nombreComp/*nombreCompM*/);
+			auxPasajero3 = auxPasajero3->sig;
+		}
 		//while (auxPas3->sig != nullptr)
 		//{
 		//	SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxPas3->nombreCompP/*nombreCompM*/);
 		//	auxPas3 = auxPas3->sig;
 		//}
 
+		if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
+		{
+			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxPasajero3->nombreComp/*nombreCompM*/);
+			auxPasajero3 = auxPasajero3->sig;
+		}
 		//if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
 		//{
 		//	SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxPas3->nombreCompP/*nombreCompM*/);
@@ -2603,7 +2698,7 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 		case IDC_BUTTON1: // generar
 		{
-			if (iniPas == nullptr)
+			if (iniPasajero == nullptr)
 			{
 				MessageBox(NULL, "No hay pacientes registrados.", "AVISO", MB_OK | MB_ICONERROR);
 			}
@@ -2961,7 +3056,6 @@ bool cMenu(HWND hwnd, long opcion)
 	return true;
 }
 
-
 // Funciones
 #pragma region funciones
 
@@ -2970,64 +3064,62 @@ bool cMenu(HWND hwnd, long opcion)
 
 void nuevoUsu(usuario* nuevo)
 {
-	if (iniUsu == nullptr)
+	if (iniUsuario == nullptr)
 	{ //Si 'inicio->sig es igual a nullptr, o sea, apunta a nada, la lista esta vacia
-		iniUsu = new usuario;
+		iniUsuario = new usuario;
 
-		strcpy_s(iniUsu->nombreUsu, nuevo->nombreUsu);
-		strcpy_s(iniUsu->nombre, nuevo->nombre);
-		strcpy_s(iniUsu->apellidoP, nuevo->apellidoP);
-		strcpy_s(iniUsu->apellidoM, nuevo->apellidoM);
-		strcpy_s(iniUsu->clave, nuevo->clave);
+		strcpy_s(iniUsuario->nick, nuevo->nick);
+		strcpy_s(iniUsuario->nombre, nuevo->nombre);
+		strcpy_s(iniUsuario->apellidoP, nuevo->apellidoP);
+		strcpy_s(iniUsuario->apellidoM, nuevo->apellidoM);
+		strcpy_s(iniUsuario->password, nuevo->password);
 
 		// Concatenación
-		strcpy_s(iniUsu->nombreComp, nuevo->nombre);
-		strcat_s(iniUsu->nombreComp, " ");
-		strcat_s(iniUsu->nombreComp, iniUsu->apellidoP);
-		strcat_s(iniUsu->nombreComp, " ");
-		strcat_s(iniUsu->nombreComp, iniUsu->apellidoM);
+		strcpy_s(iniUsuario->nombreComp, nuevo->nombre);
+		strcat_s(iniUsuario->nombreComp, " ");
+		strcat_s(iniUsuario->nombreComp, iniUsuario->apellidoP);
+		strcat_s(iniUsuario->nombreComp, " ");
+		strcat_s(iniUsuario->nombreComp, iniUsuario->apellidoM);
+		/*strcpy_s(auxUsu->foto, nuevo->foto);*/
 
-		strcpy_s(iniUsu->foto, nuevo->foto);
+		iniUsuario->sig = nullptr;
+		iniUsuario->ant = nullptr;
 
-		iniUsu->sig = nullptr;
-		iniUsu->ant = nullptr;
-
-		auxUsu2 = auxUsu;
-		auxUsu3 = auxUsu;
-		auxUsu = iniUsu;
+		auxUsuario2 = auxUsuario;
+		auxUsuario3 = auxUsuario;
+		auxUsuario = iniUsuario;
 	}
 	else
 	{
-		auxUsu = iniUsu;
+		auxUsuario = iniUsuario;
 
-		while (auxUsu->sig != nullptr)
+		while (auxUsuario->sig != nullptr)
 		{
-			auxUsu = auxUsu->sig;
+			auxUsuario = auxUsuario->sig;
 		}
 
-		auxUsu->sig = new usuario;
-		auxUsu->sig->sig = nullptr;
-		auxUsu->sig->ant = auxUsu;
-		auxUsu = auxUsu->sig;
+		auxUsuario->sig = new usuario;
+		auxUsuario->sig->sig = nullptr;
+		auxUsuario->sig->ant = auxUsuario;
+		auxUsuario = auxUsuario->sig;
 
-		strcpy_s(auxUsu->nombreUsu, nuevo->nombreUsu);
-		strcpy_s(auxUsu->nombre, nuevo->nombre);
-		strcpy_s(auxUsu->apellidoP, nuevo->apellidoP);
-		strcpy_s(auxUsu->apellidoM, nuevo->apellidoM);
-		strcpy_s(auxUsu->clave, nuevo->clave);
+		strcpy_s(auxUsuario->nick, nuevo->nick);
+		strcpy_s(auxUsuario->nombre, nuevo->nombre);
+		strcpy_s(auxUsuario->apellidoP, nuevo->apellidoP);
+		strcpy_s(auxUsuario->apellidoM, nuevo->apellidoM);
+		strcpy_s(auxUsuario->password, nuevo->password);
 
 		// Concatenación
-		strcpy_s(auxUsu->nombreComp, nuevo->nombre);
-		strcat_s(auxUsu->nombreComp, " ");
-		strcat_s(auxUsu->nombreComp, auxUsu->apellidoP);
-		strcat_s(auxUsu->nombreComp, " ");
-		strcat_s(auxUsu->nombreComp, auxUsu->apellidoM);
+		strcpy_s(auxUsuario->nombreComp, nuevo->nombre);
+		strcat_s(auxUsuario->nombreComp, " ");
+		strcat_s(auxUsuario->nombreComp, auxUsuario->apellidoP);
+		strcat_s(auxUsuario->nombreComp, " ");
+		strcat_s(auxUsuario->nombreComp, auxUsuario->apellidoM);
+		/*strcpy_s(auxUsu->foto, nuevo->foto);*/
 
-		strcpy_s(auxUsu->foto, nuevo->foto);
-
-		auxUsu2 = auxUsu;
-		auxUsu3 = auxUsu;
-		auxUsu = iniUsu;
+		auxUsuario2 = auxUsuario;
+		auxUsuario3 = auxUsuario;
+		auxUsuario = iniUsuario;
 	}
 
 	MessageBox(NULL, "Se ha registrado el usuario con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
@@ -3037,37 +3129,37 @@ void nuevoUsu(usuario* nuevo)
 void eliminarUsu(char nomUsu[30])
 {
 	usuario* start;
-	auxUsu = iniUsu;
+	auxUsuario = iniUsuario;
 
-	if (auxUsu == nullptr)
+	if (auxUsuario == nullptr)
 	{
 		MessageBox(0, "La lista esta vacia.", "AVISO", MB_OK);
 	}
 	else
 	{
-		while (auxUsu->sig != nullptr && strcmp(auxUsu->nombreUsu, nomUsu) != 0)
+		while (auxUsuario->sig != nullptr && strcmp(auxUsuario->nick, nomUsu) != 0)
 		{ //Nos movemos en el arreglo para buscar el usuario
 
-			auxUsu = auxUsu->sig;
+			auxUsuario = auxUsuario->sig;
 		}
-		if (auxUsu->sig == nullptr && strcmp(auxUsu->nombreUsu, nomUsu) != 0)
+		if (auxUsuario->sig == nullptr && strcmp(auxUsuario->nick, nomUsu) != 0)
 		{
 			MessageBox(0, "Usuario no encontrado", "AVISO", MB_OK);
 		}
-		else if (auxUsu == iniUsu)
+		else if (auxUsuario == iniUsuario)
 		{	//El nodo es el primero 
 
-			if (auxUsu->sig == nullptr)
+			if (auxUsuario->sig == nullptr)
 			{ //Si es el primero y unico nodo
 				//delete auxEsp;		//Eliminamos el primer nodo
 				//inicio = nullptr;
 				//auxEsp = inicio;
 
-				iniUsu = nullptr;
-				delete auxUsu;
+				iniUsuario = nullptr;
+				delete auxUsuario;
 
-				auxUsu = iniUsu;
-				auxUsu2 = auxUsu;
+				auxUsuario = iniUsuario;
+				auxUsuario2 = auxUsuario;
 				/*auxUsu3 = auxUsu;*/
 			}
 			else
@@ -3083,14 +3175,14 @@ void eliminarUsu(char nomUsu[30])
 				delete auxEsp;
 				auxEsp = iniEsp;*/
 
-				start = iniUsu->sig;
-				auxUsu->sig->ant = nullptr;
-				delete auxUsu;
-				auxUsu = start;
-				auxUsu->ant = nullptr;
+				start = iniUsuario->sig;
+				auxUsuario->sig->ant = nullptr;
+				delete auxUsuario;
+				auxUsuario = start;
+				auxUsuario->ant = nullptr;
 
-				auxUsu = iniUsu;
-				auxUsu2 = auxUsu;
+				auxUsuario = iniUsuario;
+				auxUsuario2 = auxUsuario;
 				/*auxUsu3 = auxUsu;*/
 			}
 
@@ -3099,23 +3191,23 @@ void eliminarUsu(char nomUsu[30])
 		else
 		{
 
-			if (auxUsu->sig == nullptr)
+			if (auxUsuario->sig == nullptr)
 			{ //Si el nodo es el último
-				auxUsu->ant->sig = nullptr;	//Antes de eliminar, el penultumo nodo, su puntero siguiente, lo igualamos a nullptr
-				delete auxUsu;
+				auxUsuario->ant->sig = nullptr;	//Antes de eliminar, el penultumo nodo, su puntero siguiente, lo igualamos a nullptr
+				delete auxUsuario;
 
-				auxUsu = iniUsu;
-				auxUsu2 = auxUsu;
+				auxUsuario = iniUsuario;
+				auxUsuario2 = auxUsuario;
 				/*auxUsu3 = auxUsu;*/
 			}
 			else
 			{ //Si es cualquier nodo que no sea el inicio o el último
-				auxUsu->sig->ant = auxUsu->ant;
-				auxUsu->ant->sig = auxUsu->sig;
-				delete auxUsu;
+				auxUsuario->sig->ant = auxUsuario->ant;
+				auxUsuario->ant->sig = auxUsuario->sig;
+				delete auxUsuario;
 
-				auxUsu = iniUsu;
-				auxUsu2 = auxUsu;
+				auxUsuario = iniUsuario;
+				auxUsuario2 = auxUsuario;
 				/*auxUsu3 = auxUsu;*/ //Para que auxEsp no quede sin apuntar a nada, la apuntamos al inicio
 			}
 
@@ -3128,17 +3220,17 @@ void eliminarUsu(char nomUsu[30])
 
 void escribirUsuario()
 {
-	auxUsu = iniUsu;
+	auxUsuario = iniUsuario;
 
 	ofstream escribir("Info de Usuarios.bin", ios::binary | ios::out | ios::trunc);
 	//escribir.open("C:\\Users\\hp\\Documents\\UANL\\Universidad 7\\ED\\Proyecto_Clinica\\Proyecto_Clinica\\Usuarios.txt", ios::out | ios::trunc);
 
 	if (escribir.is_open())
 	{
-		while (auxUsu != nullptr)
+		while (auxUsuario != nullptr)
 		{
-			escribir.write((char*)auxUsu, sizeof(usuario));
-			auxUsu = auxUsu->sig;
+			escribir.write((char*)auxUsuario, sizeof(usuario));
+			auxUsuario = auxUsuario->sig;
 		}
 
 		escribir.close();
@@ -3170,7 +3262,7 @@ void escribirUsuario()
 
 void leerUsuario()
 {
-	auxUsu = iniUsu;
+	auxUsuario = iniUsuario;
 
 	ifstream leer("Info de Usuarios.bin", ios::binary);
 	//leer.open("C:\\Users\\hp\\Documents\\UANL\\Universidad 7\\ED\\Proyecto_Clinica\\Proyecto_Clinica\\Usuarios.txt", ios::in);
@@ -3182,23 +3274,23 @@ void leerUsuario()
 		while (!leer.read((char*)usuLeido, sizeof(usuario)).eof())
 		{
 
-			while (auxUsu != nullptr && auxUsu->sig != nullptr)
+			while (auxUsuario != nullptr && auxUsuario->sig != nullptr)
 			{
-				auxUsu = auxUsu->sig;
+				auxUsuario = auxUsuario->sig;
 			}
-			if (auxUsu == nullptr)
+			if (auxUsuario == nullptr)
 			{
-				iniUsu = usuLeido;
-				iniUsu->sig = nullptr;
-				iniUsu->ant = nullptr;
-				auxUsu = iniUsu;
+				iniUsuario = usuLeido;
+				iniUsuario->sig = nullptr;
+				iniUsuario->ant = nullptr;
+				auxUsuario = iniUsuario;
 			}
 			else
 			{
-				auxUsu->sig = usuLeido;
-				auxUsu->sig->ant = auxUsu;
-				auxUsu = auxUsu->sig;
-				auxUsu->sig = nullptr;
+				auxUsuario->sig = usuLeido;
+				auxUsuario->sig->ant = auxUsuario;
+				auxUsuario = auxUsuario->sig;
+				auxUsuario->sig = nullptr;
 				/*auxUsu->sig = usuLeido;
 				auxUsu->ant = auxUsu;
 				auxUsu = auxUsu->sig;
@@ -3218,52 +3310,54 @@ void leerUsuario()
 //Funciones de Listas de Especialidades
 #pragma region Funciones de Listas Especialidades
 
-void nuevaEsp(especialidad* nueva)
+void nuevaEsp(Vuelo* nueva)
 {
-	if (iniEsp == nullptr)
+	if (iniVuelo == nullptr)
 	{ //Si 'inicio->sig es igual a nullptr, o sea, apunta a nada, la lista esta vacia
-		iniEsp = new especialidad;
+		iniVuelo = new Vuelo;
 
-		strcpy_s(iniEsp->nombreEsp, nueva->nombreEsp);
-		strcpy_s(iniEsp->descripcion, nueva->descripcion);
+		strcpy_s(iniVuelo->origen, nueva->origen);
+		strcpy_s(iniVuelo->destino, nueva->destino);
 
-		strcpy_s(iniEsp->claveChar, nueva->claveChar);
-		iniEsp->claveNum = atoi(iniEsp->claveChar);
+		// ::: ANTERIOR ::: //
+		//strcpy_s(iniEsp->claveChar, nueva->claveChar);
+		//iniEsp->num = atoi(iniEsp->claveChar);
 
-		strcpy_s(iniEsp->nombreUsuE, nueva->nombreUsuE);
+		strcpy_s(iniVuelo->usuarioRegistro, nueva->usuarioRegistro);
 
-		iniEsp->sig = nullptr;
-		iniEsp->ant = nullptr;
+		iniVuelo->sig = nullptr;
+		iniVuelo->ant = nullptr;
 
-		auxEsp2 = auxEsp;
-		auxEsp3 = auxEsp;
-		auxEsp = iniEsp;
+		auxVuelo2 = auxVuelo;
+		auxVuelo3 = auxVuelo;
+		auxVuelo = iniVuelo;
 	}
 	else
 	{
-		auxEsp = iniEsp;
+		auxVuelo = iniVuelo;
 
-		while (auxEsp->sig != nullptr)
+		while (auxVuelo->sig != nullptr)
 		{
-			auxEsp = auxEsp->sig;
+			auxVuelo = auxVuelo->sig;
 		}
 
-		auxEsp->sig = new especialidad;
-		auxEsp->sig->sig = nullptr;
-		auxEsp->sig->ant = auxEsp;
-		auxEsp = auxEsp->sig;
+		auxVuelo->sig = new Vuelo;
+		auxVuelo->sig->sig = nullptr;
+		auxVuelo->sig->ant = auxVuelo;
+		auxVuelo = auxVuelo->sig;
 
-		strcpy_s(auxEsp->nombreEsp, nueva->nombreEsp);
-		strcpy_s(auxEsp->descripcion, nueva->descripcion);
+		strcpy_s(auxVuelo->origen, nueva->origen);
+		strcpy_s(auxVuelo->destino, nueva->destino);
 
-		strcpy_s(auxEsp->claveChar, nueva->claveChar);
-		auxEsp->claveNum = atoi(auxEsp->claveChar);
+		// ::: ANTERIOR ::: //
+		//strcpy_s(auxEsp->claveChar, nueva->claveChar);
+		//auxEsp->num = atoi(auxEsp->claveChar);
 
-		strcpy_s(auxEsp->nombreUsuE, nueva->nombreUsuE);
+		strcpy_s(auxVuelo->usuarioRegistro, nueva->usuarioRegistro);
 
-		auxEsp2 = auxEsp;
-		auxEsp3 = auxEsp;
-		auxEsp = iniEsp;
+		auxVuelo2 = auxVuelo;
+		auxVuelo3 = auxVuelo;
+		auxVuelo = iniVuelo;
 	}
 
 	MessageBox(NULL, "Se ha registrado la especialidad con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
@@ -3272,38 +3366,38 @@ void nuevaEsp(especialidad* nueva)
 
 void eliminarEsp(char nomEsp[30])
 {
-	especialidad* start;
-	auxEsp = iniEsp;
+	Vuelo* start;
+	auxVuelo = iniVuelo;
 
-	if (auxEsp == nullptr)
+	if (auxVuelo == nullptr)
 	{
 		MessageBox(0, "La lista esta vacia.", "AVISO", MB_OK);
 	}
 	else
 	{
-		while (auxEsp->sig != nullptr && strcmp(auxEsp->nombreEsp, nomEsp) != 0)
+		while (auxVuelo->sig != nullptr && strcmp(auxVuelo->origen, nomEsp) != 0)
 		{ //Nos movemos en el arreglo para buscar el usuario
 
-			auxEsp = auxEsp->sig;
+			auxVuelo = auxVuelo->sig;
 		}
-		if (auxEsp->sig == nullptr && strcmp(auxEsp->nombreEsp, nomEsp) != 0)
+		if (auxVuelo->sig == nullptr && strcmp(auxVuelo->origen, nomEsp) != 0)
 		{
 			MessageBox(0, "Especialidad no encontrada", "AVISO", MB_OK);
 		}
-		else if (auxEsp == iniEsp)
+		else if (auxVuelo == iniVuelo)
 		{	//El nodo es el primero 
 
-			if (auxEsp->sig == nullptr)
+			if (auxVuelo->sig == nullptr)
 			{ //Si es el primero y unico nodo
 				//delete auxEsp;		//Eliminamos el primer nodo
 				//inicio = nullptr;
 				//auxEsp = inicio;
 
-				iniEsp = nullptr;
-				delete auxEsp;
+				iniVuelo = nullptr;
+				delete auxVuelo;
 
-				auxEsp = iniEsp;
-				auxEsp2 = auxEsp;
+				auxVuelo = iniVuelo;
+				auxVuelo2 = auxVuelo;
 			}
 			else
 			{ //Si es el primero y hay mas nodos
@@ -3318,14 +3412,14 @@ void eliminarEsp(char nomEsp[30])
 				delete auxEsp;
 				auxEsp = iniEsp;*/
 
-				start = iniEsp->sig;
-				auxEsp->sig->ant = nullptr;
-				delete auxEsp;
-				auxEsp = start;
-				auxEsp->ant = nullptr;
+				start = iniVuelo->sig;
+				auxVuelo->sig->ant = nullptr;
+				delete auxVuelo;
+				auxVuelo = start;
+				auxVuelo->ant = nullptr;
 
-				auxEsp2 = auxEsp;
-				iniEsp = auxEsp;
+				auxVuelo2 = auxVuelo;
+				iniVuelo = auxVuelo;
 			}
 
 			MessageBox(0, "Especialidad eliminada", "AVISO", MB_OK);
@@ -3333,22 +3427,22 @@ void eliminarEsp(char nomEsp[30])
 		else
 		{
 
-			if (auxEsp->sig == nullptr)
+			if (auxVuelo->sig == nullptr)
 			{ //Si el nodo es el último
-				auxEsp->ant->sig = nullptr;	//Antes de eliminar, el penultumo nodo, su puntero siguiente, lo igualamos a nullptr
-				delete auxEsp;
+				auxVuelo->ant->sig = nullptr;	//Antes de eliminar, el penultumo nodo, su puntero siguiente, lo igualamos a nullptr
+				delete auxVuelo;
 
-				auxEsp = iniEsp;
-				auxEsp2 = auxEsp;
+				auxVuelo = iniVuelo;
+				auxVuelo2 = auxVuelo;
 			}
 			else
 			{ //Si es cualquier nodo que no sea el inicio o el último
-				auxEsp->sig->ant = auxEsp->ant;
-				auxEsp->ant->sig = auxEsp->sig;
-				delete auxEsp;
+				auxVuelo->sig->ant = auxVuelo->ant;
+				auxVuelo->ant->sig = auxVuelo->sig;
+				delete auxVuelo;
 
-				auxEsp2 = auxEsp;
-				auxEsp = iniEsp; //Para que auxEsp no quede sin apuntar a nada, la apuntamos al inicio
+				auxVuelo2 = auxVuelo;
+				auxVuelo = iniVuelo; //Para que auxEsp no quede sin apuntar a nada, la apuntamos al inicio
 			}
 
 			MessageBox(0, "Especialidad eliminada", "AVISO", MB_OK);
@@ -3360,17 +3454,17 @@ void eliminarEsp(char nomEsp[30])
 
 void escribirEsp()
 {
-	auxEsp = iniEsp;
+	auxVuelo = iniVuelo;
 
 	ofstream escribir;
 	escribir.open("C:\\Users\\hp\\Documents\\UANL\\Universidad 7\\ED\\Proyecto_Clinica\\Proyecto_Clinica\\Especialidades.bin", ios::out | ios::binary | ios::trunc);
 
 	if (escribir.is_open())
 	{
-		while (auxEsp != nullptr)
+		while (auxVuelo != nullptr)
 		{
-			escribir.write((char*)auxEsp, sizeof(especialidad));
-			auxEsp = auxEsp->sig;
+			escribir.write((char*)auxVuelo, sizeof(Vuelo));
+			auxVuelo = auxVuelo->sig;
 		}
 
 		escribir.close();
@@ -3402,42 +3496,42 @@ void escribirEsp()
 
 void leerEsp()
 {
-	auxEsp = iniEsp;
+	auxVuelo = iniVuelo;
 
 	ifstream leer;
 	leer.open("C:\\Users\\hp\\Documents\\UANL\\Universidad 7\\ED\\Proyecto_Clinica\\Proyecto_Clinica\\Especialidades.bin", ios::in | ios::binary);
 
 	if (leer.is_open())
 	{
-		especialidad* espLeida = new especialidad;
+		Vuelo* espLeida = new Vuelo;
 
-		while (!leer.read((char*)espLeida, sizeof(especialidad)).eof())
+		while (!leer.read((char*)espLeida, sizeof(Vuelo)).eof())
 		{
 
-			while (auxEsp != nullptr && auxEsp->sig != nullptr)
+			while (auxVuelo != nullptr && auxVuelo->sig != nullptr)
 			{
-				auxEsp = auxEsp->sig;
+				auxVuelo = auxVuelo->sig;
 			}
-			if (auxEsp == nullptr)
+			if (auxVuelo == nullptr)
 			{
-				iniEsp = espLeida;
-				iniEsp->sig = nullptr;
-				iniEsp->ant = nullptr;
-				auxEsp = iniEsp;
+				iniVuelo = espLeida;
+				iniVuelo->sig = nullptr;
+				iniVuelo->ant = nullptr;
+				auxVuelo = iniVuelo;
 			}
 			else
 			{
-				auxEsp->sig = espLeida;
-				auxEsp->sig->ant = auxEsp;
-				auxEsp = auxEsp->sig;
-				auxEsp->sig = nullptr;
+				auxVuelo->sig = espLeida;
+				auxVuelo->sig->ant = auxVuelo;
+				auxVuelo = auxVuelo->sig;
+				auxVuelo->sig = nullptr;
 				/*auxEsp->sig = espLeida;
 				auxEsp->ant = auxEsp;
 				auxEsp = auxEsp->sig;
 				auxEsp->sig = nullptr;*/
 			}
 
-			espLeida = new especialidad;
+			espLeida = new Vuelo;
 		}
 
 		leer.close();
@@ -3450,40 +3544,40 @@ void leerEsp()
 //Funciones de Listas de Medicos
 #pragma region Funciones de Listas Medicos
 
-void nuevoMed(medico* nuevoMed)
+void nuevoMed(boleto* nuevoMed)
 {
 	if (pivote == nullptr)
 	{ //Si 'inicio->sig es igual a nullptr, o sea, apunta a nada, la lista esta vacia
-		pivote = new medico;
+		pivote = new boleto;
 
-		strcpy_s(pivote->nombreMed, nuevoMed->nombreMed);
-		strcpy_s(pivote->apellidoPM, nuevoMed->apellidoPM);
-		strcpy_s(pivote->apellidoMM, nuevoMed->apellidoMM);
+		strcpy_s(pivote->nombrePasajero, nuevoMed->nombrePasajero);
+		strcpy_s(pivote->apellidoPPasajero, nuevoMed->apellidoPPasajero);
+		strcpy_s(pivote->apellidoMPasajero, nuevoMed->apellidoMPasajero);
 
 		// Concatenación
-		strcpy_s(pivote->nombreCompM, nuevoMed->nombreMed);
-		strcat_s(pivote->nombreCompM, " ");
-		strcat_s(pivote->nombreCompM, pivote->apellidoPM);
-		strcat_s(pivote->nombreCompM, " ");
-		strcat_s(pivote->nombreCompM, pivote->apellidoMM);
+		strcpy_s(pivote->nombreCompPasajero, nuevoMed->nombrePasajero);
+		strcat_s(pivote->nombreCompPasajero, " ");
+		strcat_s(pivote->nombreCompPasajero, pivote->apellidoPPasajero);
+		strcat_s(pivote->nombreCompPasajero, " ");
+		strcat_s(pivote->nombreCompPasajero, pivote->apellidoMPasajero);
 
-		strcpy_s(pivote->cedulaChar, nuevoMed->cedulaChar);
-		pivote->cedulaNum = atoi(pivote->cedulaChar);
-		strcpy_s(pivote->numConsultorioChar, nuevoMed->numConsultorioChar);
-		pivote->numConsultorioNum = atoi(pivote->numConsultorioChar);
-		strcpy_s(pivote->telefonoChar, nuevoMed->telefonoChar);
-		pivote->telefonoNum = atoi(pivote->telefonoChar);
+		//strcpy_s(pivote->cedulaChar, nuevoMed->cedulaChar);
+		//pivote->cedulaNum = atoi(pivote->cedulaChar);
+		//strcpy_s(pivote->numConsultorioChar, nuevoMed->numConsultorioChar);
+		//pivote->clase = atoi(pivote->numConsultorioChar);
+		//strcpy_s(pivote->telefonoChar, nuevoMed->telefonoChar);
+		//pivote->estado = atoi(pivote->telefonoChar);
 
-		strcpy_s(pivote->hoararioChar, nuevoMed->hoararioChar);
-		pivote->hoararioNum = nuevoMed->hoararioNum;
-		strcpy_s(pivote->diasChar, nuevoMed->diasChar);
-		pivote->diasNum = nuevoMed->diasNum;
+		//strcpy_s(pivote->hoararioChar, nuevoMed->hoararioChar);
+		pivote->pase = nuevoMed->pase;
+		//strcpy_s(pivote->diasChar, nuevoMed->diasChar);
+		//pivote->diasNum = nuevoMed->diasNum;
 
-		strcpy_s(pivote->especialidad, nuevoMed->especialidad);
+		strcpy_s(pivote->vuelo, nuevoMed->vuelo);
 
-		strcpy_s(pivote->foto, nuevoMed->foto);
+		//strcpy_s(pivote->foto, nuevoMed->foto);
 
-		strcpy_s(pivote->nombreUsuM, nuevoMed->nombreUsuM);
+		strcpy_s(pivote->usuarioRegistro, nuevoMed->usuarioRegistro);
 
 		pivote->sig = nullptr;
 		pivote->ant = nullptr;
@@ -3495,19 +3589,22 @@ void nuevoMed(medico* nuevoMed)
 	}
 	else
 	{
-		auxMed = pivote;
+		// ::: ANTERIOR ::: //
+		/*
+		 		auxMed = pivote;	
 		nuevoMed->cedulaNum = atoi(nuevoMed->cedulaChar);
 
-		/*if (nuevoMed->cedulaNum == auxMed->cedulaNum)
-		{
-			auxMed2 = auxMed->ant;
-			auxMed->ant = new medico;
-			auxMed->ant->ant = auxMed2;
-			auxMed->ant->sig = auxMed;
-			auxMed = auxMed->ant;
-			auxMed2->sig = auxMed;
-		}
-		else */if (nuevoMed->cedulaNum > auxMed->cedulaNum)
+		//if (nuevoMed->cedulaNum == auxMed->cedulaNum)
+		//{
+		//	auxMed2 = auxMed->ant;
+		//	auxMed->ant = new medico;
+		//	auxMed->ant->ant = auxMed2;
+		//	auxMed->ant->sig = auxMed;
+		//	auxMed = auxMed->ant;
+		//	auxMed2->sig = auxMed;
+		//}
+		//else 
+		if (nuevoMed->cedulaNum > auxMed->cedulaNum)
 		{
 			while (auxMed->sig != nullptr && nuevoMed->cedulaNum > auxMed->cedulaNum)
 			{
@@ -3517,19 +3614,20 @@ void nuevoMed(medico* nuevoMed)
 			if (auxMed->ant != nullptr && auxMed->sig != nullptr)
 			{
 
-				/*if (nuevoMed->cedulaNum == auxMed->cedulaNum)
-				{
-					auxMed2 = auxMed->ant;
-					auxMed->ant = new medico;
-					auxMed->ant->ant = auxMed2;
-					auxMed->ant->sig = auxMed;
-					auxMed = auxMed->ant;
-					auxMed2->sig = auxMed;
-				}
-				else */if (nuevoMed->cedulaNum > auxMed->cedulaNum)
+				//if (nuevoMed->cedulaNum == auxMed->cedulaNum)
+				//{
+				//	auxMed2 = auxMed->ant;
+				//	auxMed->ant = new medico;
+				//	auxMed->ant->ant = auxMed2;
+				//	auxMed->ant->sig = auxMed;
+				//	auxMed = auxMed->ant;
+				//	auxMed2->sig = auxMed;
+				//}
+				//else
+				if (nuevoMed->cedulaNum > auxMed->cedulaNum)
 				{
 					auxMed2 = auxMed->sig;
-					auxMed->sig = new medico;
+					auxMed->sig = new boleto;
 					auxMed->sig->sig = auxMed2;
 					auxMed->sig->ant = auxMed;
 					auxMed = auxMed->sig;
@@ -3538,7 +3636,7 @@ void nuevoMed(medico* nuevoMed)
 				else
 				{
 					auxMed2 = auxMed->ant;
-					auxMed->ant = new medico;
+					auxMed->ant = new boleto;
 					auxMed->ant->ant = auxMed2;
 					auxMed->ant->sig = auxMed;
 					auxMed = auxMed->ant;
@@ -3547,18 +3645,19 @@ void nuevoMed(medico* nuevoMed)
 			}
 			else
 			{
-				/*if (nuevoMed->cedulaNum == auxMed->cedulaNum)
+				//if (nuevoMed->cedulaNum == auxMed->cedulaNum)
+				//{
+				//	auxMed2 = auxMed->ant;
+				//	auxMed->ant = new medico;
+				//	auxMed->ant->ant = auxMed2;
+				//	auxMed->ant->sig = auxMed;
+				//	auxMed = auxMed->ant;
+				//	auxMed2->sig = auxMed;
+				//}
+				//else
+				if (nuevoMed->cedulaNum > auxMed->cedulaNum)
 				{
-					auxMed2 = auxMed->ant;
-					auxMed->ant = new medico;
-					auxMed->ant->ant = auxMed2;
-					auxMed->ant->sig = auxMed;
-					auxMed = auxMed->ant;
-					auxMed2->sig = auxMed;
-				}
-				else */if (nuevoMed->cedulaNum > auxMed->cedulaNum)
-				{
-					auxMed->sig = new medico;
+					auxMed->sig = new boleto;
 					auxMed->sig->sig = nullptr;
 					auxMed->sig->ant = auxMed;
 					auxMed = auxMed->sig;
@@ -3566,7 +3665,7 @@ void nuevoMed(medico* nuevoMed)
 				else
 				{
 					auxMed2 = auxMed->ant;
-					auxMed->ant = new medico;
+					auxMed->ant = new boleto;
 					auxMed->ant->ant = auxMed2;
 					auxMed->ant->sig = auxMed;
 					auxMed = auxMed->ant;
@@ -3584,19 +3683,20 @@ void nuevoMed(medico* nuevoMed)
 			if (auxMed->ant != nullptr && auxMed->sig != nullptr)
 			{
 
-				/*if (nuevoMed->cedulaNum == auxMed->cedulaNum)
+				//if (nuevoMed->cedulaNum == auxMed->cedulaNum)
+				//{
+				//	auxMed2 = auxMed->ant;
+				//	auxMed->ant = new medico;
+				//	auxMed->ant->ant = auxMed2;
+				//	auxMed->ant->sig = auxMed;
+				//	auxMed = auxMed->ant;
+				//	auxMed2->sig = auxMed;
+				//}
+				//else 
+				if (nuevoMed->cedulaNum < auxMed->cedulaNum)
 				{
 					auxMed2 = auxMed->ant;
-					auxMed->ant = new medico;
-					auxMed->ant->ant = auxMed2;
-					auxMed->ant->sig = auxMed;
-					auxMed = auxMed->ant;
-					auxMed2->sig = auxMed;
-				}
-				else */if (nuevoMed->cedulaNum < auxMed->cedulaNum)
-				{
-					auxMed2 = auxMed->ant;
-					auxMed->ant = new medico;
+					auxMed->ant = new boleto;
 					auxMed->ant->ant = auxMed2;
 					auxMed->ant->sig = auxMed;
 					auxMed = auxMed->ant;
@@ -3605,7 +3705,7 @@ void nuevoMed(medico* nuevoMed)
 				else
 				{
 					auxMed2 = auxMed->sig;
-					auxMed->sig = new medico;
+					auxMed->sig = new boleto;
 					auxMed->sig->sig = auxMed2;
 					auxMed->sig->ant = auxMed;
 					auxMed = auxMed->sig;
@@ -3614,18 +3714,19 @@ void nuevoMed(medico* nuevoMed)
 			}
 			else
 			{
-				/*if (nuevoMed->cedulaNum == auxMed->cedulaNum)
+				//if (nuevoMed->cedulaNum == auxMed->cedulaNum)
+				//{
+				//	auxMed2 = auxMed->ant;
+				//	auxMed->ant = new medico;
+				//	auxMed->ant->ant = auxMed2;
+				//	auxMed->ant->sig = auxMed;
+				//	auxMed = auxMed->ant;
+				//	auxMed2->sig = auxMed;
+				//}
+				//else 
+				if (nuevoMed->cedulaNum < auxMed->cedulaNum)
 				{
-					auxMed2 = auxMed->ant;
-					auxMed->ant = new medico;
-					auxMed->ant->ant = auxMed2;
-					auxMed->ant->sig = auxMed;
-					auxMed = auxMed->ant;
-					auxMed2->sig = auxMed;
-				}
-				else */if (nuevoMed->cedulaNum < auxMed->cedulaNum)
-				{
-					auxMed->ant = new medico;
+					auxMed->ant = new boleto;
 					auxMed->ant->ant = nullptr;
 					auxMed->ant->sig = auxMed;
 					auxMed = auxMed->ant;
@@ -3633,44 +3734,46 @@ void nuevoMed(medico* nuevoMed)
 				else
 				{
 					auxMed2 = auxMed->sig;
-					auxMed->sig = new medico;
+					auxMed->sig = new boleto;
 					auxMed->sig->sig = auxMed2;
 					auxMed->sig->ant = auxMed;
 					auxMed = auxMed->sig;
 					auxMed2->ant = auxMed;
 				}
 			}
-			
-		}
 
-		strcpy_s(auxMed->nombreMed, nuevoMed->nombreMed);
-		strcpy_s(auxMed->apellidoPM, nuevoMed->apellidoPM);
-		strcpy_s(auxMed->apellidoMM, nuevoMed->apellidoMM);
+		}
+		*/
+
+
+		strcpy_s(auxMed->nombrePasajero, nuevoMed->nombrePasajero);
+		strcpy_s(auxMed->apellidoPPasajero, nuevoMed->apellidoPPasajero);
+		strcpy_s(auxMed->apellidoMPasajero, nuevoMed->apellidoMPasajero);
 
 		// Concatenación
-		strcpy_s(auxMed->nombreCompM, nuevoMed->nombreMed);
-		strcat_s(auxMed->nombreCompM, " ");
-		strcat_s(auxMed->nombreCompM, auxMed->apellidoPM);
-		strcat_s(auxMed->nombreCompM, " ");
-		strcat_s(auxMed->nombreCompM, auxMed->apellidoMM);
+		strcpy_s(auxMed->nombreCompPasajero, nuevoMed->nombrePasajero);
+		strcat_s(auxMed->nombreCompPasajero, " ");
+		strcat_s(auxMed->nombreCompPasajero, auxMed->apellidoPPasajero);
+		strcat_s(auxMed->nombreCompPasajero, " ");
+		strcat_s(auxMed->nombreCompPasajero, auxMed->apellidoMPasajero);
 
-		strcpy_s(auxMed->cedulaChar, nuevoMed->cedulaChar);
-		auxMed->cedulaNum = atoi(auxMed->cedulaChar);
-		strcpy_s(auxMed->numConsultorioChar, nuevoMed->numConsultorioChar);
-		auxMed->numConsultorioNum = atoi(auxMed->numConsultorioChar);
-		strcpy_s(auxMed->telefonoChar, nuevoMed->telefonoChar);
-		auxMed->telefonoNum = atoi(auxMed->telefonoChar);
+		//strcpy_s(auxMed->cedulaChar, nuevoMed->cedulaChar);
+		//auxMed->cedulaNum = atoi(auxMed->cedulaChar);
+		//strcpy_s(auxMed->numConsultorioChar, nuevoMed->numConsultorioChar);
+		//auxMed->clase = atoi(auxMed->numConsultorioChar);
+		//strcpy_s(auxMed->telefonoChar, nuevoMed->telefonoChar);
+		//auxMed->estado = atoi(auxMed->telefonoChar);
 
-		strcpy_s(auxMed->hoararioChar, nuevoMed->hoararioChar);
-		auxMed->hoararioNum = nuevoMed->hoararioNum;
-		strcpy_s(auxMed->diasChar, nuevoMed->diasChar);
-		auxMed->diasNum = nuevoMed->diasNum;
+		//strcpy_s(auxMed->hoararioChar, nuevoMed->hoararioChar);
+		auxMed->pase = nuevoMed->pase;
+		//strcpy_s(auxMed->diasChar, nuevoMed->diasChar);
+		//auxMed->diasNum = nuevoMed->diasNum;
 
-		strcpy_s(auxMed->especialidad, nuevoMed->especialidad);
+		strcpy_s(auxMed->vuelo, nuevoMed->vuelo);
 
-		strcpy_s(auxMed->foto, nuevoMed->foto);
+		//strcpy_s(auxMed->foto, nuevoMed->foto);
 
-		strcpy_s(auxMed->nombreUsuM, nuevoMed->nombreUsuM);
+		strcpy_s(auxMed->usuarioRegistro, nuevoMed->usuarioRegistro);
 
 		while (auxMed->ant != nullptr)
 		{
@@ -3690,7 +3793,7 @@ void nuevoMed(medico* nuevoMed)
 
 void eliminarMed(char medicoNom[60])
 {
-	medico* start;
+	boleto* start;
 	auxMed = iniMed;
 
 	if (auxMed == nullptr)
@@ -3699,13 +3802,13 @@ void eliminarMed(char medicoNom[60])
 	}
 	else
 	{
-		while (auxMed->sig != nullptr && strcmp(auxMed->nombreCompM, medicoNom) != 0)
+		while (auxMed->sig != nullptr && strcmp(auxMed->nombreCompPasajero, medicoNom) != 0)
 		{ //Nos movemos en el arreglo para buscar el usuario
 
 			auxMed = auxMed->sig;
 		}
 
-		if (auxMed->sig == nullptr || strcmp(auxMed->nombreCompM, medicoNom) != 0)
+		if (auxMed->sig == nullptr || strcmp(auxMed->nombreCompPasajero, medicoNom) != 0)
 		{
 			MessageBox(0, "Medico no encontrado", "AVISO", MB_OK);
 		}
@@ -3808,7 +3911,7 @@ void escribirMed()
 	{
 		while (auxMed != nullptr)
 		{
-			escribir.write((char*)auxMed, sizeof(medico));
+			escribir.write((char*)auxMed, sizeof(boleto));
 			auxMed = auxMed->sig;
 		}
 
@@ -3848,9 +3951,9 @@ void leerMed()
 
 	if (leer.is_open())
 	{
-		medico* medLeido = new medico;
+		boleto* medLeido = new boleto;
 
-		while (!leer.read((char*)medLeido, sizeof(medico)).eof())
+		while (!leer.read((char*)medLeido, sizeof(boleto)).eof())
 		{
 
 			while (auxMed != nullptr && auxMed->sig != nullptr)
@@ -3876,7 +3979,7 @@ void leerMed()
 				auxMed->sig = nullptr;*/
 			}
 
-			medLeido = new medico;
+			medLeido = new boleto;
 		}
 
 		leer.close();
@@ -3895,7 +3998,7 @@ void reporteMed()
 	{
 		while (auxMed != nullptr)
 		{
-			escribir.write((char*)auxMed, sizeof(medico));
+			escribir.write((char*)auxMed, sizeof(boleto));
 			auxMed = auxMed->sig;
 		}
 
@@ -3931,54 +4034,56 @@ void reporteMed()
 //Funciones de Listas de Pacientes
 #pragma region Funciones de Listas Pacientes
 
-void nuevoPas(paciente* nuevoPas)
+void nuevoPas(pasajero* nuevoPas)
 {
-	if (iniPas == nullptr)
+	if (iniPasajero == nullptr)
 	{ //Si 'inicio->sig es igual a nullptr, o sea, apunta a nada, la lista esta vacia
-		iniPas = new paciente;
+		iniPasajero = new pasajero;
 
-		strcpy_s(iniPas->nombrePas, nuevoPas->nombrePas);
-		strcpy_s(iniPas->apellidoPP, nuevoPas->apellidoPP);
-		strcpy_s(iniPas->apellidoMP, nuevoPas->apellidoMP);
+		strcpy_s(iniPasajero->nombre, nuevoPas->nombre);
+		strcpy_s(iniPasajero->apellidoP, nuevoPas->apellidoP);
+		strcpy_s(iniPasajero->apellidoM, nuevoPas->apellidoM);
 
 		// Concatenación
-		strcpy_s(iniPas->nombreCompP, nuevoPas->nombrePas);
-		strcat_s(iniPas->nombreCompP, " ");
-		strcat_s(iniPas->nombreCompP, iniPas->apellidoPP);
-		strcat_s(iniPas->nombreCompP, " ");
-		strcat_s(iniPas->nombreCompP, iniPas->apellidoMP);
+		strcpy_s(iniPasajero->nombreComp, nuevoPas->nombre);
+		strcat_s(iniPasajero->nombreComp, " ");
+		strcat_s(iniPasajero->nombreComp, iniPasajero->apellidoP);
+		strcat_s(iniPasajero->nombreComp, " ");
+		strcat_s(iniPasajero->nombreComp, iniPasajero->apellidoM);
 
-		strcpy_s(iniPas->genero, nuevoPas->genero);
+		
 
-		strcpy_s(iniPas->telefonoCharP, nuevoPas->telefonoCharP);
-		iniPas->telefonoNumP = atoi(iniPas->telefonoCharP);
+		strcpy_s(iniPasajero->nacionalidad, nuevoPas->nacionalidad);
+		
+		// ::: CAMBIO DE TIPO ::: //
+		//strcpy_s(iniPas->fecha, nuevoPas->fecha);
+		//strcpy_s(iniPas->genero, nuevoPas->genero);
 
-		strcpy_s(iniPas->ref, nuevoPas->ref);
-		strcpy_s(iniPas->fecha, nuevoPas->fecha);
+		// ::: PASADOS ::: //
+		//iniPas->telefonoNumP = atoi(iniPas->nacionalidad);
+		//strcpy_s(iniPas->ref, nuevoPas->ref);
+		//strcpy_s(iniPas->edadChar, nuevoPas->edadChar);
+		//iniPas->edadNum = atoi(iniPas->edadChar);
+		//strcpy_s(iniPas->pMedicoP, nuevoPas->pMedicoP);
 
-		strcpy_s(iniPas->edadChar, nuevoPas->edadChar);
-		iniPas->edadNum = atoi(iniPas->edadChar);
+		strcpy_s(iniPasajero->usuarioRegistro, nuevoPas->usuarioRegistro);
 
-		strcpy_s(iniPas->pMedicoP, nuevoPas->pMedicoP);
+		iniPasajero->sig = nullptr;
+		iniPasajero->ant = nullptr;
 
-		strcpy_s(iniPas->nombreUsuP, nuevoPas->nombreUsuP);
-
-		iniPas->sig = nullptr;
-		iniPas->ant = nullptr;
-
-		auxPas = iniPas;
-		auxPas2 = auxPas;
-		auxPas3 = auxPas;
+		auxPasajero = iniPasajero;
+		auxPasajero2 = auxPasajero;
+		auxPasajero3 = auxPasajero;
 	}
 	else
 	{
-		auxPas = iniPas;
+		auxPasajero = iniPasajero;
 
-		strcpy_s(nuevoPas->nombreCompP, nuevoPas->nombrePas);
-		strcat_s(nuevoPas->nombreCompP, " ");
-		strcat_s(nuevoPas->nombreCompP, nuevoPas->apellidoPP);
-		strcat_s(nuevoPas->nombreCompP, " ");
-		strcat_s(nuevoPas->nombreCompP, nuevoPas->apellidoMP);
+		strcpy_s(nuevoPas->nombreComp, nuevoPas->nombre);
+		strcat_s(nuevoPas->nombreComp, " ");
+		strcat_s(nuevoPas->nombreComp, nuevoPas->apellidoP);
+		strcat_s(nuevoPas->nombreComp, " ");
+		strcat_s(nuevoPas->nombreComp, nuevoPas->apellidoM);
 
 		/*if (nuevoPas->cedulaNum == auxPas->cedulaNum)
 		{
@@ -3989,14 +4094,14 @@ void nuevoPas(paciente* nuevoPas)
 			auxPas = auxPas->ant;
 			auxPas2->sig = auxPas;
 		}
-		else */if (strcmp(nuevoPas->nombreCompP, auxPas->nombreCompP) > 0)
+		else */if (strcmp(nuevoPas->nombreComp, auxPasajero->nombreComp) > 0)
 		{
-			while (auxPas->sig != nullptr && strcmp(nuevoPas->nombreCompP, auxPas->nombreCompP) > 0)
+			while (auxPasajero->sig != nullptr && strcmp(nuevoPas->nombreComp, auxPasajero->nombreComp) > 0)
 			{
-				auxPas = auxPas->sig;
+				auxPasajero = auxPasajero->sig;
 			}
 
-			if (auxPas->ant != nullptr && auxPas->sig != nullptr)
+			if (auxPasajero->ant != nullptr && auxPasajero->sig != nullptr)
 			{
 
 				/*if (nuevoPas->cedulaNum == auxPas->cedulaNum)
@@ -4008,23 +4113,23 @@ void nuevoPas(paciente* nuevoPas)
 					auxPas = auxPas->ant;
 					auxPas2->sig = auxPas;
 				}
-				else */if (strcmp(nuevoPas->nombreCompP, auxPas->nombreCompP) > 0)
+				else */if (strcmp(nuevoPas->nombreComp, auxPasajero->nombreComp) > 0)
 				{
-					auxPas2 = auxPas->sig;
-					auxPas->sig = new paciente;
-					auxPas->sig->sig = auxPas2;
-					auxPas->sig->ant = auxPas;
-					auxPas = auxPas->sig;
-					auxPas2->ant = auxPas;
+					auxPasajero2 = auxPasajero->sig;
+					auxPasajero->sig = new pasajero;
+					auxPasajero->sig->sig = auxPasajero2;
+					auxPasajero->sig->ant = auxPasajero;
+					auxPasajero = auxPasajero->sig;
+					auxPasajero2->ant = auxPasajero;
 				}
 				else
 				{
-					auxPas2 = auxPas->ant;
-					auxPas->ant = new paciente;
-					auxPas->ant->ant = auxPas2;
-					auxPas->ant->sig = auxPas;
-					auxPas = auxPas->ant;
-					auxPas2->sig = auxPas;
+					auxPasajero2 = auxPasajero->ant;
+					auxPasajero->ant = new pasajero;
+					auxPasajero->ant->ant = auxPasajero2;
+					auxPasajero->ant->sig = auxPasajero;
+					auxPasajero = auxPasajero->ant;
+					auxPasajero2->sig = auxPasajero;
 				}
 			}
 			else
@@ -4038,32 +4143,32 @@ void nuevoPas(paciente* nuevoPas)
 					auxPas = auxPas->ant;
 					auxPas2->sig = auxPas;
 				}
-				else */if (strcmp(nuevoPas->nombreCompP, auxPas->nombreCompP) > 0)
+				else */if (strcmp(nuevoPas->nombreComp, auxPasajero->nombreComp) > 0)
 				{
-					auxPas->sig = new paciente;
-					auxPas->sig->sig = nullptr;
-					auxPas->sig->ant = auxPas;
-					auxPas = auxPas->sig;
+					auxPasajero->sig = new pasajero;
+					auxPasajero->sig->sig = nullptr;
+					auxPasajero->sig->ant = auxPasajero;
+					auxPasajero = auxPasajero->sig;
 				}
 				else
 				{
-					auxPas2 = auxPas->ant;
-					auxPas->ant = new paciente;
-					auxPas->ant->ant = auxPas2;
-					auxPas->ant->sig = auxPas;
-					auxPas = auxPas->ant;
-					auxPas2->sig = auxPas;
+					auxPasajero2 = auxPasajero->ant;
+					auxPasajero->ant = new pasajero;
+					auxPasajero->ant->ant = auxPasajero2;
+					auxPasajero->ant->sig = auxPasajero;
+					auxPasajero = auxPasajero->ant;
+					auxPasajero2->sig = auxPasajero;
 				}
 			}
 		}
 		else
 		{
-			while (auxPas->ant != nullptr && strcmp(nuevoPas->nombreCompP, auxPas->nombreCompP) < 0)
+			while (auxPasajero->ant != nullptr && strcmp(nuevoPas->nombreComp, auxPasajero->nombreComp) < 0)
 			{
-				auxPas = auxPas->ant;
+				auxPasajero = auxPasajero->ant;
 			}
 
-			if (auxPas->ant != nullptr && auxPas->sig != nullptr)
+			if (auxPasajero->ant != nullptr && auxPasajero->sig != nullptr)
 			{
 
 				/*if (nuevoPas->cedulaNum == auxPas->cedulaNum)
@@ -4075,23 +4180,23 @@ void nuevoPas(paciente* nuevoPas)
 					auxPas = auxPas->ant;
 					auxPas2->sig = auxPas;
 				}
-				else */if (strcmp(nuevoPas->nombreCompP, auxPas->nombreCompP) < 0)
+				else */if (strcmp(nuevoPas->nombreComp, auxPasajero->nombreComp) < 0)
 				{
-					auxPas2 = auxPas->ant;
-					auxPas->ant = new paciente;
-					auxPas->ant->ant = auxPas2;
-					auxPas->ant->sig = auxPas;
-					auxPas = auxPas->ant;
-					auxPas2->sig = auxPas;
+					auxPasajero2 = auxPasajero->ant;
+					auxPasajero->ant = new pasajero;
+					auxPasajero->ant->ant = auxPasajero2;
+					auxPasajero->ant->sig = auxPasajero;
+					auxPasajero = auxPasajero->ant;
+					auxPasajero2->sig = auxPasajero;
 				}
 				else
 				{
-					auxPas2 = auxPas->sig;
-					auxPas->sig = new paciente;
-					auxPas->sig->sig = auxPas2;
-					auxPas->sig->ant = auxPas;
-					auxPas = auxPas->sig;
-					auxPas2->ant = auxPas;
+					auxPasajero2 = auxPasajero->sig;
+					auxPasajero->sig = new pasajero;
+					auxPasajero->sig->sig = auxPasajero2;
+					auxPasajero->sig->ant = auxPasajero;
+					auxPasajero = auxPasajero->sig;
+					auxPasajero2->ant = auxPasajero;
 				}
 			}
 			else
@@ -4105,62 +4210,65 @@ void nuevoPas(paciente* nuevoPas)
 					auxPas = auxPas->ant;
 					auxPas2->sig = auxPas;
 				}
-				else */if (strcmp(nuevoPas->nombrePas, auxPas->nombrePas) < 0)
+				else */if (strcmp(nuevoPas->nombre, auxPasajero->nombre) < 0)
 				{
-					auxPas->ant = new paciente;
-					auxPas->ant->ant = nullptr;
-					auxPas->ant->sig = auxPas;
-					auxPas = auxPas->ant;
+					auxPasajero->ant = new pasajero;
+					auxPasajero->ant->ant = nullptr;
+					auxPasajero->ant->sig = auxPasajero;
+					auxPasajero = auxPasajero->ant;
 				}
 				else
 				{
-					auxPas2 = auxPas->sig;
-					auxPas->sig = new paciente;
-					auxPas->sig->sig = auxPas2;
-					auxPas->sig->ant = auxPas;
-					auxPas = auxPas->sig;
-					auxPas2->ant = auxPas;
+					auxPasajero2 = auxPasajero->sig;
+					auxPasajero->sig = new pasajero;
+					auxPasajero->sig->sig = auxPasajero2;
+					auxPasajero->sig->ant = auxPasajero;
+					auxPasajero = auxPasajero->sig;
+					auxPasajero2->ant = auxPasajero;
 				}
 			}
 
 		}
 
-		strcpy_s(auxPas->nombrePas, nuevoPas->nombrePas);
-		strcpy_s(auxPas->apellidoPP, nuevoPas->apellidoPP);
-		strcpy_s(auxPas->apellidoMP, nuevoPas->apellidoMP);
+		strcpy_s(auxPasajero->nombre, nuevoPas->nombre);
+		strcpy_s(auxPasajero->apellidoP, nuevoPas->apellidoP);
+		strcpy_s(auxPasajero->apellidoM, nuevoPas->apellidoM);
 
 		// Concatenación
-		strcpy_s(auxPas->nombreCompP, auxPas->nombrePas);
-		strcat_s(auxPas->nombreCompP, " ");
-		strcat_s(auxPas->nombreCompP, auxPas->apellidoPP);
-		strcat_s(auxPas->nombreCompP, " ");
-		strcat_s(auxPas->nombreCompP, auxPas->apellidoMP);
+		strcpy_s(auxPasajero->nombreComp, auxPasajero->nombre);
+		strcat_s(auxPasajero->nombreComp, " ");
+		strcat_s(auxPasajero->nombreComp, auxPasajero->apellidoP);
+		strcat_s(auxPasajero->nombreComp, " ");
+		strcat_s(auxPasajero->nombreComp, auxPasajero->apellidoM);
 
-		strcpy_s(auxPas->genero, nuevoPas->genero);
+		
 
-		strcpy_s(auxPas->telefonoCharP, nuevoPas->telefonoCharP);
-		auxPas->telefonoNumP = atoi(auxPas->telefonoCharP);
+		strcpy_s(auxPasajero->nacionalidad, nuevoPas->nacionalidad);
+		
 
-		strcpy_s(auxPas->ref, nuevoPas->ref);
-		strcpy_s(auxPas->fecha, nuevoPas->fecha);
+		// ::: CAMBIO DE TIPO ::: //
+		//strcpy_s(auxPas->fecha, nuevoPas->fecha);
+		//strcpy_s(auxPas->genero, nuevoPas->genero);
 
-		strcpy_s(auxPas->edadChar, nuevoPas->edadChar);
-		auxPas->edadNum = atoi(auxPas->edadChar);
+		// ::: PASADOS ::: //
+		//auxPas->telefonoNumP = atoi(auxPas->nacionalidad);
+		//strcpy_s(auxPas->edadChar, nuevoPas->edadChar);
+		//auxPas->edadNum = atoi(auxPas->edadChar);
+		//strcpy_s(auxPas->ref, nuevoPas->ref);
+		//strcpy_s(auxPas->pMedicoP, nuevoPas->pMedicoP);
 
-		strcpy_s(auxPas->pMedicoP, nuevoPas->pMedicoP);
+		strcpy_s(auxPasajero->usuarioRegistro, nuevoPas->usuarioRegistro);
 
-		strcpy_s(auxPas->nombreUsuP, nuevoPas->nombreUsuP);
-
-		while (auxPas->ant != nullptr)
+		while (auxPasajero->ant != nullptr)
 		{
-			auxPas = auxPas->ant;
+			auxPasajero = auxPasajero->ant;
 		}
 
-		iniPas = auxPas;
+		iniPasajero = auxPasajero;
 
-		auxPas = iniPas;
-		auxPas2 = auxPas;
-		auxPas3 = auxPas;
+		auxPasajero = iniPasajero;
+		auxPasajero2 = auxPasajero;
+		auxPasajero3 = auxPasajero;
 	}
 
 	MessageBox(NULL, "Se ha registrado al paciente con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
@@ -4169,53 +4277,53 @@ void nuevoPas(paciente* nuevoPas)
 
 void eliminarPas(char pacienteNom[60])
 {
-	paciente* start;
-	auxPas = iniPas;
+	pasajero* start;
+	auxPasajero = iniPasajero;
 
-	if (auxPas == nullptr)
+	if (auxPasajero == nullptr)
 	{
 		MessageBox(0, "La lista esta vacia.", "AVISO", MB_OK);
 	}
 	else
 	{
-		while (auxPas->sig != nullptr && strcmp(auxPas->nombreCompP, pacienteNom) != 0)
+		while (auxPasajero->sig != nullptr && strcmp(auxPasajero->nombreComp, pacienteNom) != 0)
 		{ //Nos movemos en el arreglo para buscar el usuario
 
-			auxPas = auxPas->sig;
+			auxPasajero = auxPasajero->sig;
 		}
 
-		if (auxPas->sig == nullptr || strcmp(auxPas->nombreCompP, pacienteNom) != 0)
+		if (auxPasajero->sig == nullptr || strcmp(auxPasajero->nombreComp, pacienteNom) != 0)
 		{
 			MessageBox(0, "paciente no encontrado", "AVISO", MB_OK);
 		}
 
-		if (auxPas == iniPas)
+		if (auxPasajero == iniPasajero)
 		{	//El nodo es el primero 
-			if (iniPas->ant != nullptr && iniPas->sig != nullptr)
+			if (iniPasajero->ant != nullptr && iniPasajero->sig != nullptr)
 			{
-				iniPas = iniPas->sig;
+				iniPasajero = iniPasajero->sig;
 			}
-			else if (iniPas->ant == nullptr)
+			else if (iniPasajero->ant == nullptr)
 			{
-				iniPas = iniPas->sig;
+				iniPasajero = iniPasajero->sig;
 			}
 			else
 			{
-				iniPas = iniPas->ant;
+				iniPasajero = iniPasajero->ant;
 			}
 
-			if (auxPas->sig == nullptr)
+			if (auxPasajero->sig == nullptr)
 			{ //Si es el primero y unico nodo
 				//delete auxPas;		//Eliminamos el primer nodo
 				//inicio = nullptr;
 				//auxPas = inicio;
 
-				iniPas = nullptr;
-				delete auxPas;
+				iniPasajero = nullptr;
+				delete auxPasajero;
 
-				auxPas = iniPas;
-				auxPas2 = auxPas;
-				auxPas3 = auxPas;
+				auxPasajero = iniPasajero;
+				auxPasajero2 = auxPasajero;
+				auxPasajero3 = auxPasajero;
 			}
 			else
 			{ //Si es el primero y hay mas nodos
@@ -4230,15 +4338,15 @@ void eliminarPas(char pacienteNom[60])
 				delete auxPas;
 				auxPas = iniPas;*/
 
-				start = iniPas->sig;
-				auxPas->sig->ant = nullptr;
-				delete auxPas;
-				auxPas = start;
-				auxPas->ant = nullptr;
+				start = iniPasajero->sig;
+				auxPasajero->sig->ant = nullptr;
+				delete auxPasajero;
+				auxPasajero = start;
+				auxPasajero->ant = nullptr;
 
-				auxPas2 = auxPas;
-				auxPas3 = auxPas;
-				iniPas = auxPas;
+				auxPasajero2 = auxPasajero;
+				auxPasajero3 = auxPasajero;
+				iniPasajero = auxPasajero;
 			}
 
 			MessageBox(0, "paciente eliminado", "AVISO", MB_OK);
@@ -4246,23 +4354,23 @@ void eliminarPas(char pacienteNom[60])
 		else
 		{
 
-			if (auxPas->sig == nullptr)
+			if (auxPasajero->sig == nullptr)
 			{ //Si el nodo es el último
-				auxPas->ant->sig = nullptr;	//Antes de eliminar, el penultumo nodo, su puntero siguiente, lo igualamos a nullptr
-				delete auxPas;
+				auxPasajero->ant->sig = nullptr;	//Antes de eliminar, el penultumo nodo, su puntero siguiente, lo igualamos a nullptr
+				delete auxPasajero;
 
-				auxPas = iniPas;
-				auxPas2 = auxPas;
+				auxPasajero = iniPasajero;
+				auxPasajero2 = auxPasajero;
 			}
 			else
 			{ //Si es cualquier nodo que no sea el inicio o el último
-				auxPas->sig->ant = auxPas->ant;
-				auxPas->ant->sig = auxPas->sig;
-				delete auxPas;
+				auxPasajero->sig->ant = auxPasajero->ant;
+				auxPasajero->ant->sig = auxPasajero->sig;
+				delete auxPasajero;
 
-				auxPas2 = auxPas;
-				auxPas3 = auxPas;
-				auxPas = iniPas; //Para que auxPas no quede sin apuntar a nada, la apuntamos al inicio
+				auxPasajero2 = auxPasajero;
+				auxPasajero3 = auxPasajero;
+				auxPasajero = iniPasajero; //Para que auxPas no quede sin apuntar a nada, la apuntamos al inicio
 			}
 
 			MessageBox(0, "paciente eliminado", "AVISO", MB_OK);
@@ -4274,17 +4382,17 @@ void eliminarPas(char pacienteNom[60])
 
 void escribirPas()
 {
-	auxPas = iniPas;
+	auxPasajero = iniPasajero;
 
 	ofstream escribir;
 	escribir.open("C:\\Users\\hp\\Documents\\UANL\\Universidad 7\\ED\\Proyecto_Clinica\\Proyecto_Clinica\\Pacientes.bin", ios::out | ios::binary | ios::trunc);
 
 	if (escribir.is_open())
 	{
-		while (auxPas != nullptr)
+		while (auxPasajero != nullptr)
 		{
-			escribir.write((char*)auxPas, sizeof(paciente));
-			auxPas = auxPas->sig;
+			escribir.write((char*)auxPasajero, sizeof(pasajero));
+			auxPasajero = auxPasajero->sig;
 		}
 
 		escribir.close();
@@ -4316,42 +4424,42 @@ void escribirPas()
 
 void leerPas()
 {
-	auxPas = iniPas;
+	auxPasajero = iniPasajero;
 
 	ifstream leer;
 	leer.open("C:\\Users\\hp\\Documents\\UANL\\Universidad 7\\ED\\Proyecto_Clinica\\Proyecto_Clinica\\Pacientes.bin", ios::in | ios::binary);
 
 	if (leer.is_open())
 	{
-		paciente* pasLeido = new paciente;
+		pasajero* pasLeido = new pasajero;
 
-		while (!leer.read((char*)pasLeido, sizeof(paciente)).eof())
+		while (!leer.read((char*)pasLeido, sizeof(pasajero)).eof())
 		{
 
-			while (auxPas != nullptr && auxPas->sig != nullptr)
+			while (auxPasajero != nullptr && auxPasajero->sig != nullptr)
 			{
-				auxPas = auxPas->sig;
+				auxPasajero = auxPasajero->sig;
 			}
-			if (auxPas == nullptr)
+			if (auxPasajero == nullptr)
 			{
-				iniPas = pasLeido;
-				iniPas->sig = nullptr;
-				iniPas->ant = nullptr;
-				auxPas = iniPas;
+				iniPasajero = pasLeido;
+				iniPasajero->sig = nullptr;
+				iniPasajero->ant = nullptr;
+				auxPasajero = iniPasajero;
 			}
 			else
 			{
-				auxPas->sig = pasLeido;
-				auxPas->sig->ant = auxPas;
-				auxPas = auxPas->sig;
-				auxPas->sig = nullptr;
+				auxPasajero->sig = pasLeido;
+				auxPasajero->sig->ant = auxPasajero;
+				auxPasajero = auxPasajero->sig;
+				auxPasajero->sig = nullptr;
 				/*auxPas->sig = espLeida;
 				auxPas->ant = auxPas;
 				auxPas = auxPas->sig;
 				auxPas->sig = nullptr;*/
 			}
 
-			pasLeido = new paciente;
+			pasLeido = new pasajero;
 		}
 
 		leer.close();
@@ -4361,17 +4469,17 @@ void leerPas()
 
 void reportePas()
 {
-	auxPas = iniPas;
+	auxPasajero = iniPasajero;
 
 	ofstream escribir;
 	escribir.open("C:\\Users\\hp\\Documents\\UANL\\Universidad 7\\ED\\Proyecto_Clinica\\Proyecto_Clinica\\PacientesReporte.txt", ios::out | ios::trunc);
 
 	if (escribir.is_open())
 	{
-		while (auxPas != nullptr)
+		while (auxPasajero != nullptr)
 		{
-			escribir.write((char*)auxPas, sizeof(paciente));
-			auxPas = auxPas->sig;
+			escribir.write((char*)auxPasajero, sizeof(pasajero));
+			auxPasajero = auxPasajero->sig;
 		}
 
 		escribir.close();
