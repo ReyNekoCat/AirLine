@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Español (México) resources
+// Spanish (Mexico) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESM)
 LANGUAGE LANG_SPANISH, SUBLANG_SPANISH_MEXICAN
@@ -62,7 +62,7 @@ BEGIN
     CTEXT           "Contraseña:",IDC_STATIC,56,225,64,15,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
     EDITTEXT        IDC_EDIT6,130,200,123,15,ES_AUTOHSCROLL,WS_EX_CLIENTEDGE
     CTEXT           "Cumpleaños",IDC_STATIC,56,150,64,15,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
-    CTEXT           "Edad:",IDC_STATIC,56,174,64,16,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
+    CTEXT           "Género:",IDC_STATIC,56,174,64,16,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
     CONTROL         "",IDC_DATETIMEPICKER1,"SysDateTimePick32",DTS_RIGHTALIGN | WS_TABSTOP,130,150,123,15
     EDITTEXT        IDC_EDIT7,130,225,123,15,ES_PASSWORD | ES_AUTOHSCROLL,WS_EX_CLIENTEDGE
 END
@@ -1000,12 +1000,12 @@ BEGIN
     END
 END
 
-#endif    // Español (México) resources
+#endif    // Spanish (Mexico) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Español (España, alfabetización internacional) resources
+// Spanish (Spain, International Sort) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESN)
 LANGUAGE LANG_SPANISH, SUBLANG_SPANISH_MODERN
@@ -1036,7 +1036,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // Español (España, alfabetización internacional) resources
+#endif    // Spanish (Spain, International Sort) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
