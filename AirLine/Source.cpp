@@ -142,36 +142,36 @@ BOOL CALLBACK cDialog14(HWND, UINT, WPARAM, LPARAM); // Lista Citas
 #pragma region Prototipos
 
 #pragma region Funciones de Listas Usuarios
-void nuevoUsu(usuario* nuevo);
-void eliminarUsu(char nomUsu[30]);
-void escribirUsuario();
-void leerUsuario();
+void nuevoUsuario(usuario* nuevo);
+void eliminarUsuario(char nomUsu[30]);
+void escribirUsuarios();
+void leerUsuarios();
 #pragma endregion
 
-#pragma region Funciones de Listas Especialidades
-void nuevaEsp(Vuelo* nueva);
-void eliminarEsp(char nomEsp[30]);
-void escribirEsp();
-void leerEsp();
+#pragma region Funciones de Listas Vuelos (Especialidades)
+void nuevoVuelo(Vuelo* nueva);
+void eliminarVuelo(char vuelo[30]);
+void escribirVuelo();
+void leerVuelos();
+void reporteVuelos(); //Antes Boletos/Medicos
 #pragma endregion
 
-#pragma region Funciones de Listas Medicos
-void nuevoMed(boleto* nuevoMed);
-void eliminarMed(char medicoNom[60]);
-void escribirMed();
-void leerMed();
-void reporteMed();
+#pragma region Funciones de Listas Boletos (Medicos)
+void nuevoBoleto(boleto* nuevoMed);
+void eliminarBoleto(char medicoNom[60]);
+void escribirBoletos();
+void leerBoletos();
 #pragma endregion
 
-#pragma region Funciones de Listas Pacientes
-void nuevoPas(pasajero* nuevoPas);
-void eliminarPas(char paciente[60]);
-void escribirPas();
-void leerPas();
-void reportePas();
+#pragma region Funciones de Listas Pasajeros (Pacientes)
+void nuevoPasajero(pasajero* nuevoPas);
+void eliminarPasajero(char pasajero[60]);
+void escribirPasajeros();
+void leerPasajeros();
+void reportePasajeros(); //No es necesario
 #pragma endregion
 
-//#pragma region Funciones de Arbol Medico
+#pragma region Funciones de Arbol Medico
 //medico *crearNodo(medico* nuevoMed);
 //void nuevoMed(medico*& pivote, medico* nuevoMed);
 //bool buscarMed(medico *pivote, medico* busqueda);
@@ -185,15 +185,15 @@ int WINAPI WinMain(
 	HINSTANCE hPreveInstance,  // Instancia previa (null)
 	PSTR cmdLine,  // Comandos de línea para la ejecución
 	int showCmd  // Metodo de inicialización
-) {
+	) {
 	hInstanceGlobal = hInstance;
-	leerUsuario();
-	leerEsp();
-	leerMed();
-	leerPas();
+	leerUsuarios();
+	leerVuelos();
+	leerBoletos();
+	leerPasajeros();
 
 	// Asignacion de valores fijos
-#pragma region Valores fijos
+	#pragma region Valores fijos
 
 	// Consultorios
 	for (i = 1; i < 5; i++)
@@ -374,10 +374,10 @@ int WINAPI WinMain(
 		DispatchMessage(&msg); // Envía el evento traducido a mi dialogo
 	}
 
-	escribirUsuario();
-	escribirEsp();
-	escribirMed();
-	escribirPas();
+	escribirUsuarios();
+	escribirVuelo();
+	escribirBoletos();
+	escribirPasajeros();
 	//system("pause");
 	return 0;
 }
@@ -541,7 +541,7 @@ BOOL CALLBACK cDialog2(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						temp->nacimiento = dia;
 
 						strcpy_s(temp->foto, "");
-						nuevoUsu(temp);
+						nuevoUsuario(temp);
 
 						SetDlgItemText(hwnd, IDC_EDIT1, "");
 						SetDlgItemText(hwnd, IDC_EDIT2, "");
@@ -797,14 +797,14 @@ BOOL CALLBACK cDialog4(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						{
 							MessageBox(NULL, "El usuario que inicio sesion será eliminado, se cerrará la sesion.", "AVISO", MB_OK | MB_ICONINFORMATION);
 
-							eliminarUsu(usuario);
+							eliminarUsuario(usuario);
 
 							DestroyWindow(hwnd);
 							PostQuitMessage(0);
 						}
 						else
 						{
-							eliminarUsu(usuario);
+							eliminarUsuario(usuario);
 
 							SendMessage(GetDlgItem(hwnd, IDC_LIST1), LB_DELETESTRING, indice, 0);
 							SetDlgItemText(hwnd, IDC_EDIT2, "");
@@ -935,7 +935,7 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				GetDlgItemText(hwnd, IDC_EDIT4, temp->destino, sizeof(temp->destino));
 				//GetDlgItemText(hwnd, IDC_EDIT3, temp->claveChar, sizeof(temp->claveChar));
 				strcpy_s(temp->usuarioRegistro, miUsuario->nick);
-				nuevaEsp(temp);
+				nuevoVuelo(temp);
 				SetDlgItemText(hwnd, IDC_EDIT2, "");
 				SetDlgItemText(hwnd, IDC_EDIT3, "");
 				SetDlgItemText(hwnd, IDC_EDIT4, "");
@@ -1603,7 +1603,7 @@ BOOL CALLBACK cDialog7(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					//strcpy_s(temp->foto, zFile);
 					strcpy_s(temp->usuarioRegistro, miUsuario->nick);
 
-					nuevoMed(temp);
+					nuevoBoleto(temp);
 
 					SetDlgItemText(hwnd, IDC_EDIT2, "");
 					SetDlgItemText(hwnd, IDC_EDIT3, "");
@@ -2047,7 +2047,7 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					indiceE = SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETCURSEL, 0, 0);
 					SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETTEXT, indiceE, (LPARAM)medico);
 
-					eliminarMed(medico);
+					eliminarBoleto(medico);
 
 					SendMessage(GetDlgItem(hwnd, IDC_LIST3), LB_DELETESTRING, indiceE, 0);
 
@@ -2364,7 +2364,7 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 					strcpy_s(temp->usuarioRegistro, miUsuario->nick);
 
-					nuevoPas(temp);
+					nuevoPasajero(temp);
 
 					SetDlgItemText(hwnd, IDC_EDIT2, "");
 					SetDlgItemText(hwnd, IDC_EDIT3, "");
@@ -2573,7 +2573,7 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			}
 			else
 			{
-				reportePas();
+				reportePasajeros();
 				MessageBox(NULL, "Reporte fue guardado en C:-Users-hp-Documents-UANL-Universidad 7-ED-Proyecto_Clinica-Proyecto_Clinica.", "AVISO", MB_OK | MB_ICONEXCLAMATION);
 			}
 
@@ -2928,7 +2928,7 @@ bool cMenu(HWND hwnd, long opcion)
 // Funciones
 #pragma region funciones
 //Funciones de Listas de Usuarios#pragma region Funciones de Listas Usuarios
-void nuevoUsu(usuario* nuevo)
+void nuevoUsuario(usuario* nuevo)
 {
 	if (iniUsuario == nullptr)
 	{ //Si 'inicio->sig es igual a nullptr, o sea, apunta a nada, la lista esta vacia
@@ -2991,7 +2991,7 @@ void nuevoUsu(usuario* nuevo)
 	MessageBox(NULL, "Se ha registrado el usuario con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
 	/*int opc = MessageBox(hwnd, (LPCWSTR)L"¿Seguro que desea eliminar este usuario?", (LPCWSTR)L"AVISO", MB_YESNO | MB_ICONQUESTION);*/
 }
-void eliminarUsu(char nomUsu[30])
+void eliminarUsuario(char nomUsu[30])
 {
 	usuario* start;
 	auxUsuario = iniUsuario;
@@ -3050,12 +3050,10 @@ void eliminarUsu(char nomUsu[30])
 				auxUsuario2 = auxUsuario;
 				/*auxUsu3 = auxUsu;*/
 			}
-
 			MessageBox(0, "Usuario eliminado", "AVISO", MB_OK);
 		}
 		else
 		{
-
 			if (auxUsuario->sig == nullptr)
 			{ //Si el nodo es el último
 				auxUsuario->ant->sig = nullptr;	//Antes de eliminar, el penultumo nodo, su puntero siguiente, lo igualamos a nullptr
@@ -3075,29 +3073,28 @@ void eliminarUsu(char nomUsu[30])
 				auxUsuario2 = auxUsuario;
 				/*auxUsu3 = auxUsu;*/ //Para que auxEsp no quede sin apuntar a nada, la apuntamos al inicio
 			}
-
 			MessageBox(0, "Usuario eliminado", "AVISO", MB_OK);
-
 		}
 	}
 }
-void escribirUsuario()
+void escribirUsuarios()
 {
-	auxUsuario = iniUsuario;
-
-	ofstream escribir("Info de Usuarios.bin", ios::binary | ios::out | ios::trunc);
-	//escribir.open("C:\\Users\\hp\\Documents\\UANL\\Universidad 7\\ED\\Proyecto_Clinica\\Proyecto_Clinica\\Usuarios.txt", ios::out | ios::trunc);
-
-	if (escribir.is_open())
-	{
-		while (auxUsuario != nullptr)
-		{
-			escribir.write((char*)auxUsuario, sizeof(usuario));
-			auxUsuario = auxUsuario->sig;
-		}
-
-		escribir.close();
+	ofstream escribir("Usuarios.bin", ios::binary | ios::out | ios::trunc);
+	if (!escribir.is_open()) {
+		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
+		return;
 	}
+	auxUsuario = iniUsuario;
+	while (auxUsuario != nullptr)
+	{
+		if (escribir.bad()) {
+			MessageBox(NULL, "Ocurrió un error durante la escritura", "Error", MB_OK | MB_ICONERROR);
+			return;
+		}
+		escribir.write((char*)auxUsuario, sizeof(usuario));
+		auxUsuario = auxUsuario->sig;
+	}
+	escribir.close();
 
 	/*auxUsu = iniUsu;
 
@@ -3122,19 +3119,19 @@ void escribirUsuario()
 		}
 	}*/
 }
-void leerUsuario()
+void leerUsuarios()
 {
+	ifstream leer("Usuarios.bin", ios::binary);
+	if (!leer.is_open()) {
+		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
+		return;
+	}
 	auxUsuario = iniUsuario;
-	ifstream leer("Info de Usuarios.bin", ios::binary);
-	//leer.open("C:\\Users\\hp\\Documents\\UANL\\Universidad 7\\ED\\Proyecto_Clinica\\Proyecto_Clinica\\Usuarios.txt", ios::in);
-
 	if (leer.is_open())
 	{
 		usuario* usuLeido = new usuario;
-
 		while (!leer.read((char*)usuLeido, sizeof(usuario)).eof())
 		{
-
 			while (auxUsuario != nullptr && auxUsuario->sig != nullptr)
 			{
 				auxUsuario = auxUsuario->sig;
@@ -3167,7 +3164,7 @@ void leerUsuario()
 
 //Funciones de Listas de Vuelos (Especialidades)
 #pragma region Funciones de Listas Vuelos (Especialidades)
-void nuevaEsp(Vuelo* nueva)
+void nuevoVuelo(Vuelo* nueva)
 {
 	if (iniVuelo == nullptr)
 	{ //Si 'inicio->sig es igual a nullptr, o sea, apunta a nada, la lista esta vacia
@@ -3220,7 +3217,7 @@ void nuevaEsp(Vuelo* nueva)
 	MessageBox(NULL, "Se ha registrado la especialidad con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
 	/*int opc = MessageBox(hwnd, (LPCWSTR)L"¿Seguro que desea eliminar este usuario?", (LPCWSTR)L"AVISO", MB_YESNO | MB_ICONQUESTION);*/
 }
-void eliminarEsp(char nomEsp[30])
+void eliminarVuelo(char nomEsp[30])
 {
 	Vuelo* start;
 	auxVuelo = iniVuelo;
@@ -3307,24 +3304,27 @@ void eliminarEsp(char nomEsp[30])
 	}
 
 }
-void escribirEsp()
+void escribirVuelo()
 {
+	ofstream escribir("Vuelos.bin", ios::binary | ios::out | ios::trunc);
+	if (!escribir.is_open()) {
+		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
+		return;
+	}
 	auxVuelo = iniVuelo;
-
-	ofstream escribir;
-	escribir.open("C:\\Users\\hp\\Documents\\UANL\\Universidad 7\\ED\\Proyecto_Clinica\\Proyecto_Clinica\\Especialidades.bin", ios::out | ios::binary | ios::trunc);
-
 	if (escribir.is_open())
 	{
 		while (auxVuelo != nullptr)
 		{
+			if (escribir.bad()) {
+				MessageBox(NULL, "Ocurrió un error durante la escritura", "Error", MB_OK | MB_ICONERROR);
+				return;
+			}
 			escribir.write((char*)auxVuelo, sizeof(Vuelo));
 			auxVuelo = auxVuelo->sig;
 		}
-
 		escribir.close();
 	}
-
 	/*auxEsp = iniEsp;
 
 	if (auxEsp == nullptr)
@@ -3348,20 +3348,19 @@ void escribirEsp()
 		}
 	}*/
 }
-void leerEsp()
+void leerVuelos()
 {
+	ifstream leer("Vuelos.bin", ios::binary);
+	if (!leer.is_open()) {
+		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
+		return;
+	}
 	auxVuelo = iniVuelo;
-
-	ifstream leer;
-	leer.open("C:\\Users\\hp\\Documents\\UANL\\Universidad 7\\ED\\Proyecto_Clinica\\Proyecto_Clinica\\Especialidades.bin", ios::in | ios::binary);
-
 	if (leer.is_open())
 	{
 		Vuelo* espLeida = new Vuelo;
-
 		while (!leer.read((char*)espLeida, sizeof(Vuelo)).eof())
 		{
-
 			while (auxVuelo != nullptr && auxVuelo->sig != nullptr)
 			{
 				auxVuelo = auxVuelo->sig;
@@ -3384,19 +3383,61 @@ void leerEsp()
 				auxEsp = auxEsp->sig;
 				auxEsp->sig = nullptr;*/
 			}
-
 			espLeida = new Vuelo;
 		}
-
 		leer.close();
 		delete espLeida;
 	}
+}
+void reporteVuelos()
+{
+	ofstream escribir("Reporte de vuelos.txt", ios::out | ios::trunc);
+	if (!escribir.is_open()) {
+		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
+		return;
+	}
+	auxBoleto = iniBoleto;
+	if (escribir.is_open())
+	{
+		while (auxBoleto != nullptr)
+		{
+			if (escribir.bad()) {
+				MessageBox(NULL, "Ocurrió un error durante la escritura", "Error", MB_OK | MB_ICONERROR);
+				return;
+			}
+			escribir.write((char*)auxBoleto, sizeof(boleto));
+			auxBoleto = auxBoleto->sig;
+		}
+		escribir.close();
+	}
+	/*auxMed = iniMed;
+
+	if (auxMed == nullptr)
+	{
+		MessageBox(0, "La lista esta vacia.", "AVISO", MB_OK);
+	}
+	else
+	{
+		ofstream escribir;
+		escribir.open("C:\\Users\\hp\\Documents\\UANL\\Universidad 5\\ProgAv\\Proyecto Final\\Segundo Avance\\Segundo Avance\\Segundo Avance\\Usuarios.bin", ios::out | ios::binary | ios::trunc);
+
+		if (escribir.is_open())
+		{
+			while (auxMed != nullptr)
+			{
+				escribir.write((char*)auxMed, sizeof(usuario));
+				auxMed = auxMed->sig;
+			}
+
+			escribir.close();
+		}
+	}*/
 }
 #pragma endregion
 
 //Funciones de Listas de Boletos (Medicos)
 #pragma region Funciones de Listas Boletos (Medicos)
-void nuevoMed(boleto* nuevoMed)
+void nuevoBoleto(boleto* nuevoMed)
 {
 	if (pivote == nullptr)
 	{ //Si 'inicio->sig es igual a nullptr, o sea, apunta a nada, la lista esta vacia
@@ -3642,7 +3683,7 @@ void nuevoMed(boleto* nuevoMed)
 	MessageBox(NULL, "Se ha registrado al medico con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
 	/*int opc = MessageBox(hwnd, (LPCWSTR)L"¿Seguro que desea eliminar este usuario?", (LPCWSTR)L"AVISO", MB_YESNO | MB_ICONQUESTION);*/
 }
-void eliminarMed(char medicoNom[60])
+void eliminarBoleto(char medicoNom[60])
 {
 	boleto* start;
 	auxBoleto = iniBoleto;
@@ -3750,17 +3791,22 @@ void eliminarMed(char medicoNom[60])
 	}
 
 }
-void escribirMed()
+void escribirBoletos()
 {
+	ofstream escribir("Boletos.bin", ios::binary | ios::out | ios::trunc);
+	if (!escribir.is_open()) {
+		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
+		return;
+	}
 	auxBoleto = iniBoleto;
-
-	ofstream escribir;
-	escribir.open("C:\\Users\\hp\\Documents\\UANL\\Universidad 7\\ED\\Proyecto_Clinica\\Proyecto_Clinica\\Medicos.bin", ios::out | ios::binary | ios::trunc);
-
 	if (escribir.is_open())
 	{
 		while (auxBoleto != nullptr)
 		{
+			if (escribir.bad()) {
+				MessageBox(NULL, "Ocurrió un error durante la escritura", "Error", MB_OK | MB_ICONERROR);
+				return;
+			}
 			escribir.write((char*)auxBoleto, sizeof(boleto));
 			auxBoleto = auxBoleto->sig;
 		}
@@ -3791,20 +3837,19 @@ void escribirMed()
 		}
 	}*/
 }
-void leerMed()
+void leerBoletos()
 {
+	ifstream leer("Boletos.bin", ios::binary);
+	if (!leer.is_open()) {
+		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
+		return;
+	}
 	auxBoleto = iniBoleto;
-
-	ifstream leer;
-	leer.open("C:\\Users\\hp\\Documents\\UANL\\Universidad 7\\ED\\Proyecto_Clinica\\Proyecto_Clinica\\Medicos.bin", ios::in | ios::binary);
-
 	if (leer.is_open())
 	{
 		boleto* medLeido = new boleto;
-
 		while (!leer.read((char*)medLeido, sizeof(boleto)).eof())
 		{
-
 			while (auxBoleto != nullptr && auxBoleto->sig != nullptr)
 			{
 				auxBoleto = auxBoleto->sig;
@@ -3827,60 +3872,17 @@ void leerMed()
 				auxMed = auxMed->sig;
 				auxMed->sig = nullptr;*/
 			}
-
 			medLeido = new boleto;
 		}
-
 		leer.close();
 		delete medLeido;
 	}
-}
-void reporteMed()
-{
-	auxBoleto = iniBoleto;
-
-	ofstream escribir;
-	escribir.open("C:\\Users\\hp\\Documents\\UANL\\Universidad 7\\ED\\Proyecto_Clinica\\Proyecto_Clinica\\Medicos.txt", ios::out| ios::trunc);
-
-	if (escribir.is_open())
-	{
-		while (auxBoleto != nullptr)
-		{
-			escribir.write((char*)auxBoleto, sizeof(boleto));
-			auxBoleto = auxBoleto->sig;
-		}
-
-		escribir.close();
-	}
-
-	/*auxMed = iniMed;
-
-	if (auxMed == nullptr)
-	{
-		MessageBox(0, "La lista esta vacia.", "AVISO", MB_OK);
-	}
-	else
-	{
-		ofstream escribir;
-		escribir.open("C:\\Users\\hp\\Documents\\UANL\\Universidad 5\\ProgAv\\Proyecto Final\\Segundo Avance\\Segundo Avance\\Segundo Avance\\Usuarios.bin", ios::out | ios::binary | ios::trunc);
-
-		if (escribir.is_open())
-		{
-			while (auxMed != nullptr)
-			{
-				escribir.write((char*)auxMed, sizeof(usuario));
-				auxMed = auxMed->sig;
-			}
-
-			escribir.close();
-		}
-	}*/
 }
 #pragma endregion
 
 //Funciones de Listas de Pasajeros (Pacientes)
 #pragma region Funciones de Listas Pasajeros (Pacientes)
-void nuevoPas(pasajero* nuevoPas)
+void nuevoPasajero(pasajero* nuevoPas)
 {
 	if (iniPasajero == nullptr)
 	{ //Si 'inicio->sig es igual a nullptr, o sea, apunta a nada, la lista esta vacia
@@ -4120,7 +4122,7 @@ void nuevoPas(pasajero* nuevoPas)
 	MessageBox(NULL, "Se ha registrado al paciente con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
 	/*int opc = MessageBox(hwnd, (LPCWSTR)L"¿Seguro que desea eliminar este usuario?", (LPCWSTR)L"AVISO", MB_YESNO | MB_ICONQUESTION);*/
 }
-void eliminarPas(char pacienteNom[60])
+void eliminarPasajero(char pacienteNom[60])
 {
 	pasajero* start;
 	auxPasajero = iniPasajero;
@@ -4224,24 +4226,24 @@ void eliminarPas(char pacienteNom[60])
 	}
 
 }
-void escribirPas()
+void escribirPasajeros()
 {
-	auxPasajero = iniPasajero;
-
-	ofstream escribir;
-	escribir.open("C:\\Users\\hp\\Documents\\UANL\\Universidad 7\\ED\\Proyecto_Clinica\\Proyecto_Clinica\\Pacientes.bin", ios::out | ios::binary | ios::trunc);
-
-	if (escribir.is_open())
-	{
-		while (auxPasajero != nullptr)
-		{
-			escribir.write((char*)auxPasajero, sizeof(pasajero));
-			auxPasajero = auxPasajero->sig;
-		}
-
-		escribir.close();
+	ofstream escribir("Pasajeros.bin", ios::binary | ios::out | ios::trunc);
+	if (!escribir.is_open()) {
+		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
+		return;
 	}
-
+	auxPasajero = iniPasajero;
+	while (auxPasajero != nullptr)
+	{
+		if (escribir.bad()) {
+			MessageBox(NULL, "Ocurrió un error durante la escritura", "Error", MB_OK | MB_ICONERROR);
+			return;
+		}
+		escribir.write((char*)auxPasajero, sizeof(pasajero));
+		auxPasajero = auxPasajero->sig;
+	}
+	escribir.close();
 	/*auxPas = iniPas;
 
 	if (auxPas == nullptr)
@@ -4265,20 +4267,19 @@ void escribirPas()
 		}
 	}*/
 }
-void leerPas()
+void leerPasajeros()
 {
+	ifstream leer("Pasajeros.bin", ios::binary);
+	if (!leer.is_open()) {
+		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
+		return;
+	}
 	auxPasajero = iniPasajero;
-
-	ifstream leer;
-	leer.open("C:\\Users\\hp\\Documents\\UANL\\Universidad 7\\ED\\Proyecto_Clinica\\Proyecto_Clinica\\Pacientes.bin", ios::in | ios::binary);
-
 	if (leer.is_open())
 	{
 		pasajero* pasLeido = new pasajero;
-
 		while (!leer.read((char*)pasLeido, sizeof(pasajero)).eof())
 		{
-
 			while (auxPasajero != nullptr && auxPasajero->sig != nullptr)
 			{
 				auxPasajero = auxPasajero->sig;
@@ -4301,15 +4302,13 @@ void leerPas()
 				auxPas = auxPas->sig;
 				auxPas->sig = nullptr;*/
 			}
-
 			pasLeido = new pasajero;
 		}
-
 		leer.close();
 		delete pasLeido;
 	}
 }
-void reportePas()
+/*void reportePasajeros()
 {
 	auxPasajero = iniPasajero;
 
@@ -4348,8 +4347,8 @@ void reportePas()
 
 			escribir.close();
 		}
-	}*/
-}
+	}* /
+}*/ // No necesario
 #pragma endregion
 
 #pragma region Funciones de Arbol Boletos (Medicos)

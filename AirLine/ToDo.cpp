@@ -7,12 +7,12 @@
 	Z	Si		10      Diseño de un documento en Word con el modelo de datos y código en C++.
 	Z	No		10		Definición de cuántas listas ligadas se utilizarán en todo el proyecto y estructura de cada nodo.
 	Z	Si		10		Definición de árboles binarios
-	X	Si		5		Algoritmo Quicksort aplicado a la lista.
+	Z	Si		5		Algoritmo Quicksort aplicado a la lista.
 	X	Si		5		Algoritmo Heapsort aplicado a la lista.
 	Z	No		15		Algoritmo de manipulación de información de cada lista ligada y árbol binario.
 	Z	Si		10		Funciones para manejo de archivos, un archivo por cada lista ligada.
 	Z	Si		25		Diseño de pantallas del proyecto en WinAPI con C++.
-	?	Si		10		Utilización de clases para la estructura de datos y métodos.
+	Z	Si		10		Utilización de clases para la estructura de datos y métodos.
 */
 ////// ::: ENTREGA 2 ::: //
 /*	 /	Req. / Puntos / Info. /
