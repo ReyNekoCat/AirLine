@@ -171,7 +171,7 @@ void leerPasajeros();
 void reportePasajeros(); //No es necesario
 #pragma endregion
 
-#pragma region Funciones de Arbol Medico
+#pragma region Funciones de Arbol Boletos (Medicos)
 //medico *crearNodo(medico* nuevoMed);
 //void nuevoMed(medico*& pivote, medico* nuevoMed);
 //bool buscarMed(medico *pivote, medico* busqueda);
@@ -2141,75 +2141,6 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	return false;  // Un callback siempre retorna falso
 }
-
-// Reporte Medicos
-//BOOL CALLBACK cDialog9(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-//{
-//	switch (msg)
-//	{
-//	case WM_INITDIALOG:
-//	{
-//		if (miUsuario != nullptr)
-//		{
-//			SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nombreComp);
-//		}
-//
-//
-//		auxMed3 = iniMed; // Medicos
-//
-//		while (auxMed3->sig != nullptr)
-//		{
-//			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompM/*nombreCompM*/);
-//			auxMed3 = auxMed3->sig;
-//		}
-//
-//		if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
-//		{
-//			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompM/*nombreCompM*/);
-//			auxMed3 = auxMed3->sig;
-//		}
-//
-//		break;
-//	}
-//	case WM_COMMAND:
-//	{
-//		long opcion = LOWORD(wParam);
-//		cMenu(hwnd, opcion);
-//
-//		switch (LOWORD(wParam))
-//		{
-//		case IDC_BUTTON1: // Generar
-//		{
-//			if (iniMed == nullptr)
-//			{
-//				MessageBox(NULL, "No hay medicos registrados.", "AVISO", MB_OK | MB_ICONERROR);
-//			}
-//			else
-//			{
-//				reporteMed();
-//				MessageBox(NULL, "Reporte fue guardado en C:-Users-hp-Documents-UANL-Universidad 7-ED-Proyecto_Clinica-Proyecto_Clinica.", "AVISO", MB_OK | MB_ICONERROR);
-//			}
-//
-//			break;
-//		}
-//		default:
-//		{
-//			break;
-//		}
-//
-//		}
-//
-//		break;
-//	}
-//	default:
-//	{
-//		break;
-//	}
-//
-//	}
-//
-//	return false;  // Un callback siempre retorna falso
-//}
 
 // Registro Pasajeros
 BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -4308,24 +4239,28 @@ void leerPasajeros()
 		delete pasLeido;
 	}
 }
-/*void reportePasajeros()
+void reportePasajeros()
 {
+	ofstream escribir("Reporte de pasajeros.txt", ios::out | ios::trunc);
+	if (!escribir.is_open()) {
+		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
+		return;
+	}
 	auxPasajero = iniPasajero;
-
-	ofstream escribir;
-	escribir.open("C:\\Users\\hp\\Documents\\UANL\\Universidad 7\\ED\\Proyecto_Clinica\\Proyecto_Clinica\\PacientesReporte.txt", ios::out | ios::trunc);
-
 	if (escribir.is_open())
 	{
 		while (auxPasajero != nullptr)
 		{
+			if (escribir.bad()) {
+				MessageBox(NULL, "Ocurrió un error durante la escritura", "Error", MB_OK | MB_ICONERROR);
+				return;
+			}
 			escribir.write((char*)auxPasajero, sizeof(pasajero));
 			auxPasajero = auxPasajero->sig;
 		}
 
 		escribir.close();
 	}
-
 	/*auxPas = iniPas;
 
 	if (auxPas == nullptr)
@@ -4347,8 +4282,8 @@ void leerPasajeros()
 
 			escribir.close();
 		}
-	}* /
-}*/ // No necesario
+	}*/
+}
 #pragma endregion
 
 #pragma region Funciones de Arbol Boletos (Medicos)
