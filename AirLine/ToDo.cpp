@@ -16,18 +16,18 @@
 */
 ////// ::: ENTREGA 2 ::: //
 /*	 /	Req. / Puntos / Info. /
-   X	Sí		5       Ingreso al sistema por usuario y contraseña, recordar usuario.
-   X	No		5		Registro de Usuarios
-   X	Sí		10		Registro de Vuelos
-   X	Sí		10		Registro de Pasajeros
+   Y	Sí		5       Ingreso al sistema por usuario y contraseña, *recordar usuario.
+   Z	No		5		Registro de Usuarios
+   Y	Sí		10		Registro de Vuelos
+   Y	Sí		10		Registro de Pasajeros
    X	Sí		10		Compra de boletos
    X	Sí		5		Pases de abordar
    X 	Sí		10		Cancelación/Confirmación de Vuelos
    X	No		10		Cancelación de boletos comprados
    X	Sí		10		Manifiesto
-   X	No		10		Reporte de Vuelos
+   Y	No		10		Reporte de Vuelos
    X	Sí		10		Uso apropiado de métodos de ordenamiento y búsqueda binaria en listas ligadas.
-   X	Sí		5		Guardado de información en archivos binarios.
+   Y	Sí		5		Guardado de información en archivos binarios.
 */	
 				/// :::: DESCRIPCIONES DEL PROYECTO :::: ///
 
@@ -91,7 +91,7 @@
 		- Débito
 		- Transferencia
 		- etc.
-	X Un mismo pasajero no puede tener dos o más boletos en el mismo vuelo.
+	X Un mismo pasajero no puede tener dos o más boletos en el mismo vuelo. (solo uno)
 	X Los pasajeros tienen hasta 10 días antes de la realización del vuelo para cancelar su compra.
 		X La cantidad de días para hacer una cancelación también se configura por vuelo.
 */
@@ -101,9 +101,9 @@
 	X Se debe guardar fecha y hora en la que se obtiene el pase de abordar.
 */
 ////// ::: MANIFIESTO ::: //
-/*	-Se debe tener una pantalla donde se muestren todos los vuelos realizados
+/*	- Se debe tener una pantalla donde se muestren todos los vuelos realizados
 		X Se debe elegir uno y se deben mostrar la lista de pasajeros que realizaron el vuelo.
-	X Se debe tener la opción de ordenar por número de asiento
+	X Se debe tener la opción de ordenar por número de asiento (ordenamientos)
 		- O de ordenar por apellidos y nombre de los pasajeros
 	X En la parte superior del manifiesto deben de venir los datos del vuelo 
 		X Además de mostrar al lado la lista de pasajeros.
@@ -123,6 +123,7 @@
 /*	- Se debe utilizar listas doblemente ligadas para el manejo de la información.
 	X Todas las entidades se deben de guardar en archivos binarios.
 	X Se deben de utilizar al menos (uno de) los métodos de ordenamiento HeapSort y QuickSort, en la entidad que elija el alumno.
+		- Vuelos y Pasajeros
 	X La entidad de usuarios debe de ser gestionada con un árbol binario.
 	X Para las búsquedas de información, se debe de utilizar el método de búsqueda binaria.
 */

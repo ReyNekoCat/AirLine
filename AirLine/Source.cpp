@@ -39,6 +39,7 @@ struct Vuelo
 	char origen[30];
 	char destino[30];
 	int num;
+	int status;
 	double fecha;
 	double registro;
 	//char claveChar[20];
@@ -57,7 +58,8 @@ struct boleto
 	int num;
 	int clase;                          
 	int pase;							
-	int estado;							
+	int estado;
+	double registroPase;
 	//char diasChar[30];
 	char usuarioRegistro[30];			
 	boleto* ant;
@@ -86,6 +88,15 @@ pasajero* iniPasajero, * auxPasajero, * auxPasajero2, * auxPasajero3 = nullptr;
 #pragma region Structs Fijos
 
 int i = 0;
+//Lugares
+
+//Avion
+//Modelos
+//Asientos (Para cada rango)
+//Clase
+//Precios
+//RangoNiños
+//RangoAdultos
 
 struct consultorio
 {
@@ -1677,414 +1688,121 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
-	case WM_INITDIALOG:
-	{
-		if (miUsuario != nullptr)
+		case WM_INITDIALOG:
 		{
-			SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nombreComp);
-		}
-		if (miUsuario->foto != nullptr)
-		{
-			strcpy_s(zFile, miUsuario->foto); //Inicializar zfile con la dirección de memoria del puntero foto
-
-			HBITMAP bmp; //1
-			bmp = (HBITMAP)LoadImage(NULL, miUsuario->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
-			SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
-		}
-
-		auxMed3 = iniBoleto; // Medicos
-
-		while (auxMed3->sig != nullptr)
-		{
-			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
-			auxMed3 = auxMed3->sig;
-		}
-
-		if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
-		{
-			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
-			auxMed3 = auxMed3->sig;
-		}
-
-		aux = ini; // Consultorios
-
-		while (aux->sig != nullptr)
-		{
-			SendDlgItemMessage(hwnd, IDC_LIST6, LB_ADDSTRING, (WPARAM)0, (LPARAM)aux->num);
-			aux = aux->sig;
-		}
-
-		if (aux->sig == nullptr/* || auxUsu2->ant == nullptr*/)
-		{
-			SendDlgItemMessage(hwnd, IDC_LIST6, LB_ADDSTRING, (WPARAM)0, (LPARAM)aux->num);
-			aux = aux->sig;
-		}
-
-		aux2 = ini2; // Horarios
-
-		while (aux2->sig != nullptr)
-		{
-			SendDlgItemMessage(hwnd, IDC_LIST7, LB_ADDSTRING, (WPARAM)0, (LPARAM)aux2->hor);
-			aux2 = aux2->sig;
-		}
-
-		if (aux2->sig == nullptr/* || auxUsu2->ant == nullptr*/)
-		{
-			SendDlgItemMessage(hwnd, IDC_LIST7, LB_ADDSTRING, (WPARAM)0, (LPARAM)aux2->hor);
-			aux2 = aux2->sig;
-		}
-
-		aux3 = ini3; // Días
-
-		while (aux3->sig != nullptr)
-		{
-			SendDlgItemMessage(hwnd, IDC_LIST8, LB_ADDSTRING, (WPARAM)0, (LPARAM)aux3->dia);
-			aux3 = aux3->sig;
-		}
-
-		if (aux3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
-		{
-			SendDlgItemMessage(hwnd, IDC_LIST8, LB_ADDSTRING, (WPARAM)0, (LPARAM)aux3->dia);
-			aux3 = aux3->sig;
-		}
-
-		auxVuelo3 = iniVuelo; // Especialidades
-
-		if (iniVuelo != nullptr)
-		{
-			while (auxVuelo3->sig != nullptr)
+			if (miUsuario != nullptr)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST10, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo3->origen);
-				auxVuelo3 = auxVuelo3->sig;
+				SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nombreComp);
 			}
-
-			if (auxVuelo3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
+			if (miUsuario->foto != nullptr)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST10, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo3->origen);
-				auxVuelo3 = auxVuelo3->sig;
-			}
-		}
-		else
-		{
-			MessageBox(NULL, "No hay especialidades registradas.", "AVISO", MB_OK | MB_ICONINFORMATION);
-		}
-
-		break;
-	}
-	case WM_COMMAND:
-	{
-		long opcion = LOWORD(wParam);
-		cMenu(hwnd, opcion);
-
-		switch (LOWORD(wParam))
-		{
-		case IDC_LIST6: // Consultorio
-		{
-			switch (HIWORD(wParam))
-			{
-			case LBN_DBLCLK: //Al dar doble clic en el ListBox 
-			{
-				char num2[30] = { 0 };
-				int indice2 = 0;
-				indice2 = SendDlgItemMessage(hwnd, IDC_LIST6, LB_GETCURSEL, 0, 0);
-				SendDlgItemMessage(hwnd, IDC_LIST6, LB_GETTEXT, indice2, (LPARAM)num2);
-
-				aux = ini;
-
-				while (aux->sig != nullptr && strcmp(aux->num, num2) != 0)
-				{
-					aux = aux->sig;
-				}
-
-				SetDlgItemText(hwnd, IDC_EDIT17, aux->num);
-
-				break;
-			}
-
-			default:
-			{
-				break;
-			}
-
-			}
-
-			break;
-		}
-		case IDC_LIST7: // Horario
-		{
-			switch (HIWORD(wParam))
-			{
-			case LBN_DBLCLK: //Al dar doble clic en el ListBox 
-			{
-				char num3[30] = { 0 };
-				int indice3 = 0;
-				indice3 = SendDlgItemMessage(hwnd, IDC_LIST7, LB_GETCURSEL, 0, 0);
-				SendDlgItemMessage(hwnd, IDC_LIST7, LB_GETTEXT, indice3, (LPARAM)num3);
-
-				aux2 = ini2;
-
-				while (aux2->sig != nullptr && strcmp(aux2->hor, num3) != 0)
-				{
-					aux2 = aux2->sig;
-				}
-
-				SetDlgItemText(hwnd, IDC_EDIT15, aux2->hor);
-
-				break;
-			}
-
-			default:
-			{
-				break;
-			}
-
-			}
-
-			break;
-		}
-		case IDC_LIST8: // Día
-		{
-			switch (HIWORD(wParam))
-			{
-			case LBN_DBLCLK: //Al dar doble clic en el ListBox 
-			{
-				char num4[30] = { 0 };
-				int indice4 = 0;
-				indice4 = SendDlgItemMessage(hwnd, IDC_LIST8, LB_GETCURSEL, 0, 0);
-				SendDlgItemMessage(hwnd, IDC_LIST8, LB_GETTEXT, indice4, (LPARAM)num4);
-
-				aux3 = ini3;
-
-				while (aux3->sig != nullptr && strcmp(aux3->dia, num4) != 0)
-				{
-					aux3 = aux3->sig;
-
-				}
-
-				SetDlgItemText(hwnd, IDC_EDIT16, aux3->dia);
-
-				break;
-			}
-
-			default:
-			{
-				break;
-			}
-
-			}
-
-			break;
-		}
-		case IDC_LIST10: // Especialidades
-		{
-			switch (HIWORD(wParam))
-			{
-			case LBN_DBLCLK: //Al dar doble clic en el ListBox 
-			{
-				char num5[30] = { 0 };
-				int indice5 = 0;
-				indice5 = SendDlgItemMessage(hwnd, IDC_LIST10, LB_GETCURSEL, 0, 0);
-				SendDlgItemMessage(hwnd, IDC_LIST10, LB_GETTEXT, indice5, (LPARAM)num5);
-
-				auxVuelo3 = iniVuelo;
-
-				while (auxVuelo3->sig != nullptr && strcmp(auxVuelo3->origen, num5) != 0)
-				{
-					auxVuelo3 = auxVuelo3->sig;
-
-				}
-
-				SetDlgItemText(hwnd, IDC_EDIT18, auxVuelo3->origen);
-
-				break;
-			}
-
-			default:
-			{
-				break;
-			}
-
-			}
-
-			break;
-		}
-		case IDC_LIST3: // Medicos
-		{
-			switch (HIWORD(wParam))
-			{
-			case LBN_DBLCLK: //Al dar doble clic en el ListBox 
-			{
-				char num[60] = { 0 };
-				int indice = 0;
-				indice = SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETCURSEL, 0, 0);
-				SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETTEXT, indice, (LPARAM)num);
-
-				auxMed3 = iniBoleto;
-
-				while (auxMed3->sig != nullptr && strcmp(auxMed3->nombreCompPasajero, num) != 0)
-				{
-					auxMed3 = auxMed3->sig;
-
-				}
-
-				SetDlgItemText(hwnd, IDC_EDIT2, auxMed3->nombrePasajero);
-				SetDlgItemText(hwnd, IDC_EDIT3, auxMed3->apellidoPPasajero);
-				SetDlgItemText(hwnd, IDC_EDIT4, auxMed3->apellidoMPasajero);
-
-				//SetDlgItemText(hwnd, IDC_EDIT5, auxMed3->cedulaChar);
-				SetDlgItemText(hwnd, IDC_EDIT18, auxMed3->vuelo);
-
-				//SetDlgItemText(hwnd, IDC_EDIT8, auxMed3->telefonoChar);
-
-				//SetDlgItemText(hwnd, IDC_EDIT17, auxMed3->numConsultorioChar);
-				//SetDlgItemText(hwnd, IDC_EDIT15, auxMed3->hoararioChar);
-				//SetDlgItemText(hwnd, IDC_EDIT16, auxMed3->diasChar);
-
-				//strcpy_s(zFile, auxMed3->foto); //Inicializar zfile con la dirección de memoria del puntero foto
+				strcpy_s(zFile, miUsuario->foto); //Inicializar zfile con la dirección de memoria del puntero foto
 
 				HBITMAP bmp; //1
-				//bmp = (HBITMAP)LoadImage(NULL, auxMed3->foto, IMAGE_BITMAP, 120, 120, LR_LOADFROMFILE); //2
-				//SendDlgItemMessage(hwnd, IDC_BMP2, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3 
+				bmp = (HBITMAP)LoadImage(NULL, miUsuario->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
+				SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
+			}
+			auxMed3 = iniBoleto; // Medicos
 
-				break;
+			while (auxMed3->sig != nullptr)
+			{
+				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
+				auxMed3 = auxMed3->sig;
+			}
+			if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
+			{
+				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
+				auxMed3 = auxMed3->sig;
+			}
+			aux = ini; // Consultorios
+
+			while (aux->sig != nullptr)
+			{
+				SendDlgItemMessage(hwnd, IDC_LIST6, LB_ADDSTRING, (WPARAM)0, (LPARAM)aux->num);
+				aux = aux->sig;
+			}
+			if (aux->sig == nullptr/* || auxUsu2->ant == nullptr*/)
+			{
+				SendDlgItemMessage(hwnd, IDC_LIST6, LB_ADDSTRING, (WPARAM)0, (LPARAM)aux->num);
+				aux = aux->sig;
+			}
+			aux2 = ini2; // Horarios
+
+			while (aux2->sig != nullptr)
+			{
+				SendDlgItemMessage(hwnd, IDC_LIST7, LB_ADDSTRING, (WPARAM)0, (LPARAM)aux2->hor);
+				aux2 = aux2->sig;
 			}
 
-			default:
+			if (aux2->sig == nullptr/* || auxUsu2->ant == nullptr*/)
 			{
-				break;
+				SendDlgItemMessage(hwnd, IDC_LIST7, LB_ADDSTRING, (WPARAM)0, (LPARAM)aux2->hor);
+				aux2 = aux2->sig;
 			}
 
+			aux3 = ini3; // Días
+
+			while (aux3->sig != nullptr)
+			{
+				SendDlgItemMessage(hwnd, IDC_LIST8, LB_ADDSTRING, (WPARAM)0, (LPARAM)aux3->dia);
+				aux3 = aux3->sig;
 			}
 
-			break;
-		}
-		case IDC_BUTTON1: // Editar
-		{
-			GetDlgItemText(hwnd, IDC_EDIT2, auxMed3->nombrePasajero, sizeof(auxMed3->nombrePasajero));
-			GetDlgItemText(hwnd, IDC_EDIT3, auxMed3->apellidoPPasajero, sizeof(auxMed3->apellidoPPasajero));
-			GetDlgItemText(hwnd, IDC_EDIT4, auxMed3->apellidoPPasajero, sizeof(auxMed3->apellidoPPasajero));
+			if (aux3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
+			{
+				SendDlgItemMessage(hwnd, IDC_LIST8, LB_ADDSTRING, (WPARAM)0, (LPARAM)aux3->dia);
+				aux3 = aux3->sig;
+			}
 
-			//GetDlgItemText(hwnd, IDC_EDIT5, auxMed3->cedulaChar, sizeof(auxMed3->cedulaChar));
-			//auxMed3->cedulaNum = atoi(auxMed3->cedulaChar);
-			GetDlgItemText(hwnd, IDC_EDIT18, auxMed3->vuelo, sizeof(auxMed3->vuelo));
-			
-			//GetDlgItemText(hwnd, IDC_EDIT8, auxMed3->telefonoChar, sizeof(auxMed3->telefonoChar));
-			//auxMed3->estado = atoi(auxMed3->telefonoChar);
+			auxVuelo3 = iniVuelo; // Especialidades
 
-			//GetDlgItemText(hwnd, IDC_EDIT17, auxMed3->numConsultorioChar, sizeof(auxMed3->numConsultorioChar));
-			//auxMed3->clase = atoi(auxMed3->numConsultorioChar);
-			//GetDlgItemText(hwnd, IDC_EDIT15, auxMed3->hoararioChar, sizeof(auxMed3->hoararioChar));
-			// Horario
-			/*
-			* if (strcmp(auxMed3->hoararioChar, "6am - 6pm") == 0)
+			if (iniVuelo != nullptr)
 			{
-				auxMed3->pase = 1;
-			}
-			else if (strcmp(auxMed3->hoararioChar, "6pm - 12am") == 0)
-			{
-				auxMed3->pase = 2;
-			}
-			else if (strcmp(auxMed3->hoararioChar, "6am - 3pm") == 0)
-			{
-				auxMed3->pase = 3;
-			}
-			else
-			{
-				auxMed3->pase = 4;
-			}
-			GetDlgItemText(hwnd, IDC_EDIT16, auxMed3->diasChar, sizeof(auxMed3->diasChar));
-			*/
-			
-			// Días
-			/*
-			if (strcmp(auxMed3->diasChar, "Lunes - Viernes (M)") == 0)
-			{
-				auxMed3->diasNum = 1;
-			}
-			else if (strcmp(auxMed3->diasChar, "Lunes - Viernes (N)") == 0)
-			{
-				auxMed3->diasNum = 2;
-			}
-			else if (strcmp(auxMed3->diasChar, "Sabado (M)") == 0)
-			{
-				auxMed3->diasNum = 3;
-			}
-			else
-			{
-				auxMed3->diasNum = 4;
-			}
-			*/
-
-			// Concatenación
-			strcpy_s(auxMed3->nombreCompPasajero, auxMed3->nombrePasajero);
-			strcat_s(auxMed3->nombreCompPasajero, " ");
-			strcat_s(auxMed3->nombreCompPasajero, auxMed3->apellidoPPasajero);
-			strcat_s(auxMed3->nombreCompPasajero, " ");
-			strcat_s(auxMed3->nombreCompPasajero, auxMed3->apellidoPPasajero);
-
-			//strcpy_s(auxMed3->foto,zFile);
-
-			MessageBox(NULL, "Cambios guardados.", "AVISO", MB_OK | MB_ICONINFORMATION);
-
-			break;
-		}
-		case IDC_BUTTON2: // Eliminar
-		{
-			if (auxMed3 == nullptr)
-			{
-				MessageBox(NULL, "No se ha seleccionado a un medico, seleccione uno de la lista con doble click.", "AVISO", MB_OK | MB_ICONERROR);
-			}
-			else
-			{
-				int opc = MessageBox(hwnd, "¿Seguro que desea eliminar a este medico?", "AVISO", MB_YESNO | MB_ICONQUESTION);
-
-				switch (opc)
+				while (auxVuelo3->sig != nullptr)
 				{
-				case IDYES:
-				{
-					char medico[60] = { 0 };
-					int indiceE = 0;
-					indiceE = SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETCURSEL, 0, 0);
-					SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETTEXT, indiceE, (LPARAM)medico);
-
-					eliminarBoleto(medico);
-
-					SendMessage(GetDlgItem(hwnd, IDC_LIST3), LB_DELETESTRING, indiceE, 0);
-
-					SetDlgItemText(hwnd, IDC_EDIT2, "");
-					SetDlgItemText(hwnd, IDC_EDIT3, "");
-					SetDlgItemText(hwnd, IDC_EDIT4, "");
-
-					SetDlgItemText(hwnd, IDC_EDIT5, "");
-					SetDlgItemText(hwnd, IDC_EDIT18, "");
-
-					SetDlgItemText(hwnd, IDC_EDIT8, "");
-
-					SetDlgItemText(hwnd, IDC_EDIT17, "");
-					SetDlgItemText(hwnd, IDC_EDIT15, "");
-					SetDlgItemText(hwnd, IDC_EDIT16, "");
-
-					auxMed3 = nullptr;
-
-					break;
+					SendDlgItemMessage(hwnd, IDC_LIST10, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo3->origen);
+					auxVuelo3 = auxVuelo3->sig;
 				}
 
-				case IDNO:
+				if (auxVuelo3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
 				{
-					SetDlgItemText(hwnd, IDC_EDIT2, "");
-					SetDlgItemText(hwnd, IDC_EDIT3, "");
-					SetDlgItemText(hwnd, IDC_EDIT4, "");
+					SendDlgItemMessage(hwnd, IDC_LIST10, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo3->origen);
+					auxVuelo3 = auxVuelo3->sig;
+				}
+			}
+			else
+			{
+				MessageBox(NULL, "No hay especialidades registradas.", "AVISO", MB_OK | MB_ICONINFORMATION);
+			}
 
-					SetDlgItemText(hwnd, IDC_EDIT5, "");
-					SetDlgItemText(hwnd, IDC_EDIT18, "");
+			break;
+		}
+		case WM_COMMAND:
+		{
+			long opcion = LOWORD(wParam);
+			cMenu(hwnd, opcion);
 
-					SetDlgItemText(hwnd, IDC_EDIT8, "");
+			switch (LOWORD(wParam))
+			{
+			case IDC_LIST6: // Consultorio
+			{
+				switch (HIWORD(wParam))
+				{
+				case LBN_DBLCLK: //Al dar doble clic en el ListBox 
+				{
+					char num2[30] = { 0 };
+					int indice2 = 0;
+					indice2 = SendDlgItemMessage(hwnd, IDC_LIST6, LB_GETCURSEL, 0, 0);
+					SendDlgItemMessage(hwnd, IDC_LIST6, LB_GETTEXT, indice2, (LPARAM)num2);
 
-					SetDlgItemText(hwnd, IDC_EDIT17, "");
-					SetDlgItemText(hwnd, IDC_EDIT15, "");
-					SetDlgItemText(hwnd, IDC_EDIT16, "");
+					aux = ini;
 
-					auxMed3 = nullptr;
+					while (aux->sig != nullptr && strcmp(aux->num, num2) != 0)
+					{
+						aux = aux->sig;
+					}
+
+					SetDlgItemText(hwnd, IDC_EDIT17, aux->num);
 
 					break;
 				}
@@ -2095,47 +1813,332 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				}
 
 				}
+
+				break;
 			}
-
-			break;
-		}
-		case IDC_BUTTON3: // Cargar
-		{
-			OPENFILENAME ofn;
-
-			ZeroMemory(&ofn, sizeof(ofn));
-
-			ofn.lStructSize = sizeof(ofn);
-			ofn.hwndOwner = hwnd; //Puntero de la ventana padre
-			ofn.lpstrFilter = "ALL\0 * .*\0Bitmaps\0 * .bmp\0";
-			ofn.lpstrFile = zFile;
-			ofn.lpstrFile[0] = '\0';
-			ofn.nMaxFile = sizeof(zFile);
-			ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-			ofn.nFilterIndex = 2;
-
-			if (GetOpenFileName(&ofn) == TRUE)
+			case IDC_LIST7: // Horario
 			{
-				HBITMAP bmp; //1
-				bmp = (HBITMAP)LoadImage(NULL, zFile, IMAGE_BITMAP, 120, 120, LR_LOADFROMFILE); //2
-				SendDlgItemMessage(hwnd, /*IDC_BMP2*/1056, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3 
+				switch (HIWORD(wParam))
+				{
+				case LBN_DBLCLK: //Al dar doble clic en el ListBox 
+				{
+					char num3[30] = { 0 };
+					int indice3 = 0;
+					indice3 = SendDlgItemMessage(hwnd, IDC_LIST7, LB_GETCURSEL, 0, 0);
+					SendDlgItemMessage(hwnd, IDC_LIST7, LB_GETTEXT, indice3, (LPARAM)num3);
+
+					aux2 = ini2;
+
+					while (aux2->sig != nullptr && strcmp(aux2->hor, num3) != 0)
+					{
+						aux2 = aux2->sig;
+					}
+
+					SetDlgItemText(hwnd, IDC_EDIT15, aux2->hor);
+
+					break;
+				}
+
+				default:
+				{
+					break;
+				}
+
+				}
+
+				break;
+			}
+			case IDC_LIST8: // Día
+			{
+				switch (HIWORD(wParam))
+				{
+				case LBN_DBLCLK: //Al dar doble clic en el ListBox 
+				{
+					char num4[30] = { 0 };
+					int indice4 = 0;
+					indice4 = SendDlgItemMessage(hwnd, IDC_LIST8, LB_GETCURSEL, 0, 0);
+					SendDlgItemMessage(hwnd, IDC_LIST8, LB_GETTEXT, indice4, (LPARAM)num4);
+
+					aux3 = ini3;
+
+					while (aux3->sig != nullptr && strcmp(aux3->dia, num4) != 0)
+					{
+						aux3 = aux3->sig;
+
+					}
+
+					SetDlgItemText(hwnd, IDC_EDIT16, aux3->dia);
+
+					break;
+				}
+
+				default:
+				{
+					break;
+				}
+
+				}
+
+				break;
+			}
+			case IDC_LIST10: // Especialidades
+			{
+				switch (HIWORD(wParam))
+				{
+				case LBN_DBLCLK: //Al dar doble clic en el ListBox 
+				{
+					char num5[30] = { 0 };
+					int indice5 = 0;
+					indice5 = SendDlgItemMessage(hwnd, IDC_LIST10, LB_GETCURSEL, 0, 0);
+					SendDlgItemMessage(hwnd, IDC_LIST10, LB_GETTEXT, indice5, (LPARAM)num5);
+
+					auxVuelo3 = iniVuelo;
+
+					while (auxVuelo3->sig != nullptr && strcmp(auxVuelo3->origen, num5) != 0)
+					{
+						auxVuelo3 = auxVuelo3->sig;
+
+					}
+
+					SetDlgItemText(hwnd, IDC_EDIT18, auxVuelo3->origen);
+
+					break;
+				}
+
+				default:
+				{
+					break;
+				}
+
+				}
+
+				break;
+			}
+			case IDC_LIST3: // Medicos
+			{
+				switch (HIWORD(wParam))
+				{
+				case LBN_DBLCLK: //Al dar doble clic en el ListBox 
+				{
+					char num[60] = { 0 };
+					int indice = 0;
+					indice = SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETCURSEL, 0, 0);
+					SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETTEXT, indice, (LPARAM)num);
+
+					auxMed3 = iniBoleto;
+
+					while (auxMed3->sig != nullptr && strcmp(auxMed3->nombreCompPasajero, num) != 0)
+					{
+						auxMed3 = auxMed3->sig;
+
+					}
+
+					SetDlgItemText(hwnd, IDC_EDIT2, auxMed3->nombrePasajero);
+					SetDlgItemText(hwnd, IDC_EDIT3, auxMed3->apellidoPPasajero);
+					SetDlgItemText(hwnd, IDC_EDIT4, auxMed3->apellidoMPasajero);
+
+					//SetDlgItemText(hwnd, IDC_EDIT5, auxMed3->cedulaChar);
+					SetDlgItemText(hwnd, IDC_EDIT18, auxMed3->vuelo);
+
+					//SetDlgItemText(hwnd, IDC_EDIT8, auxMed3->telefonoChar);
+
+					//SetDlgItemText(hwnd, IDC_EDIT17, auxMed3->numConsultorioChar);
+					//SetDlgItemText(hwnd, IDC_EDIT15, auxMed3->hoararioChar);
+					//SetDlgItemText(hwnd, IDC_EDIT16, auxMed3->diasChar);
+
+					//strcpy_s(zFile, auxMed3->foto); //Inicializar zfile con la dirección de memoria del puntero foto
+
+					HBITMAP bmp; //1
+					//bmp = (HBITMAP)LoadImage(NULL, auxMed3->foto, IMAGE_BITMAP, 120, 120, LR_LOADFROMFILE); //2
+					//SendDlgItemMessage(hwnd, IDC_BMP2, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3 
+
+					break;
+				}
+
+				default:
+				{
+					break;
+				}
+
+				}
+
+				break;
+			}
+			case IDC_BUTTON1: // Editar
+			{
+				GetDlgItemText(hwnd, IDC_EDIT2, auxMed3->nombrePasajero, sizeof(auxMed3->nombrePasajero));
+				GetDlgItemText(hwnd, IDC_EDIT3, auxMed3->apellidoPPasajero, sizeof(auxMed3->apellidoPPasajero));
+				GetDlgItemText(hwnd, IDC_EDIT4, auxMed3->apellidoPPasajero, sizeof(auxMed3->apellidoPPasajero));
+
+				//GetDlgItemText(hwnd, IDC_EDIT5, auxMed3->cedulaChar, sizeof(auxMed3->cedulaChar));
+				//auxMed3->cedulaNum = atoi(auxMed3->cedulaChar);
+				GetDlgItemText(hwnd, IDC_EDIT18, auxMed3->vuelo, sizeof(auxMed3->vuelo));
+			
+				//GetDlgItemText(hwnd, IDC_EDIT8, auxMed3->telefonoChar, sizeof(auxMed3->telefonoChar));
+				//auxMed3->estado = atoi(auxMed3->telefonoChar);
+
+				//GetDlgItemText(hwnd, IDC_EDIT17, auxMed3->numConsultorioChar, sizeof(auxMed3->numConsultorioChar));
+				//auxMed3->clase = atoi(auxMed3->numConsultorioChar);
+				//GetDlgItemText(hwnd, IDC_EDIT15, auxMed3->hoararioChar, sizeof(auxMed3->hoararioChar));
+				// Horario
+				/*
+				* if (strcmp(auxMed3->hoararioChar, "6am - 6pm") == 0)
+				{
+					auxMed3->pase = 1;
+				}
+				else if (strcmp(auxMed3->hoararioChar, "6pm - 12am") == 0)
+				{
+					auxMed3->pase = 2;
+				}
+				else if (strcmp(auxMed3->hoararioChar, "6am - 3pm") == 0)
+				{
+					auxMed3->pase = 3;
+				}
+				else
+				{
+					auxMed3->pase = 4;
+				}
+				GetDlgItemText(hwnd, IDC_EDIT16, auxMed3->diasChar, sizeof(auxMed3->diasChar));
+				*/
+			
+				// Días
+				/*
+				if (strcmp(auxMed3->diasChar, "Lunes - Viernes (M)") == 0)
+				{
+					auxMed3->diasNum = 1;
+				}
+				else if (strcmp(auxMed3->diasChar, "Lunes - Viernes (N)") == 0)
+				{
+					auxMed3->diasNum = 2;
+				}
+				else if (strcmp(auxMed3->diasChar, "Sabado (M)") == 0)
+				{
+					auxMed3->diasNum = 3;
+				}
+				else
+				{
+					auxMed3->diasNum = 4;
+				}
+				*/
+
+				// Concatenación
+				strcpy_s(auxMed3->nombreCompPasajero, auxMed3->nombrePasajero);
+				strcat_s(auxMed3->nombreCompPasajero, " ");
+				strcat_s(auxMed3->nombreCompPasajero, auxMed3->apellidoPPasajero);
+				strcat_s(auxMed3->nombreCompPasajero, " ");
+				strcat_s(auxMed3->nombreCompPasajero, auxMed3->apellidoPPasajero);
+
+				//strcpy_s(auxMed3->foto,zFile);
+
+				MessageBox(NULL, "Cambios guardados.", "AVISO", MB_OK | MB_ICONINFORMATION);
+
+				break;
+			}
+			case IDC_BUTTON2: // Eliminar
+			{
+				if (auxMed3 == nullptr)
+				{
+					MessageBox(NULL, "No se ha seleccionado a un medico, seleccione uno de la lista con doble click.", "AVISO", MB_OK | MB_ICONERROR);
+				}
+				else
+				{
+					int opc = MessageBox(hwnd, "¿Seguro que desea eliminar a este medico?", "AVISO", MB_YESNO | MB_ICONQUESTION);
+
+					switch (opc)
+					{
+					case IDYES:
+					{
+						char medico[60] = { 0 };
+						int indiceE = 0;
+						indiceE = SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETCURSEL, 0, 0);
+						SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETTEXT, indiceE, (LPARAM)medico);
+
+						eliminarBoleto(medico);
+
+						SendMessage(GetDlgItem(hwnd, IDC_LIST3), LB_DELETESTRING, indiceE, 0);
+
+						SetDlgItemText(hwnd, IDC_EDIT2, "");
+						SetDlgItemText(hwnd, IDC_EDIT3, "");
+						SetDlgItemText(hwnd, IDC_EDIT4, "");
+
+						SetDlgItemText(hwnd, IDC_EDIT5, "");
+						SetDlgItemText(hwnd, IDC_EDIT18, "");
+
+						SetDlgItemText(hwnd, IDC_EDIT8, "");
+
+						SetDlgItemText(hwnd, IDC_EDIT17, "");
+						SetDlgItemText(hwnd, IDC_EDIT15, "");
+						SetDlgItemText(hwnd, IDC_EDIT16, "");
+
+						auxMed3 = nullptr;
+
+						break;
+					}
+
+					case IDNO:
+					{
+						SetDlgItemText(hwnd, IDC_EDIT2, "");
+						SetDlgItemText(hwnd, IDC_EDIT3, "");
+						SetDlgItemText(hwnd, IDC_EDIT4, "");
+
+						SetDlgItemText(hwnd, IDC_EDIT5, "");
+						SetDlgItemText(hwnd, IDC_EDIT18, "");
+
+						SetDlgItemText(hwnd, IDC_EDIT8, "");
+
+						SetDlgItemText(hwnd, IDC_EDIT17, "");
+						SetDlgItemText(hwnd, IDC_EDIT15, "");
+						SetDlgItemText(hwnd, IDC_EDIT16, "");
+
+						auxMed3 = nullptr;
+
+						break;
+					}
+
+					default:
+					{
+						break;
+					}
+
+					}
+				}
+
+				break;
+			}
+			case IDC_BUTTON3: // Cargar
+			{
+				OPENFILENAME ofn;
+
+				ZeroMemory(&ofn, sizeof(ofn));
+
+				ofn.lStructSize = sizeof(ofn);
+				ofn.hwndOwner = hwnd; //Puntero de la ventana padre
+				ofn.lpstrFilter = "ALL\0 * .*\0Bitmaps\0 * .bmp\0";
+				ofn.lpstrFile = zFile;
+				ofn.lpstrFile[0] = '\0';
+				ofn.nMaxFile = sizeof(zFile);
+				ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+				ofn.nFilterIndex = 2;
+
+				if (GetOpenFileName(&ofn) == TRUE)
+				{
+					HBITMAP bmp; //1
+					bmp = (HBITMAP)LoadImage(NULL, zFile, IMAGE_BITMAP, 120, 120, LR_LOADFROMFILE); //2
+					SendDlgItemMessage(hwnd, /*IDC_BMP2*/1056, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3 
+				}
+
+				break;
+			}
+			default:
+			{
+				break;
+			}
+
 			}
 
 			break;
 		}
-		default:
-		{
-			break;
-		}
-
-		}
-
-		break;
-	}
-	default:
-	{
-		break;
-	}
+		default: break;
 
 	}
 
@@ -2161,7 +2164,6 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				bmp = (HBITMAP)LoadImage(NULL, miUsuario->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 				SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 			}
-
 			auxMed3 = iniBoleto; // Medicos
 
 			while (auxMed3->sig != nullptr)
@@ -2169,13 +2171,11 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
 				auxMed3 = auxMed3->sig;
 			}
-
 			if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
 			{
 				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
 				auxMed3 = auxMed3->sig;
 			}
-
 
 			//FECHA
 			SYSTEMTIME fechaHoy;
@@ -2227,95 +2227,95 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 			switch (LOWORD(wParam))
 			{
-			case IDC_LIST3: // Medicos
-			{
-				switch (HIWORD(wParam))
+				case IDC_LIST3: // Medicos
 				{
-					case LBN_DBLCLK: //Al dar doble clic en el ListBox 
+					switch (HIWORD(wParam))
 					{
-						char num[60] = { 0 };
-						int indice = 0;
-						indice = SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETCURSEL, 0, 0);
-						SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETTEXT, indice, (LPARAM)num);
-
-						auxMed3 = iniBoleto;
-
-						while (auxMed3->sig != nullptr && strcmp(auxMed3->nombreCompPasajero, num) != 0)
+						case LBN_DBLCLK: //Al dar doble clic en el ListBox 
 						{
-							auxMed3 = auxMed3->sig;
+							char num[60] = { 0 };
+							int indice = 0;
+							indice = SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETCURSEL, 0, 0);
+							SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETTEXT, indice, (LPARAM)num);
 
+							auxMed3 = iniBoleto;
+
+							while (auxMed3->sig != nullptr && strcmp(auxMed3->nombreCompPasajero, num) != 0)
+							{
+								auxMed3 = auxMed3->sig;
+
+							}
+							SetDlgItemText(hwnd, IDC_EDIT8, auxMed3->nombreCompPasajero);
+							break;
 						}
-						SetDlgItemText(hwnd, IDC_EDIT8, auxMed3->nombreCompPasajero);
-						break;
+						default: break;
 					}
-					default: break;
+					break;
 				}
-				break;
-			}
-			case IDC_BUTTON1: // Guardar
-			{
-				/*GetDlgItemText(hwnd, IDC_DATETIMEPICKER1, fecha, sizeof(fecha));*/
-
-				char pasBuscar[60];
-
-				GetDlgItemText(hwnd, IDC_EDIT2, pasBuscar, sizeof(pasBuscar));
-
-				auxPasajero2 = iniPasajero;
-
-				while (auxPasajero2/*->sig*/ != nullptr && strcmp(pasBuscar, auxPasajero2->nombreComp) != 0)
+				case IDC_BUTTON1: // Guardar
 				{
-					auxPasajero2 = auxPasajero2->sig;
+					/*GetDlgItemText(hwnd, IDC_DATETIMEPICKER1, fecha, sizeof(fecha));*/
+
+					char pasBuscar[60];
+
+					GetDlgItemText(hwnd, IDC_EDIT2, pasBuscar, sizeof(pasBuscar));
+
+					auxPasajero2 = iniPasajero;
+
+					while (auxPasajero2/*->sig*/ != nullptr && strcmp(pasBuscar, auxPasajero2->nombreComp) != 0)
+					{
+						auxPasajero2 = auxPasajero2->sig;
+					}
+
+					if (auxPasajero2/*->sig*/ == nullptr || strcmp(pasBuscar, auxPasajero2->nombreComp) != 0)
+					{
+						pasajero* temp = new pasajero;
+
+						GetDlgItemText(hwnd, IDC_EDIT2, temp->nombre, sizeof(temp->nombre));
+						GetDlgItemText(hwnd, IDC_EDIT3, temp->apellidoP, sizeof(temp->apellidoP));
+						GetDlgItemText(hwnd, IDC_EDIT4, temp->apellidoM, sizeof(temp->apellidoM));
+
+						// Genero 
+						if (IsDlgButtonChecked(hwnd, IDC_RADIO1))
+						{
+							//strcpy_s(temp->genero, "Masculino");
+						}
+						else
+						{
+							//strcpy_s(temp->genero, "Femenino");
+						}
+
+						GetDlgItemText(hwnd, IDC_EDIT5, temp->nacionalidad, sizeof(temp->nacionalidad));
+						//GetDlgItemText(hwnd, IDC_DATETIMEPICKER1, temp->fecha, sizeof(temp->fecha));
+
+						// ::: PASADOS ::: //
+						//GetDlgItemText(hwnd, IDC_EDIT6, temp->ref, sizeof(temp->ref));				
+						//GetDlgItemText(hwnd, IDC_EDIT7, temp->edadChar, sizeof(temp->edadChar));
+						//GetDlgItemText(hwnd, IDC_EDIT8, temp->pMedicoP, sizeof(temp->pMedicoP));
+
+						strcpy_s(temp->usuarioRegistro, miUsuario->nick);
+
+						nuevoPasajero(temp);
+
+						SetDlgItemText(hwnd, IDC_EDIT2, "");
+						SetDlgItemText(hwnd, IDC_EDIT3, "");
+						SetDlgItemText(hwnd, IDC_EDIT4, "");
+						SetDlgItemText(hwnd, IDC_EDIT5, "");
+						SetDlgItemText(hwnd, IDC_EDIT8, "");
+
+						EndDialog(hwnd, 0);
+
+						HWND hDialog10 = CreateDialog(hInstanceGlobal, MAKEINTRESOURCE(IDD_DIALOG10), 0, cDialog10);
+
+						ShowWindow(hDialog10, SW_SHOW);
+						UpdateWindow(hDialog10);
+					}else
+						MessageBox(NULL, "Es posible que este paciente ya este registrado.", "AVISO", MB_OK | MB_ICONINFORMATION);
+					break;
 				}
-
-				if (auxPasajero2/*->sig*/ == nullptr || strcmp(pasBuscar, auxPasajero2->nombreComp) != 0)
-				{
-					pasajero* temp = new pasajero;
-
-					GetDlgItemText(hwnd, IDC_EDIT2, temp->nombre, sizeof(temp->nombre));
-					GetDlgItemText(hwnd, IDC_EDIT3, temp->apellidoP, sizeof(temp->apellidoP));
-					GetDlgItemText(hwnd, IDC_EDIT4, temp->apellidoM, sizeof(temp->apellidoM));
-
-					// Genero 
-					if (IsDlgButtonChecked(hwnd, IDC_RADIO1))
-					{
-						//strcpy_s(temp->genero, "Masculino");
-					}
-					else
-					{
-						//strcpy_s(temp->genero, "Femenino");
-					}
-
-					GetDlgItemText(hwnd, IDC_EDIT5, temp->nacionalidad, sizeof(temp->nacionalidad));
-					//GetDlgItemText(hwnd, IDC_DATETIMEPICKER1, temp->fecha, sizeof(temp->fecha));
-
-					// ::: PASADOS ::: //
-					//GetDlgItemText(hwnd, IDC_EDIT6, temp->ref, sizeof(temp->ref));				
-					//GetDlgItemText(hwnd, IDC_EDIT7, temp->edadChar, sizeof(temp->edadChar));
-					//GetDlgItemText(hwnd, IDC_EDIT8, temp->pMedicoP, sizeof(temp->pMedicoP));
-
-					strcpy_s(temp->usuarioRegistro, miUsuario->nick);
-
-					nuevoPasajero(temp);
-
-					SetDlgItemText(hwnd, IDC_EDIT2, "");
-					SetDlgItemText(hwnd, IDC_EDIT3, "");
-					SetDlgItemText(hwnd, IDC_EDIT4, "");
-					SetDlgItemText(hwnd, IDC_EDIT5, "");
-					SetDlgItemText(hwnd, IDC_EDIT8, "");
-
-					EndDialog(hwnd, 0);
-
-					HWND hDialog10 = CreateDialog(hInstanceGlobal, MAKEINTRESOURCE(IDD_DIALOG10), 0, cDialog10);
-
-					ShowWindow(hDialog10, SW_SHOW);
-					UpdateWindow(hDialog10);
-				}else
-					MessageBox(NULL, "Es posible que este paciente ya este registrado.", "AVISO", MB_OK | MB_ICONINFORMATION);
-				break;
+				default: break;
 			}
-			default: break;
 		}
-	}
 	return false;  // Un callback siempre retorna falso
 	}
 }
@@ -2325,120 +2325,104 @@ BOOL CALLBACK cDialog11(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
-	case WM_INITDIALOG:
-	{
-		if (miUsuario != nullptr)
+		case WM_INITDIALOG:
 		{
-			SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nombreComp);
-		}
-		if (miUsuario->foto != nullptr)
-		{
-			strcpy_s(zFile, miUsuario->foto); //Inicializar zfile con la dirección de memoria del puntero foto
+			if (miUsuario != nullptr)
+				SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nombreComp);
 
-			HBITMAP bmp; //1
-			bmp = (HBITMAP)LoadImage(NULL, miUsuario->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
-			SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
-		}
+			if (miUsuario->foto != nullptr)
+			{
+				strcpy_s(zFile, miUsuario->foto); //Inicializar zfile con la dirección de memoria del puntero foto
 
-		auxMed3 = iniBoleto; // Medicos
+				HBITMAP bmp; //1
+				bmp = (HBITMAP)LoadImage(NULL, miUsuario->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
+				SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
+			}
+			auxMed3 = iniBoleto; // Medicos
 
-		while (auxMed3->sig != nullptr)
-		{
-			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
-			auxMed3 = auxMed3->sig;
-		}
+			while (auxMed3->sig != nullptr)
+			{
+				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
+				auxMed3 = auxMed3->sig;
+			}
+			if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
+			{
+				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
+				auxMed3 = auxMed3->sig;
+			}
 
-		if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
-		{
-			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->nombreCompPasajero/*nombreCompM*/);
-			auxMed3 = auxMed3->sig;
-		}
+			//FECHA
+			SYSTEMTIME fechaHoy;
+			ZeroMemory(&fechaHoy, sizeof(fechaHoy));
+			GetLocalTime(&fechaHoy);
 
+			char fechaCompleta[30] = { 0 };
+			char fechaChar[5] = { 0 };
 
-		//FECHA
-		SYSTEMTIME fechaHoy;
-		ZeroMemory(&fechaHoy, sizeof(fechaHoy));
-		GetLocalTime(&fechaHoy);
+			sprintf_s(fechaChar, "%d", fechaHoy.wYear);
 
-		char fechaCompleta[30] = { 0 };
-		char fechaChar[5] = { 0 };
+			strcat_s(fechaCompleta, fechaChar);
+			strcat_s(fechaCompleta, "/");
 
-		sprintf_s(fechaChar, "%d", fechaHoy.wYear);
+			sprintf_s(fechaChar, "%d", fechaHoy.wMonth);
 
-		strcat_s(fechaCompleta, fechaChar);
-		strcat_s(fechaCompleta, "/");
+			strcat_s(fechaCompleta, fechaChar);
+			strcat_s(fechaCompleta, "/");
 
-		sprintf_s(fechaChar, "%d", fechaHoy.wMonth);
+			sprintf_s(fechaChar, "%d", fechaHoy.wDay);
 
-		strcat_s(fechaCompleta, fechaChar);
-		strcat_s(fechaCompleta, "/");
+			strcat_s(fechaCompleta, fechaChar);
+			strcat_s(fechaCompleta, "/");
 
-		sprintf_s(fechaChar, "%d", fechaHoy.wDay);
+			sprintf_s(fechaChar, "%d", fechaHoy.wHour);
 
-		strcat_s(fechaCompleta, fechaChar);
-		strcat_s(fechaCompleta, "/");
+			strcat_s(fechaCompleta, fechaChar);
+			strcat_s(fechaCompleta, ":");
 
-		sprintf_s(fechaChar, "%d", fechaHoy.wHour);
+			sprintf_s(fechaChar, "%d", fechaHoy.wMinute);
 
-		strcat_s(fechaCompleta, fechaChar);
-		strcat_s(fechaCompleta, ":");
+			strcat_s(fechaCompleta, fechaChar);
+			strcat_s(fechaCompleta, ":");
 
-		sprintf_s(fechaChar, "%d", fechaHoy.wMinute);
+			sprintf_s(fechaChar, "%d", fechaHoy.wSecond);
 
-		strcat_s(fechaCompleta, fechaChar);
-		strcat_s(fechaCompleta, ":");
+			strcat_s(fechaCompleta, fechaChar);
 
-		sprintf_s(fechaChar, "%d", fechaHoy.wSecond);
-
-		strcat_s(fechaCompleta, fechaChar);
-
-		/*strcpy_s(aux->fechaCompleta, fechaCompleta);*/
-
-		/*SetWindowText(GetDlgItem(hwnd, IDC_EDIT35), fechaCompleta);*/
-
-		break;
-	}
-	case WM_COMMAND:
-	{
-		long opcion = LOWORD(wParam);
-		cMenu(hwnd, opcion);
-
-		switch (LOWORD(wParam))
-		{
-		case IDC_BUTTON1: // Buscar
-		{
-
-
+			/*strcpy_s(aux->fechaCompleta, fechaCompleta);*/
+			/*SetWindowText(GetDlgItem(hwnd, IDC_EDIT35), fechaCompleta);*/
 			break;
 		}
-		case IDC_BUTTON2: // Editar
+		case WM_COMMAND:
 		{
+			long opcion = LOWORD(wParam);
+			cMenu(hwnd, opcion);
+
+			switch (LOWORD(wParam))
+			{
+				case IDC_BUTTON1: // Buscar
+				{
 
 
+					break;
+				}
+				case IDC_BUTTON2: // Editar
+				{
+
+
+					break;
+				}
+				case IDC_BUTTON3: // Eliminar
+				{
+
+
+					break;
+				}
+				default: break;
+			}
 			break;
 		}
-		case IDC_BUTTON3: // Eliminar
-		{
-
-
-			break;
-		}
-		default:
-		{
-			break;
-		}
-
-		}
-
-		break;
+		default: break;
 	}
-	default:
-	{
-		break;
-	}
-
-	}
-
 	return false;  // Un callback siempre retorna falso
 }
 
@@ -2447,87 +2431,72 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
-	case WM_INITDIALOG:
-	{
-		if (miUsuario != nullptr)
+		case WM_INITDIALOG:
 		{
-			SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nombreComp);
-		}
-		if (miUsuario->foto != nullptr)
-		{
-			strcpy_s(zFile, miUsuario->foto); //Inicializar zfile con la dirección de memoria del puntero foto
+			if (miUsuario != nullptr)
+				SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nombreComp);
 
-			HBITMAP bmp; //1
-			bmp = (HBITMAP)LoadImage(NULL, miUsuario->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
-			SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
-		}
-
-		auxPasajero3 = iniPasajero;
-		//auxPas3 = iniPas;
-
-		while (auxPasajero3->sig != nullptr)
-		{
-			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxPasajero3->nombreComp/*nombreCompM*/);
-			auxPasajero3 = auxPasajero3->sig;
-		}
-		//while (auxPas3->sig != nullptr)
-		//{
-		//	SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxPas3->nombreCompP/*nombreCompM*/);
-		//	auxPas3 = auxPas3->sig;
-		//}
-
-		if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
-		{
-			SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxPasajero3->nombreComp/*nombreCompM*/);
-			auxPasajero3 = auxPasajero3->sig;
-		}
-		//if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
-		//{
-		//	SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxPas3->nombreCompP/*nombreCompM*/);
-		//	auxPas3 = auxPas3->sig;
-		//}
-
-		break;
-	}
-	case WM_COMMAND:
-	{
-		long opcion = LOWORD(wParam);
-		cMenu(hwnd, opcion);
-
-		switch (LOWORD(wParam))
-		{
-		case IDC_BUTTON1: // generar
-		{
-			if (iniPasajero == nullptr)
+			if (miUsuario->foto != nullptr)
 			{
-				MessageBox(NULL, "No hay pacientes registrados.", "AVISO", MB_OK | MB_ICONERROR);
-			}
-			else
-			{
-				reportePasajeros();
-				MessageBox(NULL, "Reporte fue guardado en C:-Users-hp-Documents-UANL-Universidad 7-ED-Proyecto_Clinica-Proyecto_Clinica.", "AVISO", MB_OK | MB_ICONEXCLAMATION);
+				strcpy_s(zFile, miUsuario->foto); //Inicializar zfile con la dirección de memoria del puntero foto
+
+				HBITMAP bmp; //1
+				bmp = (HBITMAP)LoadImage(NULL, miUsuario->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
+				SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 			}
 
-			break;
+			auxPasajero3 = iniPasajero;
+			//auxPas3 = iniPas;
 
+			while (auxPasajero3->sig != nullptr)
+			{
+				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxPasajero3->nombreComp/*nombreCompM*/);
+				auxPasajero3 = auxPasajero3->sig;
+			}
+			//while (auxPas3->sig != nullptr)
+			//{
+			//	SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxPas3->nombreCompP/*nombreCompM*/);
+			//	auxPas3 = auxPas3->sig;
+			//}
+
+			if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
+			{
+				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxPasajero3->nombreComp/*nombreCompM*/);
+				auxPasajero3 = auxPasajero3->sig;
+			}
+			//if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
+			//{
+			//	SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxPas3->nombreCompP/*nombreCompM*/);
+			//	auxPas3 = auxPas3->sig;
+			//}
 			break;
 		}
-		default:
+		case WM_COMMAND:
 		{
+			long opcion = LOWORD(wParam);
+			cMenu(hwnd, opcion);
+
+			switch (LOWORD(wParam))
+			{
+				case IDC_BUTTON1: // generar
+				{
+					if (iniPasajero == nullptr)
+					{
+						MessageBox(NULL, "No hay pacientes registrados.", "AVISO", MB_OK | MB_ICONERROR);
+					}
+					else
+					{
+						reportePasajeros();
+						MessageBox(NULL, "Reporte fue guardado en C:-Users-hp-Documents-UANL-Universidad 7-ED-Proyecto_Clinica-Proyecto_Clinica.", "AVISO", MB_OK | MB_ICONEXCLAMATION);
+					}
+					break;
+				}
+				default: break;
+			}
 			break;
 		}
-
-		}
-
-		break;
+		default: break;
 	}
-	default:
-	{
-		break;
-	}
-
-	}
-
 	return false;  // Un callback siempre retorna falso
 }
 
@@ -2857,8 +2826,9 @@ bool cMenu(HWND hwnd, long opcion)
 }
 
 // Funciones
-#pragma region funciones
-//Funciones de Listas de Usuarios#pragma region Funciones de Listas Usuarios
+#pragma region Funciones
+//Listas de Usuarios
+#pragma region Funciones de Listas Usuarios
 void nuevoUsuario(usuario* nuevo)
 {
 	if (iniUsuario == nullptr)
@@ -3093,7 +3063,7 @@ void leerUsuarios()
 }
 #pragma endregion
 
-//Funciones de Listas de Vuelos (Especialidades)
+//Listas de Vuelos (Especialidades)
 #pragma region Funciones de Listas Vuelos (Especialidades)
 void nuevoVuelo(Vuelo* nueva)
 {
@@ -3366,7 +3336,7 @@ void reporteVuelos()
 }
 #pragma endregion
 
-//Funciones de Listas de Boletos (Medicos)
+//Listas de Boletos (Medicos)
 #pragma region Funciones de Listas Boletos (Medicos)
 void nuevoBoleto(boleto* nuevoMed)
 {
@@ -3811,7 +3781,7 @@ void leerBoletos()
 }
 #pragma endregion
 
-//Funciones de Listas de Pasajeros (Pacientes)
+//Listas de Pasajeros (Pacientes)
 #pragma region Funciones de Listas Pasajeros (Pacientes)
 void nuevoPasajero(pasajero* nuevoPas)
 {
@@ -4285,122 +4255,4 @@ void reportePasajeros()
 	}*/
 }
 #pragma endregion
-
-#pragma region Funciones de Arbol Boletos (Medicos)
-
-//medico* crearNodo(medico* nuevoMed)
-//{
-//	medico* nodo = new medico;
-//
-//	//strcpy_s(nodo->nombreMed, nuevoMed->nombreMed);
-//	//strcpy_s(nodo->apellidoPM, nuevoMed->apellidoPM);
-//	//strcpy_s(nodo->apellidoMM, nuevoMed->apellidoMM);
-//
-//	//// Concatenación
-//	//strcpy_s(nodo->nombreCompM, nuevoMed->nombreMed);
-//	//strcat_s(nodo->nombreCompM, " ");
-//	//strcat_s(nodo->nombreCompM, nodo->apellidoPM);
-//	//strcat_s(nodo->nombreCompM, " ");
-//	//strcat_s(nodo->nombreCompM, nodo->apellidoMM);
-//
-//	//strcpy_s(nodo->cedulaChar, nuevoMed->cedulaChar);
-//	//nodo->cedulaNum = atoi(nodo->cedulaChar);
-//	//strcpy_s(nodo->numConsultorioChar, nuevoMed->numConsultorioChar);
-//	//nodo->numConsultorioNum = atoi(nodo->numConsultorioChar);
-//	//strcpy_s(nodo->hoararioChar, nuevoMed->hoararioChar);
-//	//nodo->hoararioNum = atoi(nodo->hoararioChar);
-//	//strcpy_s(nodo->telefonoChar, nuevoMed->telefonoChar);
-//	//nodo->telefonoNum = atoi(nodo->telefonoChar);
-//
-//	//strcpy_s(nodo->foto, nuevoMed->foto);
-//
-//	//nodo->lun = nuevoMed->lun;
-//	//nodo->mar = nuevoMed->mar;
-//	//nodo->mie = nuevoMed->mie;
-//	//nodo->jue = nuevoMed->jue;
-//	//nodo->vie = nuevoMed->vie;
-//	//nodo->sab = nuevoMed->sab;
-//
-//	//strcpy_s(nodo->nombreUsuM, nuevoMed->nombreUsuM);
-//
-//	/*nodo->der = nullptr;*/
-//	/*nodo->izq = nullptr;*/
-//
-//
-//	return nodo;
-//}
-//
-//void nuevoMed(medico*& pivote, medico* nuevoMed2)
-//{
-//
-//
-//	//nuevoMed2->cedulaNum = atoi(nuevoMed2->cedulaChar);
-//
-//	//if (pivote == nullptr)
-//	//{ //Si 'inicio->sig es igual a nullptr, o sea, apunta a nada, la lista esta vacia
-//	//	medico *nuevoNodo = crearNodo(nuevoMed2);
-//	//	pivote = nuevoNodo;
-//
-//	//	/*auxMed = pivote;
-//	//	auxMed2 = auxMed;
-//	//	auxMed3 = auxMed;*/
-//	//}
-//	//else
-//	//{
-//	//	int valorRaiz = pivote->cedulaNum;
-//
-//	//	if (nuevoMed2->cedulaNum < valorRaiz)
-//	//	{
-//	//		nuevoMed(pivote->izq, nuevoMed2);
-//	//	}
-//	//	else if (nuevoMed2->cedulaNum > valorRaiz)
-//	//	{
-//	//		nuevoMed(pivote->der, nuevoMed2);
-//	//	}
-//
-//	//	/*auxMed2 = auxMed;
-//	//	auxMed3 = auxMed;
-//	//	auxMed = pivote;*/
-//	//}
-//
-//	MessageBox(NULL, "Se ha registrado el médico con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
-//	/*int opc = MessageBox(hwnd, (LPCWSTR)L"¿Seguro que desea eliminar este usuario?", (LPCWSTR)L"AVISO", MB_YESNO | MB_ICONQUESTION);*/
-//}
-//
-//bool buscarMed(medico *pivote, medico* busqueda)
-//{
-//	busqueda->cedulaNum = atoi(busqueda->cedulaChar);
-//
-//	if (pivote == nullptr) // No hay registros
-//	{
-//		return false;
-//	}
-//	else if (pivote->cedulaNum == busqueda->cedulaNum) // Las variables son iguales
-//	{
-//		return true;
-//	}
-//	else if (busqueda->cedulaNum < pivote->cedulaNum) // La variable es menor
-//	{
-//		return buscarMed(pivote->izq, busqueda);
-//		/*cout << pivote->cedulaChar;*/
-//		/*if (pivote->izq == nullptr)
-//		{
-//			return false;
-//		}*/
-//	}
-//	else if (busqueda->cedulaNum > pivote->cedulaNum) // La variable es mayor
-//	{
-//		return buscarMed(pivote->der, busqueda);
-//		/*cout << pivote->cedulaChar;*/
-//		/*if (pivote->der == nullptr)
-//		{
-//			return false;
-//		}*/
-//	}
-//	else // La variable no existe
-//	{
-//		return false;
-//	}
-//}
-
 #pragma endregion
