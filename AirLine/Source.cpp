@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <cstdlib>
 #include <oleauto.h> //Administrar fechas
+//#include <winuser.h>
 
 using namespace std;
 
@@ -137,16 +138,16 @@ BOOL CALLBACK cDialog2(HWND, UINT, WPARAM, LPARAM); // Registro
 bool cMenu(HWND hWnd, long opcion);
 BOOL CALLBACK cDialog3(HWND, UINT, WPARAM, LPARAM); // Perfil
 BOOL CALLBACK cDialog4(HWND, UINT, WPARAM, LPARAM); // Lista Usuarios
-BOOL CALLBACK cDialog5(HWND, UINT, WPARAM, LPARAM); // Registro Especialidades
-BOOL CALLBACK cDialog6(HWND, UINT, WPARAM, LPARAM); // Lista Especialidades
-BOOL CALLBACK cDialog7(HWND, UINT, WPARAM, LPARAM); // Registro Medicos
-BOOL CALLBACK cDialog8(HWND, UINT, WPARAM, LPARAM); // Lista Medicos
-BOOL CALLBACK cDialog9(HWND, UINT, WPARAM, LPARAM); // Reporte Medicos
-BOOL CALLBACK cDialog10(HWND, UINT, WPARAM, LPARAM); // Registro Pecientes
-BOOL CALLBACK cDialog11(HWND, UINT, WPARAM, LPARAM); // Lista Pacientes
-BOOL CALLBACK cDialog12(HWND, UINT, WPARAM, LPARAM); // Reporte Pacientes
-BOOL CALLBACK cDialog13(HWND, UINT, WPARAM, LPARAM); // Registro Citas
-BOOL CALLBACK cDialog14(HWND, UINT, WPARAM, LPARAM); // Lista Citas
+BOOL CALLBACK cDialog5(HWND, UINT, WPARAM, LPARAM); // Registro Vuelos
+BOOL CALLBACK cDialog6(HWND, UINT, WPARAM, LPARAM); // Lista Vuelos
+BOOL CALLBACK cDialog7(HWND, UINT, WPARAM, LPARAM); // Manifiesto
+BOOL CALLBACK cDialog8(HWND, UINT, WPARAM, LPARAM); // Manifiesto2
+BOOL CALLBACK cDialog9(HWND, UINT, WPARAM, LPARAM); // Reporte Vuelos
+BOOL CALLBACK cDialog10(HWND, UINT, WPARAM, LPARAM); // Registro Pasajeros
+BOOL CALLBACK cDialog11(HWND, UINT, WPARAM, LPARAM); // Lista Pasajeros
+BOOL CALLBACK cDialog12(HWND, UINT, WPARAM, LPARAM); // Boletos
+BOOL CALLBACK cDialog13(HWND, UINT, WPARAM, LPARAM); // Boletos2
+BOOL CALLBACK cDialog14(HWND, UINT, WPARAM, LPARAM); // Pase abordar
 #pragma endregion
 
 //Prototipos
@@ -519,6 +520,7 @@ BOOL CALLBACK cDialog2(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						ShowWindow(hDialog3, SW_SHOW);
 						UpdateWindow(hDialog3);
 					}
+
 					break;
 				}
 				case IDC_BUTTON2: // Registrarse
@@ -540,10 +542,19 @@ BOOL CALLBACK cDialog2(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						GetDlgItemText(hwnd, IDC_EDIT2, temp->nombre, sizeof(temp->nombre));
 						GetDlgItemText(hwnd, IDC_EDIT3, temp->apellidoP, sizeof(temp->apellidoP));
 						GetDlgItemText(hwnd, IDC_EDIT4, temp->apellidoM, sizeof(temp->apellidoM));
-						//GetDlgItemText(hwnd, IDC_EDIT5, temp->genero, sizeof(temp->genero)); //Implementar la misma opción que dentro del programa
-						GetDlgItemText(hwnd, IDC_EDIT6, temp->email, sizeof(temp->email));
-						GetDlgItemText(hwnd, IDC_EDIT7, temp->password, sizeof(temp->password));
+						GetDlgItemText(hwnd, IDC_EDIT5, temp->email, sizeof(temp->email));
+						GetDlgItemText(hwnd, IDC_EDIT6, temp->password, sizeof(temp->password));
 						
+						//Genero
+						if (IDC_RADIO1 == BST_CHECKED)
+						{
+							temp->genero = 1;
+						}
+						else
+						{
+							temp->genero = 0;
+						}
+
 						//Se obtiene la fecha de nacimiento
 						HWND hDia = GetDlgItem(hwnd, IDC_DATETIMEPICKER1);
 						SYSTEMTIME diaCumple = { 0 }; double dia;			
@@ -552,6 +563,7 @@ BOOL CALLBACK cDialog2(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						temp->nacimiento = dia;
 
 						strcpy_s(temp->foto, "");
+
 						nuevoUsuario(temp);
 
 						SetDlgItemText(hwnd, IDC_EDIT1, "");
@@ -560,21 +572,20 @@ BOOL CALLBACK cDialog2(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						SetDlgItemText(hwnd, IDC_EDIT4, "");
 						SetDlgItemText(hwnd, IDC_EDIT5, "");
 						SetDlgItemText(hwnd, IDC_EDIT6, "");
-						SetDlgItemText(hwnd, IDC_EDIT7, "");
 
-						auxUsuario3 = iniUsuario;
+						
 
-						while (auxUsuario3->sig != nullptr && strcmp(usuBuscar, auxUsuario3->nick) != 0)
+						if (miUsuario == nullptr) //Registro desde la pagina de inicio
 						{
-							auxUsuario3 = auxUsuario3->sig;
-						}
+							auxUsuario3 = iniUsuario;
 
-						miUsuario = auxUsuario3;
-						inicio = true;
+							while (auxUsuario3->sig != nullptr && strcmp(usuBuscar, auxUsuario3->nick) != 0)
+							{
+								auxUsuario3 = auxUsuario3->sig;
+							}
 
-						if (miUsuario == nullptr)
-						{
 							miUsuario = auxUsuario3;
+							inicio = true;
 
 							EndDialog(hwnd, 0);
 
@@ -583,7 +594,7 @@ BOOL CALLBACK cDialog2(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 							ShowWindow(hDialog3, SW_SHOW);
 							UpdateWindow(hDialog3);
 						}
-						else
+						else //Registro como administrador
 						{
 							EndDialog(hwnd, 0);
 
@@ -595,7 +606,10 @@ BOOL CALLBACK cDialog2(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 					}
 					else
-						MessageBox(NULL, "El nombre de usuario no esta disponible, pruebe con uno diferente.", "AVISO", MB_OK | MB_ICONINFORMATION);	
+					{
+						MessageBox(NULL, "El nombre de usuario no esta disponible, pruebe con uno diferente.", "AVISO", MB_OK | MB_ICONINFORMATION);
+					}
+
 					break;
 				}
 				case IDC_BUTTON3: // Salir
@@ -609,16 +623,22 @@ BOOL CALLBACK cDialog2(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 							DestroyWindow(hwnd);
 							PostQuitMessage(0);
 						}
+
 						default: break;
 					}
+
 					break;
 				}
+
 				default: break;
 			}
+
 			break;
 		}
+
 		default: break;
 	}
+
 	return false;  // Un callback siempre retorna falso
 }
 
@@ -635,9 +655,28 @@ BOOL CALLBACK cDialog3(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				SetDlgItemText(hwnd, IDC_EDIT2, miUsuario->nombre);
 				SetDlgItemText(hwnd, IDC_EDIT3, miUsuario->apellidoP);
 				SetDlgItemText(hwnd, IDC_EDIT4, miUsuario->apellidoM);
-				SetDlgItemText(hwnd, IDC_EDIT7, miUsuario->password);
+				SetDlgItemText(hwnd, IDC_EDIT8, miUsuario->email);
+				SetDlgItemText(hwnd, IDC_EDIT9, miUsuario->password);
+
+				//Genero
+				if (miUsuario->genero == 1)
+				{
+					SetDlgItemText(hwnd, IDC_EDIT5, "Masculino");
+				}
+				else
+				{
+					SetDlgItemText(hwnd, IDC_EDIT5, "Femenino");
+				}
+
+				//Edad/Nacimiento
+				char cadenaNacimiento[100];
+				sprintf_s(cadenaNacimiento, "%f", miUsuario->nacimiento);
+				SetDlgItemText(hwnd, IDC_EDIT6, cadenaNacimiento);
+				sprintf_s(cadenaNacimiento, "%f", miUsuario->nacimiento);
+				SetDlgItemText(hwnd, IDC_EDIT7, cadenaNacimiento);
 			}
-			if (/*strcmp(miUsuario->foto, "") == 0 ||*/ miUsuario->foto != nullptr)
+
+			if (miUsuario->foto != nullptr)
 			{
 				strcpy_s(zFile, miUsuario->foto); //Inicializar zfile con la dirección de memoria del puntero foto
 
@@ -657,12 +696,11 @@ BOOL CALLBACK cDialog3(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				case IDC_BUTTON1: // Guardar
 				{
 					GetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nick, sizeof(miUsuario->nick));
-					strcpy_s(miUsuario->foto, zFile);
-
 					GetDlgItemText(hwnd, IDC_EDIT2, miUsuario->nombre, sizeof(miUsuario->nombre));
 					GetDlgItemText(hwnd, IDC_EDIT3, miUsuario->apellidoP, sizeof(miUsuario->apellidoP));
 					GetDlgItemText(hwnd, IDC_EDIT4, miUsuario->apellidoM, sizeof(miUsuario->apellidoM));
-					GetDlgItemText(hwnd, IDC_EDIT7, miUsuario->password, sizeof(miUsuario->password));
+					GetDlgItemText(hwnd, IDC_EDIT8, miUsuario->email, sizeof(miUsuario->email));
+					GetDlgItemText(hwnd, IDC_EDIT9, miUsuario->password, sizeof(miUsuario->password));
 
 					// Concatenación
 					strcpy_s(miUsuario->nombreComp, miUsuario->nombre);
@@ -670,11 +708,36 @@ BOOL CALLBACK cDialog3(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					strcat_s(miUsuario->nombreComp, miUsuario->apellidoP);
 					strcat_s(miUsuario->nombreComp, " ");
 					strcat_s(miUsuario->nombreComp, miUsuario->apellidoM);
-			
+
+					//Genero
+					if (IDC_RADIO1 == BST_CHECKED)
+					{
+						miUsuario->genero = 1;
+					}
+					else
+					{
+						miUsuario->genero = 0;
+					}
+
+					//Se obtiene la fecha de nacimiento
+					HWND hDia = GetDlgItem(hwnd, IDC_DATETIMEPICKER1);
+					SYSTEMTIME diaCumple = { 0 }; double dia;
+					DateTime_GetSystemtime(hDia, &diaCumple);
+					SystemTimeToVariantTime(&diaCumple, &dia);
+					miUsuario->nacimiento = dia;
+
 					strcpy_s(miUsuario->foto, zFile);
 
 					MessageBox(NULL, "Cambios guardados.", "AVISO", MB_OK | MB_ICONINFORMATION);
 					break;
+
+					//Recarga la pestaña
+					EndDialog(hwnd, 0);
+
+					HWND hDialog3 = CreateDialog(hInstanceGlobal, MAKEINTRESOURCE(IDD_DIALOG3), 0, cDialog3);
+
+					ShowWindow(hDialog3, SW_SHOW);
+					UpdateWindow(hDialog3);
 				}
 				case IDC_BUTTON2: // Cargar
 				{
@@ -2839,6 +2902,7 @@ void nuevoUsuario(usuario* nuevo)
 		strcpy_s(iniUsuario->nombre, nuevo->nombre);
 		strcpy_s(iniUsuario->apellidoP, nuevo->apellidoP);
 		strcpy_s(iniUsuario->apellidoM, nuevo->apellidoM);
+		strcpy_s(iniUsuario->email, nuevo->email);
 		strcpy_s(iniUsuario->password, nuevo->password);
 
 		// Concatenación
@@ -2847,6 +2911,11 @@ void nuevoUsuario(usuario* nuevo)
 		strcat_s(iniUsuario->nombreComp, iniUsuario->apellidoP);
 		strcat_s(iniUsuario->nombreComp, " ");
 		strcat_s(iniUsuario->nombreComp, iniUsuario->apellidoM);
+
+		iniUsuario->nacimiento = nuevo->nacimiento;
+
+		iniUsuario->genero = nuevo->genero;
+
 		strcpy_s(iniUsuario->foto, nuevo->foto);
 
 		iniUsuario->sig = nullptr;
@@ -2874,6 +2943,7 @@ void nuevoUsuario(usuario* nuevo)
 		strcpy_s(auxUsuario->nombre, nuevo->nombre);
 		strcpy_s(auxUsuario->apellidoP, nuevo->apellidoP);
 		strcpy_s(auxUsuario->apellidoM, nuevo->apellidoM);
+		strcpy_s(auxUsuario->email, nuevo->email);
 		strcpy_s(auxUsuario->password, nuevo->password);
 
 		// Concatenación
@@ -2882,6 +2952,11 @@ void nuevoUsuario(usuario* nuevo)
 		strcat_s(auxUsuario->nombreComp, auxUsuario->apellidoP);
 		strcat_s(auxUsuario->nombreComp, " ");
 		strcat_s(auxUsuario->nombreComp, auxUsuario->apellidoM);
+
+		auxUsuario->nacimiento = nuevo->nacimiento;
+
+		auxUsuario->genero = nuevo->genero;
+
 		strcpy_s(auxUsuario->foto, nuevo->foto);
 
 		auxUsuario2 = auxUsuario;
@@ -2892,6 +2967,7 @@ void nuevoUsuario(usuario* nuevo)
 	MessageBox(NULL, "Se ha registrado el usuario con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
 	/*int opc = MessageBox(hwnd, (LPCWSTR)L"¿Seguro que desea eliminar este usuario?", (LPCWSTR)L"AVISO", MB_YESNO | MB_ICONQUESTION);*/
 }
+
 void eliminarUsuario(char nomUsu[30])
 {
 	usuario* start;
@@ -2978,59 +3054,56 @@ void eliminarUsuario(char nomUsu[30])
 		}
 	}
 }
+
 void escribirUsuarios()
 {
-	ofstream escribir("Usuarios.bin", ios::binary | ios::out | ios::trunc);
-	if (!escribir.is_open()) {
+	auxUsuario = iniUsuario;
+
+	ofstream escribir;
+	escribir.open("Usuarios.bin", ios::out | ios::binary | ios::trunc);
+	
+	if (!escribir.is_open())
+	{
 		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
 		return;
 	}
-	auxUsuario = iniUsuario;
-	while (auxUsuario != nullptr)
-	{
-		if (escribir.bad()) {
-			MessageBox(NULL, "Ocurrió un error durante la escritura", "Error", MB_OK | MB_ICONERROR);
-			return;
-		}
-		escribir.write((char*)auxUsuario, sizeof(usuario));
-		auxUsuario = auxUsuario->sig;
-	}
-	escribir.close();
 
-	/*auxUsu = iniUsu;
-
-	if (auxUsu == nullptr)
+	if (escribir.is_open())
 	{
-		MessageBox(0, "La lista esta vacia.", "AVISO", MB_OK);
-	}
-	else
-	{
-		ofstream escribir;
-		escribir.open("C:\\Users\\hp\\Documents\\UANL\\Universidad 5\\ProgAv\\Proyecto Final\\Segundo Avance\\Segundo Avance\\Segundo Avance\\Usuarios.bin", ios::out | ios::binary | ios::trunc);
-
-		if (escribir.is_open())
+		while (auxUsuario != nullptr)
 		{
-			while (auxUsu != nullptr)
+			if (escribir.bad())
 			{
-				escribir.write((char*)auxUsu, sizeof(usuario));
-				auxUsu = auxUsu->sig;
+				MessageBox(NULL, "Ocurrió un error durante la escritura", "Error", MB_OK | MB_ICONERROR);
+				return;
 			}
 
-			escribir.close();
+			escribir.write((char*)auxUsuario, sizeof(usuario));
+			auxUsuario = auxUsuario->sig;
 		}
-	}*/
+
+		escribir.close();
+	}
 }
+
 void leerUsuarios()
 {
-	ifstream leer("Usuarios.bin", ios::binary);
-	if (!leer.is_open()) {
+	auxUsuario = iniUsuario;
+
+	ifstream leer;
+	leer.open("Usuarios.bin", ios::in | ios::binary);
+
+
+	if (!leer.is_open())
+	{
 		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
 		return;
 	}
-	auxUsuario = iniUsuario;
+
 	if (leer.is_open())
 	{
 		usuario* usuLeido = new usuario;
+
 		while (!leer.read((char*)usuLeido, sizeof(usuario)).eof())
 		{
 			while (auxUsuario != nullptr && auxUsuario->sig != nullptr)
@@ -3050,13 +3123,11 @@ void leerUsuarios()
 				auxUsuario->sig->ant = auxUsuario;
 				auxUsuario = auxUsuario->sig;
 				auxUsuario->sig = nullptr;
-				/*auxUsu->sig = usuLeido;
-				auxUsu->ant = auxUsu;
-				auxUsu = auxUsu->sig;
-				auxUsu->sig = nullptr;*/
 			}
+
 			usuLeido = new usuario;
 		}
+
 		leer.close();
 		delete usuLeido;
 	}
@@ -3118,6 +3189,7 @@ void nuevoVuelo(Vuelo* nueva)
 	MessageBox(NULL, "Se ha registrado la especialidad con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
 	/*int opc = MessageBox(hwnd, (LPCWSTR)L"¿Seguro que desea eliminar este usuario?", (LPCWSTR)L"AVISO", MB_YESNO | MB_ICONQUESTION);*/
 }
+
 void eliminarVuelo(char nomEsp[30])
 {
 	Vuelo* start;
@@ -3205,61 +3277,53 @@ void eliminarVuelo(char nomEsp[30])
 	}
 
 }
+
 void escribirVuelo()
 {
+	auxVuelo = iniVuelo;
+
 	ofstream escribir("Vuelos.bin", ios::binary | ios::out | ios::trunc);
-	if (!escribir.is_open()) {
+
+	if (!escribir.is_open())
+	{
 		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
 		return;
 	}
-	auxVuelo = iniVuelo;
+
 	if (escribir.is_open())
 	{
 		while (auxVuelo != nullptr)
 		{
-			if (escribir.bad()) {
+			if (escribir.bad())
+			{
 				MessageBox(NULL, "Ocurrió un error durante la escritura", "Error", MB_OK | MB_ICONERROR);
 				return;
 			}
+
 			escribir.write((char*)auxVuelo, sizeof(Vuelo));
 			auxVuelo = auxVuelo->sig;
 		}
+
 		escribir.close();
 	}
-	/*auxEsp = iniEsp;
-
-	if (auxEsp == nullptr)
-	{
-		MessageBox(0, "La lista esta vacia.", "AVISO", MB_OK);
-	}
-	else
-	{
-		ofstream escribir;
-		escribir.open("C:\\Users\\hp\\Documents\\UANL\\Universidad 5\\ProgAv\\Proyecto Final\\Segundo Avance\\Segundo Avance\\Segundo Avance\\Usuarios.bin", ios::out | ios::binary | ios::trunc);
-
-		if (escribir.is_open())
-		{
-			while (auxEsp != nullptr)
-			{
-				escribir.write((char*)auxEsp, sizeof(usuario));
-				auxEsp = auxEsp->sig;
-			}
-
-			escribir.close();
-		}
-	}*/
 }
+
 void leerVuelos()
 {
+	auxVuelo = iniVuelo;
+
 	ifstream leer("Vuelos.bin", ios::binary);
-	if (!leer.is_open()) {
+
+	if (!leer.is_open())
+	{
 		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
 		return;
 	}
-	auxVuelo = iniVuelo;
+
 	if (leer.is_open())
 	{
 		Vuelo* espLeida = new Vuelo;
+
 		while (!leer.read((char*)espLeida, sizeof(Vuelo)).eof())
 		{
 			while (auxVuelo != nullptr && auxVuelo->sig != nullptr)
@@ -3279,17 +3343,16 @@ void leerVuelos()
 				auxVuelo->sig->ant = auxVuelo;
 				auxVuelo = auxVuelo->sig;
 				auxVuelo->sig = nullptr;
-				/*auxEsp->sig = espLeida;
-				auxEsp->ant = auxEsp;
-				auxEsp = auxEsp->sig;
-				auxEsp->sig = nullptr;*/
 			}
+
 			espLeida = new Vuelo;
 		}
+
 		leer.close();
 		delete espLeida;
 	}
 }
+
 void reporteVuelos()
 {
 	ofstream escribir("Reporte de vuelos.txt", ios::out | ios::trunc);
@@ -3584,6 +3647,7 @@ void nuevoBoleto(boleto* nuevoMed)
 	MessageBox(NULL, "Se ha registrado al medico con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
 	/*int opc = MessageBox(hwnd, (LPCWSTR)L"¿Seguro que desea eliminar este usuario?", (LPCWSTR)L"AVISO", MB_YESNO | MB_ICONQUESTION);*/
 }
+
 void eliminarBoleto(char medicoNom[60])
 {
 	boleto* start;
@@ -3692,63 +3756,53 @@ void eliminarBoleto(char medicoNom[60])
 	}
 
 }
+
 void escribirBoletos()
 {
+	auxBoleto = iniBoleto;
+
 	ofstream escribir("Boletos.bin", ios::binary | ios::out | ios::trunc);
-	if (!escribir.is_open()) {
+
+	if (!escribir.is_open())
+	{
 		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
 		return;
 	}
-	auxBoleto = iniBoleto;
+
 	if (escribir.is_open())
 	{
 		while (auxBoleto != nullptr)
 		{
-			if (escribir.bad()) {
+			if (escribir.bad())
+			{
 				MessageBox(NULL, "Ocurrió un error durante la escritura", "Error", MB_OK | MB_ICONERROR);
 				return;
 			}
+
 			escribir.write((char*)auxBoleto, sizeof(boleto));
 			auxBoleto = auxBoleto->sig;
 		}
 
 		escribir.close();
 	}
-
-	/*auxMed = iniMed;
-
-	if (auxMed == nullptr)
-	{
-		MessageBox(0, "La lista esta vacia.", "AVISO", MB_OK);
-	}
-	else
-	{
-		ofstream escribir;
-		escribir.open("C:\\Users\\hp\\Documents\\UANL\\Universidad 5\\ProgAv\\Proyecto Final\\Segundo Avance\\Segundo Avance\\Segundo Avance\\Usuarios.bin", ios::out | ios::binary | ios::trunc);
-
-		if (escribir.is_open())
-		{
-			while (auxMed != nullptr)
-			{
-				escribir.write((char*)auxMed, sizeof(usuario));
-				auxMed = auxMed->sig;
-			}
-
-			escribir.close();
-		}
-	}*/
 }
+
 void leerBoletos()
 {
+	auxBoleto = iniBoleto;
+
 	ifstream leer("Boletos.bin", ios::binary);
-	if (!leer.is_open()) {
+
+	if (!leer.is_open())
+	{
 		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
 		return;
 	}
-	auxBoleto = iniBoleto;
+
 	if (leer.is_open())
 	{
 		boleto* medLeido = new boleto;
+
 		while (!leer.read((char*)medLeido, sizeof(boleto)).eof())
 		{
 			while (auxBoleto != nullptr && auxBoleto->sig != nullptr)
@@ -3768,13 +3822,11 @@ void leerBoletos()
 				auxBoleto->sig->ant = auxBoleto;
 				auxBoleto = auxBoleto->sig;
 				auxBoleto->sig = nullptr;
-				/*auxMed->sig = espLeida;
-				auxMed->ant = auxMed;
-				auxMed = auxMed->sig;
-				auxMed->sig = nullptr;*/
 			}
+
 			medLeido = new boleto;
 		}
+
 		leer.close();
 		delete medLeido;
 	}
@@ -4023,6 +4075,7 @@ void nuevoPasajero(pasajero* nuevoPas)
 	MessageBox(NULL, "Se ha registrado al paciente con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
 	/*int opc = MessageBox(hwnd, (LPCWSTR)L"¿Seguro que desea eliminar este usuario?", (LPCWSTR)L"AVISO", MB_YESNO | MB_ICONQUESTION);*/
 }
+
 void eliminarPasajero(char pacienteNom[60])
 {
 	pasajero* start;
@@ -4127,58 +4180,49 @@ void eliminarPasajero(char pacienteNom[60])
 	}
 
 }
+
 void escribirPasajeros()
 {
+	auxPasajero = iniPasajero;
+
 	ofstream escribir("Pasajeros.bin", ios::binary | ios::out | ios::trunc);
-	if (!escribir.is_open()) {
+	
+	if (!escribir.is_open())
+	{
 		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
 		return;
 	}
-	auxPasajero = iniPasajero;
+
 	while (auxPasajero != nullptr)
 	{
-		if (escribir.bad()) {
+		if (escribir.bad())
+		{
 			MessageBox(NULL, "Ocurrió un error durante la escritura", "Error", MB_OK | MB_ICONERROR);
 			return;
 		}
+
 		escribir.write((char*)auxPasajero, sizeof(pasajero));
 		auxPasajero = auxPasajero->sig;
 	}
+
 	escribir.close();
-	/*auxPas = iniPas;
-
-	if (auxPas == nullptr)
-	{
-		MessageBox(0, "La lista esta vacia.", "AVISO", MB_OK);
-	}
-	else
-	{
-		ofstream escribir;
-		escribir.open("C:\\Users\\hp\\Documents\\UANL\\Universidad 5\\ProgAv\\Proyecto Final\\Segundo Avance\\Segundo Avance\\Segundo Avance\\Usuarios.bin", ios::out | ios::binary | ios::trunc);
-
-		if (escribir.is_open())
-		{
-			while (auxPas != nullptr)
-			{
-				escribir.write((char*)auxPas, sizeof(usuario));
-				auxPas = auxPas->sig;
-			}
-
-			escribir.close();
-		}
-	}*/
 }
+
 void leerPasajeros()
 {
+	auxPasajero = iniPasajero;
+
 	ifstream leer("Pasajeros.bin", ios::binary);
-	if (!leer.is_open()) {
+
+	if (!leer.is_open())
+	{
 		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
 		return;
 	}
-	auxPasajero = iniPasajero;
 	if (leer.is_open())
 	{
 		pasajero* pasLeido = new pasajero;
+
 		while (!leer.read((char*)pasLeido, sizeof(pasajero)).eof())
 		{
 			while (auxPasajero != nullptr && auxPasajero->sig != nullptr)
@@ -4198,17 +4242,16 @@ void leerPasajeros()
 				auxPasajero->sig->ant = auxPasajero;
 				auxPasajero = auxPasajero->sig;
 				auxPasajero->sig = nullptr;
-				/*auxPas->sig = espLeida;
-				auxPas->ant = auxPas;
-				auxPas = auxPas->sig;
-				auxPas->sig = nullptr;*/
 			}
+
 			pasLeido = new pasajero;
 		}
+
 		leer.close();
 		delete pasLeido;
 	}
 }
+
 void reportePasajeros()
 {
 	ofstream escribir("Reporte de pasajeros.txt", ios::out | ios::trunc);
