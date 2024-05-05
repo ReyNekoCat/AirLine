@@ -9,6 +9,7 @@
 #include "commctrl.h"
 #include <stdio.h>
 #include <cstdlib>
+//#include <bits/stdc++.h>
 #include <oleauto.h> //Administrar fechas
 //#include <winuser.h>
 
@@ -3397,6 +3398,72 @@ void reporteVuelos()
 		}
 	}*/
 }
+#pragma region QuickSort
+//Fución para intercambiar dos números
+void swap(int* a, int* b)
+{
+	int t = *a; *a = *b; *b = t;
+}
+//Función para encontrar el último nodo
+Vuelo* lastNode(Vuelo* root)
+{
+	while (root && root->sig)
+		root = root->sig;
+	return root;
+}
+//Se toma el último elemento como pivote
+//Acomoda los elmentos menores a la izquierda y mayores a la derecha
+Vuelo* partition(Vuelo* l, Vuelo* h)
+{
+	// x = high (pivote)
+	int x = h->num;
+	// i = low (recorrido)
+	Vuelo* i = l->ant;
+
+	for (Vuelo* j = l; j != h; j = j->sig)
+	{
+		if (j->num <= x)
+		{
+			// Si i = NULL, se convierte en l, si no, se avanza al siguiente nodo
+			i = (i == NULL) ? l : i->sig;
+			//Se intercambian los numeros
+			swap(&(i->num), &(j->num));
+		}
+	}
+	//Se hace el mismo proceso con el pivote
+	i = (i == NULL) ? l : i->sig;
+	swap(&(i->num), &(h->num));
+	return i;
+}
+// Función recursiva
+void _quickSort(Vuelo* l, Vuelo* h)
+{
+	if (h != NULL && l != h && l != h->sig)
+	{
+		Vuelo* p = partition(l, h);
+		_quickSort(l, p->ant);
+		_quickSort(p->sig, h);
+	}
+}
+// Función principal
+void quickSort(Vuelo* head)
+{
+	// Encuentra el último nodo
+	Vuelo* h = lastNode(head);
+
+	// Manda a llamar la función de QuickSort recursiva
+	_quickSort(head, h);
+}
+void printList(Vuelo* head)
+{
+	while (head)
+	{
+		std::cout << head->num << " ";
+		head = head->sig;
+	}
+	std::cout << std::endl;
+}
+#pragma endregion
 #pragma endregion
 
 //Listas de Boletos (Medicos)
