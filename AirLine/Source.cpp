@@ -35,8 +35,7 @@ struct usuario
 };
 usuario* iniUsuario, * auxUsuario, * auxUsuario2, * auxUsuario3, * miUsuario = nullptr;
 
-struct Vuelo
-{
+struct DatoVuelo {
 	char usuarioRegistro[30];
 	char origen[30];
 	char destino[30];
@@ -45,10 +44,15 @@ struct Vuelo
 	double fecha;
 	double registro;
 	//char claveChar[20];
-	Vuelo* ant;
-	Vuelo* sig;
 };
-Vuelo* iniVuelo, * auxVuelo, * auxVuelo2, * auxVuelo3 = nullptr;
+
+struct NodoVuelo
+{
+	DatoVuelo* dato;
+	NodoVuelo* ant;
+	NodoVuelo* sig;
+};
+NodoVuelo* iniVuelo, * auxVuelo, * auxVuelo2, * auxVuelo3 = nullptr;
 
 struct boleto
 {
@@ -78,6 +82,7 @@ struct pasajero
 	char nombreComp[60];
 	char nacionalidad[20];
 	int genero;
+	int num;
 	double nacimiento;
 	double registro;
 	//char genero[20];
@@ -162,7 +167,7 @@ void leerUsuarios();
 #pragma endregion
 
 #pragma region Funciones de Listas Vuelos (Especialidades)
-void nuevoVuelo(Vuelo* nueva);
+void nuevoVuelo(NodoVuelo* nueva);
 void eliminarVuelo(char vuelo[30]);
 void escribirVuelo();
 void leerVuelos();
@@ -967,7 +972,10 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			}
 			else
 			{
-				Vuelo* tempNum = new Vuelo;
+				NodoVuelo* tempNum = new NodoVuelo;
+				DatoVuelo* tempDat = new DatoVuelo;
+				tempNum->dato = tempDat;
+
 				auxVuelo3 = iniVuelo;
 
 				while (auxVuelo3->sig != nullptr)
@@ -977,9 +985,9 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 				/*auxEsp3 = auxEsp3->ant;*/
 
-				tempNum->num = auxVuelo3->num;
+				tempNum->dato->num = auxVuelo3->dato->num;
 
-				tempNum->num = tempNum->num + 1;
+				tempNum->dato->num = tempNum->dato->num + 1;
 
 				// ::: ANTERIOR ::: // 
 				//_itoa_s(tempNum->num, tempNum->claveChar, 10);
@@ -997,19 +1005,19 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 			auxVuelo2 = iniVuelo;
 
-			while (auxVuelo2/*->sig*/ != nullptr && strcmp(espBuscar, auxVuelo2->origen) != 0)
+			while (auxVuelo2/*->sig*/ != nullptr && strcmp(espBuscar, auxVuelo2->dato->origen) != 0)
 			{
 				auxVuelo2 = auxVuelo2->sig;
 			}
 
-			if (auxVuelo2/*->sig*/ == nullptr || strcmp(espBuscar, auxVuelo2->origen) != 0)
+			if (auxVuelo2/*->sig*/ == nullptr || strcmp(espBuscar, auxVuelo2->dato->origen) != 0)
 			{
-				Vuelo* temp = new Vuelo;
+				NodoVuelo* temp = new NodoVuelo;
 
-				GetDlgItemText(hwnd, IDC_EDIT2, temp->origen, sizeof(temp->origen));
-				GetDlgItemText(hwnd, IDC_EDIT4, temp->destino, sizeof(temp->destino));
+				GetDlgItemText(hwnd, IDC_EDIT2, temp->dato->origen, sizeof(temp->dato->origen));
+				GetDlgItemText(hwnd, IDC_EDIT4, temp->dato->destino, sizeof(temp->dato->destino));
 				//GetDlgItemText(hwnd, IDC_EDIT3, temp->claveChar, sizeof(temp->claveChar));
-				strcpy_s(temp->usuarioRegistro, miUsuario->nick);
+				strcpy_s(temp->dato->usuarioRegistro, miUsuario->nick);
 				nuevoVuelo(temp);
 				SetDlgItemText(hwnd, IDC_EDIT2, "");
 				SetDlgItemText(hwnd, IDC_EDIT3, "");
@@ -1081,13 +1089,13 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			while (auxVuelo2->sig != nullptr)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST2, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo2->origen);
+				SendDlgItemMessage(hwnd, IDC_LIST2, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo2->dato->origen);
 				auxVuelo2 = auxVuelo2->sig;
 			}
 
 			if (auxVuelo2->sig == nullptr/* || auxEsp2->ant == nullptr*/)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST2, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo2->origen);
+				SendDlgItemMessage(hwnd, IDC_LIST2, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo2->dato->origen);
 				auxVuelo2 = auxVuelo2->sig;
 			}
 		}
@@ -1119,13 +1127,13 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 				auxVuelo2 = iniVuelo;
 
-				while (auxVuelo2->sig != nullptr && strcmp(auxVuelo2->origen, nombreEspC) != 0)
+				while (auxVuelo2->sig != nullptr && strcmp(auxVuelo2->dato->origen, nombreEspC) != 0)
 				{
 					auxVuelo2 = auxVuelo2->sig;
 				}
 
-				SetDlgItemText(hwnd, IDC_EDIT2, auxVuelo2->origen);
-				SetDlgItemText(hwnd, IDC_EDIT4, auxVuelo2->destino);
+				SetDlgItemText(hwnd, IDC_EDIT2, auxVuelo2->dato->origen);
+				SetDlgItemText(hwnd, IDC_EDIT4, auxVuelo2->dato->destino);
 				//SetDlgItemText(hwnd, IDC_EDIT3, auxEsp2->claveChar);
 				break;
 			}
@@ -1396,13 +1404,13 @@ BOOL CALLBACK cDialog7(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			while (auxVuelo3->sig != nullptr)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST9, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo3->origen);
+				SendDlgItemMessage(hwnd, IDC_LIST9, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo3->dato->origen);
 				auxVuelo3 = auxVuelo3->sig;
 			}
 
 			if (auxVuelo3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST9, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo3->origen);
+				SendDlgItemMessage(hwnd, IDC_LIST9, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo3->dato->origen);
 				auxVuelo3 = auxVuelo3->sig;
 			}
 		}
@@ -1538,13 +1546,13 @@ BOOL CALLBACK cDialog7(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 				auxVuelo3 = iniVuelo;
 
-				while (auxVuelo3->sig != nullptr && strcmp(auxVuelo3->origen, num5) != 0)
+				while (auxVuelo3->sig != nullptr && strcmp(auxVuelo3->dato->origen, num5) != 0)
 				{
 					auxVuelo3 = auxVuelo3->sig;
 
 				}
 
-				SetDlgItemText(hwnd, IDC_EDIT17, auxVuelo3->origen);
+				SetDlgItemText(hwnd, IDC_EDIT17, auxVuelo3->dato->origen);
 
 				break;
 			}
@@ -1824,13 +1832,13 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 				while (auxVuelo3->sig != nullptr)
 				{
-					SendDlgItemMessage(hwnd, IDC_LIST10, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo3->origen);
+					SendDlgItemMessage(hwnd, IDC_LIST10, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo3->dato->origen);
 					auxVuelo3 = auxVuelo3->sig;
 				}
 
 				if (auxVuelo3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
 				{
-					SendDlgItemMessage(hwnd, IDC_LIST10, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo3->origen);
+					SendDlgItemMessage(hwnd, IDC_LIST10, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo3->dato->origen);
 					auxVuelo3 = auxVuelo3->sig;
 				}
 			}
@@ -1958,13 +1966,13 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 					auxVuelo3 = iniVuelo;
 
-					while (auxVuelo3->sig != nullptr && strcmp(auxVuelo3->origen, num5) != 0)
+					while (auxVuelo3->sig != nullptr && strcmp(auxVuelo3->dato->origen, num5) != 0)
 					{
 						auxVuelo3 = auxVuelo3->sig;
 
 					}
 
-					SetDlgItemText(hwnd, IDC_EDIT18, auxVuelo3->origen);
+					SetDlgItemText(hwnd, IDC_EDIT18, auxVuelo3->dato->origen);
 
 					break;
 				}
@@ -2968,7 +2976,6 @@ void nuevoUsuario(usuario* nuevo)
 	MessageBox(NULL, "Se ha registrado el usuario con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
 	/*int opc = MessageBox(hwnd, (LPCWSTR)L"¿Seguro que desea eliminar este usuario?", (LPCWSTR)L"AVISO", MB_YESNO | MB_ICONQUESTION);*/
 }
-
 void eliminarUsuario(char nomUsu[30])
 {
 	usuario* start;
@@ -3055,7 +3062,6 @@ void eliminarUsuario(char nomUsu[30])
 		}
 	}
 }
-
 void escribirUsuarios()
 {
 	auxUsuario = iniUsuario;
@@ -3086,7 +3092,6 @@ void escribirUsuarios()
 		escribir.close();
 	}
 }
-
 void leerUsuarios()
 {
 	auxUsuario = iniUsuario;
@@ -3137,20 +3142,20 @@ void leerUsuarios()
 
 //Listas de Vuelos (Especialidades)
 #pragma region Funciones de Listas Vuelos (Especialidades)
-void nuevoVuelo(Vuelo* nueva)
+void nuevoVuelo(NodoVuelo* nueva)
 {
 	if (iniVuelo == nullptr)
 	{ //Si 'inicio->sig es igual a nullptr, o sea, apunta a nada, la lista esta vacia
-		iniVuelo = new Vuelo;
+		iniVuelo = new NodoVuelo;
 
-		strcpy_s(iniVuelo->origen, nueva->origen);
-		strcpy_s(iniVuelo->destino, nueva->destino);
+		strcpy_s(iniVuelo->dato->origen, nueva->dato->origen);
+		strcpy_s(iniVuelo->dato->destino, nueva->dato->destino);
 
 		// ::: ANTERIOR ::: //
 		//strcpy_s(iniEsp->claveChar, nueva->claveChar);
 		//iniEsp->num = atoi(iniEsp->claveChar);
 
-		strcpy_s(iniVuelo->usuarioRegistro, nueva->usuarioRegistro);
+		strcpy_s(iniVuelo->dato->usuarioRegistro, nueva->dato->usuarioRegistro);
 
 		iniVuelo->sig = nullptr;
 		iniVuelo->ant = nullptr;
@@ -3168,19 +3173,19 @@ void nuevoVuelo(Vuelo* nueva)
 			auxVuelo = auxVuelo->sig;
 		}
 
-		auxVuelo->sig = new Vuelo;
+		auxVuelo->sig = new NodoVuelo;
 		auxVuelo->sig->sig = nullptr;
 		auxVuelo->sig->ant = auxVuelo;
 		auxVuelo = auxVuelo->sig;
 
-		strcpy_s(auxVuelo->origen, nueva->origen);
-		strcpy_s(auxVuelo->destino, nueva->destino);
+		strcpy_s(auxVuelo->dato->origen, nueva->dato->origen);
+		strcpy_s(auxVuelo->dato->destino, nueva->dato->destino);
 
 		// ::: ANTERIOR ::: //
 		//strcpy_s(auxEsp->claveChar, nueva->claveChar);
 		//auxEsp->num = atoi(auxEsp->claveChar);
 
-		strcpy_s(auxVuelo->usuarioRegistro, nueva->usuarioRegistro);
+		strcpy_s(auxVuelo->dato->usuarioRegistro, nueva->dato->usuarioRegistro);
 
 		auxVuelo2 = auxVuelo;
 		auxVuelo3 = auxVuelo;
@@ -3190,10 +3195,9 @@ void nuevoVuelo(Vuelo* nueva)
 	MessageBox(NULL, "Se ha registrado la especialidad con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
 	/*int opc = MessageBox(hwnd, (LPCWSTR)L"¿Seguro que desea eliminar este usuario?", (LPCWSTR)L"AVISO", MB_YESNO | MB_ICONQUESTION);*/
 }
-
 void eliminarVuelo(char nomEsp[30])
 {
-	Vuelo* start;
+	NodoVuelo* start;
 	auxVuelo = iniVuelo;
 
 	if (auxVuelo == nullptr)
@@ -3202,12 +3206,12 @@ void eliminarVuelo(char nomEsp[30])
 	}
 	else
 	{
-		while (auxVuelo->sig != nullptr && strcmp(auxVuelo->origen, nomEsp) != 0)
+		while (auxVuelo->sig != nullptr && strcmp(auxVuelo->dato->origen, nomEsp) != 0)
 		{ //Nos movemos en el arreglo para buscar el usuario
 
 			auxVuelo = auxVuelo->sig;
 		}
-		if (auxVuelo->sig == nullptr && strcmp(auxVuelo->origen, nomEsp) != 0)
+		if (auxVuelo->sig == nullptr && strcmp(auxVuelo->dato->origen, nomEsp) != 0)
 		{
 			MessageBox(0, "Especialidad no encontrada", "AVISO", MB_OK);
 		}
@@ -3278,7 +3282,6 @@ void eliminarVuelo(char nomEsp[30])
 	}
 
 }
-
 void escribirVuelo()
 {
 	auxVuelo = iniVuelo;
@@ -3301,14 +3304,13 @@ void escribirVuelo()
 				return;
 			}
 
-			escribir.write((char*)auxVuelo, sizeof(Vuelo));
+			escribir.write((char*)auxVuelo, sizeof(NodoVuelo));
 			auxVuelo = auxVuelo->sig;
 		}
 
 		escribir.close();
 	}
 }
-
 void leerVuelos()
 {
 	auxVuelo = iniVuelo;
@@ -3323,9 +3325,9 @@ void leerVuelos()
 
 	if (leer.is_open())
 	{
-		Vuelo* espLeida = new Vuelo;
+		NodoVuelo* espLeida = new NodoVuelo;
 
-		while (!leer.read((char*)espLeida, sizeof(Vuelo)).eof())
+		while (!leer.read((char*)espLeida, sizeof(NodoVuelo)).eof())
 		{
 			while (auxVuelo != nullptr && auxVuelo->sig != nullptr)
 			{
@@ -3346,14 +3348,13 @@ void leerVuelos()
 				auxVuelo->sig = nullptr;
 			}
 
-			espLeida = new Vuelo;
+			espLeida = new NodoVuelo;
 		}
 
 		leer.close();
 		delete espLeida;
 	}
 }
-
 void reporteVuelos()
 {
 	ofstream escribir("Reporte de vuelos.txt", ios::out | ios::trunc);
@@ -3400,12 +3401,14 @@ void reporteVuelos()
 }
 #pragma region QuickSort
 //Fución para intercambiar dos números
-void swap(int* a, int* b)
+void swap(NodoVuelo* a, NodoVuelo* b)
 {
-	int t = *a; *a = *b; *b = t;
+	NodoVuelo aux = *a;
+	a->dato = b->dato;
+	b->dato = aux.dato;
 }
 //Función para encontrar el último nodo
-Vuelo* lastNode(Vuelo* root)
+NodoVuelo* lastNode(NodoVuelo* root)
 {
 	while (root && root->sig)
 		root = root->sig;
@@ -3413,52 +3416,52 @@ Vuelo* lastNode(Vuelo* root)
 }
 //Se toma el último elemento como pivote
 //Acomoda los elmentos menores a la izquierda y mayores a la derecha
-Vuelo* partition(Vuelo* l, Vuelo* h)
+NodoVuelo* partition(NodoVuelo* l, NodoVuelo* h)
 {
 	// x = high (pivote)
-	int x = h->num;
+	int x = h->dato->num;
 	// i = low (recorrido)
-	Vuelo* i = l->ant;
+	NodoVuelo* i = l->ant;
 
-	for (Vuelo* j = l; j != h; j = j->sig)
+	for (NodoVuelo* j = l; j != h; j = j->sig)
 	{
-		if (j->num <= x)
+		if (j->dato->num <= x)
 		{
 			// Si i = NULL, se convierte en l, si no, se avanza al siguiente nodo
 			i = (i == NULL) ? l : i->sig;
 			//Se intercambian los numeros
-			swap(&(i->num), &(j->num));
+			swap(i, j);
 		}
 	}
 	//Se hace el mismo proceso con el pivote
 	i = (i == NULL) ? l : i->sig;
-	swap(&(i->num), &(h->num));
+	swap(i, h);
 	return i;
 }
 // Función recursiva
-void _quickSort(Vuelo* l, Vuelo* h)
+void _quickSort(NodoVuelo* l, NodoVuelo* h)
 {
 	if (h != NULL && l != h && l != h->sig)
 	{
-		Vuelo* p = partition(l, h);
+		NodoVuelo* p = partition(l, h);
 		_quickSort(l, p->ant);
 		_quickSort(p->sig, h);
 	}
 }
 // Función principal
-void quickSort(Vuelo* head)
+void quickSort(NodoVuelo* head)
 {
 	// Encuentra el último nodo
-	Vuelo* h = lastNode(head);
+	NodoVuelo* h = lastNode(head);
 
 	// Manda a llamar la función de QuickSort recursiva
 	_quickSort(head, h);
 }
-void printList(Vuelo* head)
+void printList(NodoVuelo* head)
 {
 	while (head)
 	{
-		std::cout << head->num << " ";
+		std::cout << head->dato->num << "\n";
 		head = head->sig;
 	}
 	std::cout << std::endl;
@@ -4142,7 +4145,6 @@ void nuevoPasajero(pasajero* nuevoPas)
 	MessageBox(NULL, "Se ha registrado al paciente con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
 	/*int opc = MessageBox(hwnd, (LPCWSTR)L"¿Seguro que desea eliminar este usuario?", (LPCWSTR)L"AVISO", MB_YESNO | MB_ICONQUESTION);*/
 }
-
 void eliminarPasajero(char pacienteNom[60])
 {
 	pasajero* start;
@@ -4247,7 +4249,6 @@ void eliminarPasajero(char pacienteNom[60])
 	}
 
 }
-
 void escribirPasajeros()
 {
 	auxPasajero = iniPasajero;
@@ -4274,7 +4275,6 @@ void escribirPasajeros()
 
 	escribir.close();
 }
-
 void leerPasajeros()
 {
 	auxPasajero = iniPasajero;
@@ -4318,7 +4318,6 @@ void leerPasajeros()
 		delete pasLeido;
 	}
 }
-
 void reportePasajeros()
 {
 	ofstream escribir("Reporte de pasajeros.txt", ios::out | ios::trunc);
@@ -4364,5 +4363,80 @@ void reportePasajeros()
 		}
 	}*/
 }
+
+
+// Function to swap two nodes
+void swapNodes(pasajero*& a, pasajero*& b) {
+	int temp = a->num;
+	a->num = b->num;
+	b->num = temp;
+}
+
+// To heapify a subtree rooted with node ptr
+// which is a node in the linked list.
+// n is size of heap
+void heapify(pasajero* head, int n, pasajero* ptr)
+{
+	if (ptr == nullptr)
+		return;
+
+	pasajero* smallest = ptr; // Initialize smallest as root
+	pasajero* left = ptr->sig; // left = 2*ptr + 1
+	pasajero* right = nullptr; // right = 2*ptr + 2
+
+	if (left != nullptr)
+		right = left->sig;
+
+	// Find the smallest among root, left child, and right child
+	if (left != nullptr && left->num < smallest->num)
+		smallest = left;
+	if (right != nullptr && right->num < smallest->num)
+		smallest = right;
+
+	// If smallest is not root
+	if (smallest != ptr) {
+		// Swap values
+		int temp = ptr->num;
+		ptr->num = smallest->num;
+		smallest->num = temp;
+
+		// Recursively heapify the affected sub-tree
+		heapify(head, n, smallest);
+	}
+}
+
+// Main function to do heap sort
+void heapSort(pasajero* head, int n)
+{
+	// Convert linked list to heap
+	for (int i = n / 2 - 1; i >= 0; i--)
+		heapify(head, n, head);
+
+	// One by one extract an element from heap
+	for (int i = n - 1; i > 0; i--) {
+		// Move current root to end
+		pasajero* last = head;
+		for (int j = 0; j < i; j++)
+			last = last->sig;
+		int temp = head->num;
+		head->num = last->num;
+		last->num = temp;
+
+		// call max heapify on the reduced heap
+		heapify(head, i, head);
+	}
+}
+
+// A utility function to print linked list
+void printList(pasajero* head)
+{
+	pasajero* temp = head;
+	while (temp != nullptr) {
+		cout << temp->num << " ";
+		temp = temp->sig;
+	}
+	cout << "\n";
+}
+
 #pragma endregion
 #pragma endregion

@@ -122,7 +122,7 @@
 ////// ::: ESTRUCTURAS DE DATOS ::: //
 /*	- Se debe utilizar listas doblemente ligadas para el manejo de la información.
 	X Todas las entidades se deben de guardar en archivos binarios.
-	X Se deben de utilizar al menos (uno de) los métodos de ordenamiento HeapSort y QuickSort, en la entidad que elija el alumno.
+	X Se deben de utilizar al menos los métodos de ordenamiento HeapSort y QuickSort, en la entidad que elija el alumno.
 		- Vuelos y Pasajeros
 	X La entidad de usuarios debe de ser gestionada con un árbol binario.
 	X Para las búsquedas de información, se debe de utilizar el método de búsqueda binaria.
