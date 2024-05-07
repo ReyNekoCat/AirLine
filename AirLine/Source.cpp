@@ -45,7 +45,6 @@ struct DatoVuelo {
 	double registro;
 	//char claveChar[20];
 };
-
 struct NodoVuelo
 {
 	DatoVuelo* dato;
@@ -72,9 +71,7 @@ struct boleto
 	boleto* sig;
 };
 boleto* pivote, * iniBoleto, * auxBoleto, * auxMed2, * auxMed3 = nullptr;
-
-struct pasajero
-{
+struct DatoPasajero {
 	char usuarioRegistro[30];
 	char nombre[30];
 	char apellidoP[30];
@@ -87,10 +84,15 @@ struct pasajero
 	double registro;
 	//char genero[20];
 	//char fecha[100];
-	pasajero* ant;
-	pasajero* sig;
 };
-pasajero* iniPasajero, * auxPasajero, * auxPasajero2, * auxPasajero3 = nullptr;
+struct NodoPasajero
+{
+	
+	DatoPasajero* dato;
+	NodoPasajero* ant;
+	NodoPasajero* sig;
+};
+NodoPasajero* iniPasajero, * auxPasajero, * auxPasajero2, * auxPasajero3 = nullptr;
 
 #pragma region Structs Fijos
 
@@ -182,8 +184,8 @@ void leerBoletos();
 #pragma endregion
 
 #pragma region Funciones de Listas Pasajeros (Pacientes)
-void nuevoPasajero(pasajero* nuevoPas);
-void eliminarPasajero(char pasajero[60]);
+void nuevoPasajero(NodoPasajero* nuevoPas);
+void eliminarPasajero(char NodoPasajero[60]);
 void escribirPasajeros();
 void leerPasajeros();
 void reportePasajeros(); //No es necesario
@@ -1103,8 +1105,6 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			MessageBox(NULL, "No hay especialidades registradas.", "AVISO", MB_OK | MB_ICONINFORMATION);
 		}
-		
-
 		break;
 	}
 	case WM_COMMAND:
@@ -2334,18 +2334,18 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 					auxPasajero2 = iniPasajero;
 
-					while (auxPasajero2/*->sig*/ != nullptr && strcmp(pasBuscar, auxPasajero2->nombreComp) != 0)
+					while (auxPasajero2/*->sig*/ != nullptr && strcmp(pasBuscar, auxPasajero2->dato->nombreComp) != 0)
 					{
 						auxPasajero2 = auxPasajero2->sig;
 					}
 
-					if (auxPasajero2/*->sig*/ == nullptr || strcmp(pasBuscar, auxPasajero2->nombreComp) != 0)
+					if (auxPasajero2/*->sig*/ == nullptr || strcmp(pasBuscar, auxPasajero2->dato->nombreComp) != 0)
 					{
-						pasajero* temp = new pasajero;
+						NodoPasajero* temp = new NodoPasajero;
 
-						GetDlgItemText(hwnd, IDC_EDIT2, temp->nombre, sizeof(temp->nombre));
-						GetDlgItemText(hwnd, IDC_EDIT3, temp->apellidoP, sizeof(temp->apellidoP));
-						GetDlgItemText(hwnd, IDC_EDIT4, temp->apellidoM, sizeof(temp->apellidoM));
+						GetDlgItemText(hwnd, IDC_EDIT2, temp->dato->nombre, sizeof(temp->dato->nombre));
+						GetDlgItemText(hwnd, IDC_EDIT3, temp->dato->apellidoP, sizeof(temp->dato->apellidoP));
+						GetDlgItemText(hwnd, IDC_EDIT4, temp->dato->apellidoM, sizeof(temp->dato->apellidoM));
 
 						// Genero 
 						if (IsDlgButtonChecked(hwnd, IDC_RADIO1))
@@ -2357,7 +2357,7 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 							//strcpy_s(temp->genero, "Femenino");
 						}
 
-						GetDlgItemText(hwnd, IDC_EDIT5, temp->nacionalidad, sizeof(temp->nacionalidad));
+						GetDlgItemText(hwnd, IDC_EDIT5, temp->dato->nacionalidad, sizeof(temp->dato->nacionalidad));
 						//GetDlgItemText(hwnd, IDC_DATETIMEPICKER1, temp->fecha, sizeof(temp->fecha));
 
 						// ::: PASADOS ::: //
@@ -2365,7 +2365,7 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						//GetDlgItemText(hwnd, IDC_EDIT7, temp->edadChar, sizeof(temp->edadChar));
 						//GetDlgItemText(hwnd, IDC_EDIT8, temp->pMedicoP, sizeof(temp->pMedicoP));
 
-						strcpy_s(temp->usuarioRegistro, miUsuario->nick);
+						strcpy_s(temp->dato->usuarioRegistro, miUsuario->nick);
 
 						nuevoPasajero(temp);
 
@@ -2522,7 +2522,7 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 			while (auxPasajero3->sig != nullptr)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxPasajero3->nombreComp/*nombreCompM*/);
+				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxPasajero3->dato->nombreComp/*nombreCompM*/);
 				auxPasajero3 = auxPasajero3->sig;
 			}
 			//while (auxPas3->sig != nullptr)
@@ -2533,7 +2533,7 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 			if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxPasajero3->nombreComp/*nombreCompM*/);
+				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxPasajero3->dato->nombreComp/*nombreCompM*/);
 				auxPasajero3 = auxPasajero3->sig;
 			}
 			//if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
@@ -3399,30 +3399,28 @@ void reporteVuelos()
 		}
 	}*/
 }
+
 #pragma region QuickSort
-//Fución para intercambiar dos números
-void swap(NodoVuelo* a, NodoVuelo* b)
-{
-	NodoVuelo aux = *a;
+void swapDataVuelo(NodoVuelo* a, NodoVuelo* b) {
+	DatoVuelo* temp = a->dato;
 	a->dato = b->dato;
-	b->dato = aux.dato;
+	b->dato = temp;
 }
-//Función para encontrar el último nodo
-NodoVuelo* lastNode(NodoVuelo* root)
+NodoVuelo* lastNode(NodoVuelo* root) //Función para encontrar el último nodo
 {
 	while (root && root->sig)
 		root = root->sig;
 	return root;
 }
-//Se toma el último elemento como pivote
-//Acomoda los elmentos menores a la izquierda y mayores a la derecha
 NodoVuelo* partition(NodoVuelo* l, NodoVuelo* h)
 {
+	//Se toma el último elemento como pivote
 	// x = high (pivote)
 	int x = h->dato->num;
 	// i = low (recorrido)
 	NodoVuelo* i = l->ant;
 
+	//Acomoda los elmentos menores a la izquierda y mayores a la derecha
 	for (NodoVuelo* j = l; j != h; j = j->sig)
 	{
 		if (j->dato->num <= x)
@@ -3430,16 +3428,15 @@ NodoVuelo* partition(NodoVuelo* l, NodoVuelo* h)
 			// Si i = NULL, se convierte en l, si no, se avanza al siguiente nodo
 			i = (i == NULL) ? l : i->sig;
 			//Se intercambian los numeros
-			swap(i, j);
+			swapDataVuelo(i, j);
 		}
 	}
 	//Se hace el mismo proceso con el pivote
 	i = (i == NULL) ? l : i->sig;
-	swap(i, h);
+	swapDataVuelo(i, h);
 	return i;
 }
-// Función recursiva
-void _quickSort(NodoVuelo* l, NodoVuelo* h)
+void _quickSort(NodoVuelo* l, NodoVuelo* h) // Función recursiva
 {
 	if (h != NULL && l != h && l != h->sig)
 	{
@@ -3448,8 +3445,7 @@ void _quickSort(NodoVuelo* l, NodoVuelo* h)
 		_quickSort(p->sig, h);
 	}
 }
-// Función principal
-void quickSort(NodoVuelo* head)
+void quickSort(NodoVuelo* head) // Función principal
 {
 	// Encuentra el último nodo
 	NodoVuelo* h = lastNode(head);
@@ -3717,7 +3713,6 @@ void nuevoBoleto(boleto* nuevoMed)
 	MessageBox(NULL, "Se ha registrado al medico con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
 	/*int opc = MessageBox(hwnd, (LPCWSTR)L"¿Seguro que desea eliminar este usuario?", (LPCWSTR)L"AVISO", MB_YESNO | MB_ICONQUESTION);*/
 }
-
 void eliminarBoleto(char medicoNom[60])
 {
 	boleto* start;
@@ -3826,7 +3821,6 @@ void eliminarBoleto(char medicoNom[60])
 	}
 
 }
-
 void escribirBoletos()
 {
 	auxBoleto = iniBoleto;
@@ -3856,7 +3850,6 @@ void escribirBoletos()
 		escribir.close();
 	}
 }
-
 void leerBoletos()
 {
 	auxBoleto = iniBoleto;
@@ -3905,26 +3898,26 @@ void leerBoletos()
 
 //Listas de Pasajeros (Pacientes)
 #pragma region Funciones de Listas Pasajeros (Pacientes)
-void nuevoPasajero(pasajero* nuevoPas)
+void nuevoPasajero(NodoPasajero* nuevoPas)
 {
 	if (iniPasajero == nullptr)
 	{ //Si 'inicio->sig es igual a nullptr, o sea, apunta a nada, la lista esta vacia
-		iniPasajero = new pasajero;
+		iniPasajero = new NodoPasajero;
 
-		strcpy_s(iniPasajero->nombre, nuevoPas->nombre);
-		strcpy_s(iniPasajero->apellidoP, nuevoPas->apellidoP);
-		strcpy_s(iniPasajero->apellidoM, nuevoPas->apellidoM);
+		strcpy_s(iniPasajero->dato->nombre, nuevoPas->dato->nombre);
+		strcpy_s(iniPasajero->dato->apellidoP, nuevoPas->dato->apellidoP);
+		strcpy_s(iniPasajero->dato->apellidoM, nuevoPas->dato->apellidoM);
 
 		// Concatenación
-		strcpy_s(iniPasajero->nombreComp, nuevoPas->nombre);
-		strcat_s(iniPasajero->nombreComp, " ");
-		strcat_s(iniPasajero->nombreComp, iniPasajero->apellidoP);
-		strcat_s(iniPasajero->nombreComp, " ");
-		strcat_s(iniPasajero->nombreComp, iniPasajero->apellidoM);
+		strcpy_s(iniPasajero->dato->nombreComp, nuevoPas->dato->nombre);
+		strcat_s(iniPasajero->dato->nombreComp, " ");
+		strcat_s(iniPasajero->dato->nombreComp, iniPasajero->dato->apellidoP);
+		strcat_s(iniPasajero->dato->nombreComp, " ");
+		strcat_s(iniPasajero->dato->nombreComp, iniPasajero->dato->apellidoM);
 
 		
 
-		strcpy_s(iniPasajero->nacionalidad, nuevoPas->nacionalidad);
+		strcpy_s(iniPasajero->dato->nacionalidad, nuevoPas->dato->nacionalidad);
 		
 		// ::: CAMBIO DE TIPO ::: //
 		//strcpy_s(iniPas->fecha, nuevoPas->fecha);
@@ -3937,7 +3930,7 @@ void nuevoPasajero(pasajero* nuevoPas)
 		//iniPas->edadNum = atoi(iniPas->edadChar);
 		//strcpy_s(iniPas->pMedicoP, nuevoPas->pMedicoP);
 
-		strcpy_s(iniPasajero->usuarioRegistro, nuevoPas->usuarioRegistro);
+		strcpy_s(iniPasajero->dato->usuarioRegistro, nuevoPas->dato->usuarioRegistro);
 
 		iniPasajero->sig = nullptr;
 		iniPasajero->ant = nullptr;
@@ -3950,11 +3943,11 @@ void nuevoPasajero(pasajero* nuevoPas)
 	{
 		auxPasajero = iniPasajero;
 
-		strcpy_s(nuevoPas->nombreComp, nuevoPas->nombre);
-		strcat_s(nuevoPas->nombreComp, " ");
-		strcat_s(nuevoPas->nombreComp, nuevoPas->apellidoP);
-		strcat_s(nuevoPas->nombreComp, " ");
-		strcat_s(nuevoPas->nombreComp, nuevoPas->apellidoM);
+		strcpy_s(nuevoPas->dato->nombreComp, nuevoPas->dato->nombre);
+		strcat_s(nuevoPas->dato->nombreComp, " ");
+		strcat_s(nuevoPas->dato->nombreComp, nuevoPas->dato->apellidoP);
+		strcat_s(nuevoPas->dato->nombreComp, " ");
+		strcat_s(nuevoPas->dato->nombreComp, nuevoPas->dato->apellidoM);
 
 		/*if (nuevoPas->cedulaNum == auxPas->cedulaNum)
 		{
@@ -3965,9 +3958,9 @@ void nuevoPasajero(pasajero* nuevoPas)
 			auxPas = auxPas->ant;
 			auxPas2->sig = auxPas;
 		}
-		else */if (strcmp(nuevoPas->nombreComp, auxPasajero->nombreComp) > 0)
+		else */if (strcmp(nuevoPas->dato->nombreComp, auxPasajero->dato->nombreComp) > 0)
 		{
-			while (auxPasajero->sig != nullptr && strcmp(nuevoPas->nombreComp, auxPasajero->nombreComp) > 0)
+			while (auxPasajero->sig != nullptr && strcmp(nuevoPas->dato->nombreComp, auxPasajero->dato->nombreComp) > 0)
 			{
 				auxPasajero = auxPasajero->sig;
 			}
@@ -3984,10 +3977,10 @@ void nuevoPasajero(pasajero* nuevoPas)
 					auxPas = auxPas->ant;
 					auxPas2->sig = auxPas;
 				}
-				else */if (strcmp(nuevoPas->nombreComp, auxPasajero->nombreComp) > 0)
+				else */if (strcmp(nuevoPas->dato->nombreComp, auxPasajero->dato->nombreComp) > 0)
 				{
 					auxPasajero2 = auxPasajero->sig;
-					auxPasajero->sig = new pasajero;
+					auxPasajero->sig = new NodoPasajero;
 					auxPasajero->sig->sig = auxPasajero2;
 					auxPasajero->sig->ant = auxPasajero;
 					auxPasajero = auxPasajero->sig;
@@ -3996,7 +3989,7 @@ void nuevoPasajero(pasajero* nuevoPas)
 				else
 				{
 					auxPasajero2 = auxPasajero->ant;
-					auxPasajero->ant = new pasajero;
+					auxPasajero->ant = new NodoPasajero;
 					auxPasajero->ant->ant = auxPasajero2;
 					auxPasajero->ant->sig = auxPasajero;
 					auxPasajero = auxPasajero->ant;
@@ -4014,9 +4007,9 @@ void nuevoPasajero(pasajero* nuevoPas)
 					auxPas = auxPas->ant;
 					auxPas2->sig = auxPas;
 				}
-				else */if (strcmp(nuevoPas->nombreComp, auxPasajero->nombreComp) > 0)
+				else */if (strcmp(nuevoPas->dato->nombreComp, auxPasajero->dato->nombreComp) > 0)
 				{
-					auxPasajero->sig = new pasajero;
+					auxPasajero->sig = new NodoPasajero;
 					auxPasajero->sig->sig = nullptr;
 					auxPasajero->sig->ant = auxPasajero;
 					auxPasajero = auxPasajero->sig;
@@ -4024,7 +4017,7 @@ void nuevoPasajero(pasajero* nuevoPas)
 				else
 				{
 					auxPasajero2 = auxPasajero->ant;
-					auxPasajero->ant = new pasajero;
+					auxPasajero->ant = new NodoPasajero;
 					auxPasajero->ant->ant = auxPasajero2;
 					auxPasajero->ant->sig = auxPasajero;
 					auxPasajero = auxPasajero->ant;
@@ -4034,7 +4027,7 @@ void nuevoPasajero(pasajero* nuevoPas)
 		}
 		else
 		{
-			while (auxPasajero->ant != nullptr && strcmp(nuevoPas->nombreComp, auxPasajero->nombreComp) < 0)
+			while (auxPasajero->ant != nullptr && strcmp(nuevoPas->dato->nombreComp, auxPasajero->dato->nombreComp) < 0)
 			{
 				auxPasajero = auxPasajero->ant;
 			}
@@ -4051,10 +4044,10 @@ void nuevoPasajero(pasajero* nuevoPas)
 					auxPas = auxPas->ant;
 					auxPas2->sig = auxPas;
 				}
-				else */if (strcmp(nuevoPas->nombreComp, auxPasajero->nombreComp) < 0)
+				else */if (strcmp(nuevoPas->dato->nombreComp, auxPasajero->dato->nombreComp) < 0)
 				{
 					auxPasajero2 = auxPasajero->ant;
-					auxPasajero->ant = new pasajero;
+					auxPasajero->ant = new NodoPasajero;
 					auxPasajero->ant->ant = auxPasajero2;
 					auxPasajero->ant->sig = auxPasajero;
 					auxPasajero = auxPasajero->ant;
@@ -4063,7 +4056,7 @@ void nuevoPasajero(pasajero* nuevoPas)
 				else
 				{
 					auxPasajero2 = auxPasajero->sig;
-					auxPasajero->sig = new pasajero;
+					auxPasajero->sig = new NodoPasajero;
 					auxPasajero->sig->sig = auxPasajero2;
 					auxPasajero->sig->ant = auxPasajero;
 					auxPasajero = auxPasajero->sig;
@@ -4081,9 +4074,9 @@ void nuevoPasajero(pasajero* nuevoPas)
 					auxPas = auxPas->ant;
 					auxPas2->sig = auxPas;
 				}
-				else */if (strcmp(nuevoPas->nombre, auxPasajero->nombre) < 0)
+				else */if (strcmp(nuevoPas->dato->nombre, auxPasajero->dato->nombre) < 0)
 				{
-					auxPasajero->ant = new pasajero;
+					auxPasajero->ant = new NodoPasajero;
 					auxPasajero->ant->ant = nullptr;
 					auxPasajero->ant->sig = auxPasajero;
 					auxPasajero = auxPasajero->ant;
@@ -4091,7 +4084,7 @@ void nuevoPasajero(pasajero* nuevoPas)
 				else
 				{
 					auxPasajero2 = auxPasajero->sig;
-					auxPasajero->sig = new pasajero;
+					auxPasajero->sig = new NodoPasajero;
 					auxPasajero->sig->sig = auxPasajero2;
 					auxPasajero->sig->ant = auxPasajero;
 					auxPasajero = auxPasajero->sig;
@@ -4101,20 +4094,20 @@ void nuevoPasajero(pasajero* nuevoPas)
 
 		}
 
-		strcpy_s(auxPasajero->nombre, nuevoPas->nombre);
-		strcpy_s(auxPasajero->apellidoP, nuevoPas->apellidoP);
-		strcpy_s(auxPasajero->apellidoM, nuevoPas->apellidoM);
+		strcpy_s(auxPasajero->dato->nombre, nuevoPas->dato->nombre);
+		strcpy_s(auxPasajero->dato->apellidoP, nuevoPas->dato->apellidoP);
+		strcpy_s(auxPasajero->dato->apellidoM, nuevoPas->dato->apellidoM);
 
 		// Concatenación
-		strcpy_s(auxPasajero->nombreComp, auxPasajero->nombre);
-		strcat_s(auxPasajero->nombreComp, " ");
-		strcat_s(auxPasajero->nombreComp, auxPasajero->apellidoP);
-		strcat_s(auxPasajero->nombreComp, " ");
-		strcat_s(auxPasajero->nombreComp, auxPasajero->apellidoM);
+		strcpy_s(auxPasajero->dato->nombreComp, auxPasajero->dato->nombre);
+		strcat_s(auxPasajero->dato->nombreComp, " ");
+		strcat_s(auxPasajero->dato->nombreComp, auxPasajero->dato->apellidoP);
+		strcat_s(auxPasajero->dato->nombreComp, " ");
+		strcat_s(auxPasajero->dato->nombreComp, auxPasajero->dato->apellidoM);
 
 		
 
-		strcpy_s(auxPasajero->nacionalidad, nuevoPas->nacionalidad);
+		strcpy_s(auxPasajero->dato->nacionalidad, nuevoPas->dato->nacionalidad);
 		
 
 		// ::: CAMBIO DE TIPO ::: //
@@ -4128,7 +4121,7 @@ void nuevoPasajero(pasajero* nuevoPas)
 		//strcpy_s(auxPas->ref, nuevoPas->ref);
 		//strcpy_s(auxPas->pMedicoP, nuevoPas->pMedicoP);
 
-		strcpy_s(auxPasajero->usuarioRegistro, nuevoPas->usuarioRegistro);
+		strcpy_s(auxPasajero->dato->usuarioRegistro, nuevoPas->dato->usuarioRegistro);
 
 		while (auxPasajero->ant != nullptr)
 		{
@@ -4147,7 +4140,7 @@ void nuevoPasajero(pasajero* nuevoPas)
 }
 void eliminarPasajero(char pacienteNom[60])
 {
-	pasajero* start;
+	NodoPasajero* start;
 	auxPasajero = iniPasajero;
 
 	if (auxPasajero == nullptr)
@@ -4156,13 +4149,13 @@ void eliminarPasajero(char pacienteNom[60])
 	}
 	else
 	{
-		while (auxPasajero->sig != nullptr && strcmp(auxPasajero->nombreComp, pacienteNom) != 0)
+		while (auxPasajero->sig != nullptr && strcmp(auxPasajero->dato->nombreComp, pacienteNom) != 0)
 		{ //Nos movemos en el arreglo para buscar el usuario
 
 			auxPasajero = auxPasajero->sig;
 		}
 
-		if (auxPasajero->sig == nullptr || strcmp(auxPasajero->nombreComp, pacienteNom) != 0)
+		if (auxPasajero->sig == nullptr || strcmp(auxPasajero->dato->nombreComp, pacienteNom) != 0)
 		{
 			MessageBox(0, "paciente no encontrado", "AVISO", MB_OK);
 		}
@@ -4269,7 +4262,7 @@ void escribirPasajeros()
 			return;
 		}
 
-		escribir.write((char*)auxPasajero, sizeof(pasajero));
+		escribir.write((char*)auxPasajero, sizeof(NodoPasajero));
 		auxPasajero = auxPasajero->sig;
 	}
 
@@ -4288,9 +4281,9 @@ void leerPasajeros()
 	}
 	if (leer.is_open())
 	{
-		pasajero* pasLeido = new pasajero;
+		NodoPasajero* pasLeido = new NodoPasajero;
 
-		while (!leer.read((char*)pasLeido, sizeof(pasajero)).eof())
+		while (!leer.read((char*)pasLeido, sizeof(NodoPasajero)).eof())
 		{
 			while (auxPasajero != nullptr && auxPasajero->sig != nullptr)
 			{
@@ -4311,7 +4304,7 @@ void leerPasajeros()
 				auxPasajero->sig = nullptr;
 			}
 
-			pasLeido = new pasajero;
+			pasLeido = new NodoPasajero;
 		}
 
 		leer.close();
@@ -4334,7 +4327,7 @@ void reportePasajeros()
 				MessageBox(NULL, "Ocurrió un error durante la escritura", "Error", MB_OK | MB_ICONERROR);
 				return;
 			}
-			escribir.write((char*)auxPasajero, sizeof(pasajero));
+			escribir.write((char*)auxPasajero, sizeof(NodoPasajero));
 			auxPasajero = auxPasajero->sig;
 		}
 
@@ -4364,79 +4357,76 @@ void reportePasajeros()
 	}*/
 }
 
-
-// Function to swap two nodes
-void swapNodes(pasajero*& a, pasajero*& b) {
-	int temp = a->num;
-	a->num = b->num;
-	b->num = temp;
+/*
+void swapData(NodoVuelo* a, NodoVuelo* b) {
+	DatoVuelo* temp = a->dato;
+	a->dato = b->dato;
+	b->dato = temp;
 }
+*/
+void swapDataPasajeros(NodoPasajero* a, NodoPasajero* b) {
+	DatoPasajero* temp = a->dato;
+	a->dato = b->dato;
+	b->dato = temp;
+}
+void heapify(NodoPasajero* head, int n, NodoPasajero* node) {
+	NodoPasajero* smallest = node;
+	NodoPasajero* l = (node->sig != nullptr) ? node->sig : nullptr;
+	NodoPasajero* r = (node->sig != nullptr && node->sig->sig != nullptr) ? node->sig->sig : nullptr;
 
-// To heapify a subtree rooted with node ptr
-// which is a node in the linked list.
-// n is size of heap
-void heapify(pasajero* head, int n, pasajero* ptr)
-{
-	if (ptr == nullptr)
-		return;
+	if (l != nullptr && l->dato->num < smallest->dato->num)
+		smallest = l;
 
-	pasajero* smallest = ptr; // Initialize smallest as root
-	pasajero* left = ptr->sig; // left = 2*ptr + 1
-	pasajero* right = nullptr; // right = 2*ptr + 2
+	if (r != nullptr && r->dato->num < smallest->dato->num)
+		smallest = r;
 
-	if (left != nullptr)
-		right = left->sig;
-
-	// Find the smallest among root, left child, and right child
-	if (left != nullptr && left->num < smallest->num)
-		smallest = left;
-	if (right != nullptr && right->num < smallest->num)
-		smallest = right;
-
-	// If smallest is not root
-	if (smallest != ptr) {
-		// Swap values
-		int temp = ptr->num;
-		ptr->num = smallest->num;
-		smallest->num = temp;
-
-		// Recursively heapify the affected sub-tree
+	if (smallest != node) {
+		swapDataPasajeros(node, smallest);
 		heapify(head, n, smallest);
 	}
 }
 
-// Main function to do heap sort
-void heapSort(pasajero* head, int n)
-{
-	// Convert linked list to heap
-	for (int i = n / 2 - 1; i >= 0; i--)
-		heapify(head, n, head);
+void heapSort(NodoPasajero* head) {
+	// Count number of nodes in the list
+	int n = 0;
+	NodoPasajero* current = head;
+	while (current != nullptr) {
+		n++;
+		current = current->sig;
+	}
+
+	// Build heap (rearrange list)
+	for (int i = n / 2 - 1; i >= 0; i--) {
+		NodoPasajero* current = head;
+		for (int j = 0; j < i; j++) {
+			current = current->sig;
+		}
+		heapify(head, n, current);
+	}
 
 	// One by one extract an element from heap
-	for (int i = n - 1; i > 0; i--) {
+	for (int i = n - 1; i >= 0; i--) {
 		// Move current root to end
-		pasajero* last = head;
-		for (int j = 0; j < i; j++)
-			last = last->sig;
-		int temp = head->num;
-		head->num = last->num;
-		last->num = temp;
+		NodoPasajero* current = head;
+		for (int j = 0; j < i; j++) {
+			current = current->sig;
+		}
+		swapDataPasajeros(head, current);
 
 		// call max heapify on the reduced heap
 		heapify(head, i, head);
 	}
 }
-
-// A utility function to print linked list
-void printList(pasajero* head)
-{
-	pasajero* temp = head;
+/*
+void printList(NodoVuelo* head) {
+	NodoVuelo* temp = head;
 	while (temp != nullptr) {
-		cout << temp->num << " ";
+		cout << temp->dato->num << " ";
 		temp = temp->sig;
 	}
 	cout << "\n";
 }
+*/
 
 #pragma endregion
 #pragma endregion
