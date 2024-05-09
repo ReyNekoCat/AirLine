@@ -104,7 +104,7 @@
 /*	- Se debe tener una pantalla donde se muestren todos los vuelos realizados
 		X Se debe elegir uno y se deben mostrar la lista de pasajeros que realizaron el vuelo.
 	X Se debe tener la opción de ordenar por número de asiento (ordenamientos)
-		- O de ordenar por apellidos y nombre de los pasajeros
+		- O de ordenar por apellidos y nombre de los pasajeros 
 	X En la parte superior del manifiesto deben de venir los datos del vuelo 
 		X Además de mostrar al lado la lista de pasajeros.
 	- Los datos del manifiesto deben de incluir:

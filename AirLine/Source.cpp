@@ -33,8 +33,8 @@ struct DatoUsuario {
 struct NodoUsuario
 {
 	DatoUsuario* dato;
-	NodoUsuario* ant;
-	NodoUsuario* sig;
+	NodoUsuario* ant;  //Izquierda
+	NodoUsuario* sig;  //Derecha
 };
 NodoUsuario* iniUsuario, * auxUsuario, * auxUsuario2, * auxUsuario3, * miUsuario = nullptr;
 
@@ -76,7 +76,7 @@ struct NodoBoleto
 	NodoBoleto* ant;
 	NodoBoleto* sig;
 };
-NodoBoleto* pivote, * iniBoleto, * auxBoleto, * auxMed2, * auxMed3 = nullptr;
+NodoBoleto* pivote, * iniBoleto, * auxBoleto, * auxBoleto2, * auxBoleto3 = nullptr;
 
 struct DatoPasajero {
 	char usuarioRegistro[30];
@@ -361,25 +361,25 @@ int WINAPI WinMain(
 	// Pivotes
 	if (iniBoleto != nullptr)
 	{
-		auxMed3 = iniBoleto;
+		auxBoleto3 = iniBoleto;
 		float i = 0;
 
-		while (auxMed3->sig != nullptr)
+		while (auxBoleto3->sig != nullptr)
 		{
 			i++;
-			auxMed3 = auxMed3->sig;
+			auxBoleto3 = auxBoleto3->sig;
 		}
 
 		i++;
 		i = i / 2;
-		auxMed3 = iniBoleto;
+		auxBoleto3 = iniBoleto;
 
 		for (float i2 = 0; i2 < i; i2++)
 		{
-			auxMed3 = auxMed3->sig;
+			auxBoleto3 = auxBoleto3->sig;
 		}
 
-		pivote = auxMed3;
+		pivote = auxBoleto3;
 	}
 
 #pragma endregion
@@ -1603,7 +1603,7 @@ BOOL CALLBACK cDialog7(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 			GetDlgItemText(hwnd, IDC_EDIT5, medBuscar, sizeof(medBuscar));
 
-			auxMed2 = pivote;
+			auxBoleto2 = pivote;
 
 			// Campos
 			NodoBoleto* temp = new NodoBoleto;
@@ -1632,7 +1632,7 @@ BOOL CALLBACK cDialog7(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 				//while (auxMed2/*->sig*/ != nullptr && strcmp(medBuscar, auxMed2->cedulaChar) != 0)
 				{
-					auxMed2 = auxMed2->sig;
+					auxBoleto2 = auxBoleto2->sig;
 				}
 
 				//if (auxMed2/*->sig*/ == nullptr || strcmp(medBuscar, auxMed2->cedulaChar) != 0)
@@ -1781,17 +1781,17 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 				SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 			}
-			auxMed3 = iniBoleto; // Medicos
+			auxBoleto3 = iniBoleto; // Medicos
 
-			while (auxMed3->sig != nullptr)
+			while (auxBoleto3->sig != nullptr)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->dato->nombreCompPasajero/*nombreCompM*/);
-				auxMed3 = auxMed3->sig;
+				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto3->dato->nombreCompPasajero/*nombreCompM*/);
+				auxBoleto3 = auxBoleto3->sig;
 			}
-			if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
+			if (auxBoleto3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->dato->nombreCompPasajero/*nombreCompM*/);
-				auxMed3 = auxMed3->sig;
+				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto3->dato->nombreCompPasajero/*nombreCompM*/);
+				auxBoleto3 = auxBoleto3->sig;
 			}
 			aux = ini; // Consultorios
 
@@ -2004,20 +2004,20 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					indice = SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETCURSEL, 0, 0);
 					SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETTEXT, indice, (LPARAM)num);
 
-					auxMed3 = iniBoleto;
+					auxBoleto3 = iniBoleto;
 
-					while (auxMed3->sig != nullptr && strcmp(auxMed3->dato->nombreCompPasajero, num) != 0)
+					while (auxBoleto3->sig != nullptr && strcmp(auxBoleto3->dato->nombreCompPasajero, num) != 0)
 					{
-						auxMed3 = auxMed3->sig;
+						auxBoleto3 = auxBoleto3->sig;
 
 					}
 
-					SetDlgItemText(hwnd, IDC_EDIT2, auxMed3->dato->nombrePasajero);
-					SetDlgItemText(hwnd, IDC_EDIT3, auxMed3->dato->apellidoPPasajero);
-					SetDlgItemText(hwnd, IDC_EDIT4, auxMed3->dato->apellidoMPasajero);
+					SetDlgItemText(hwnd, IDC_EDIT2, auxBoleto3->dato->nombrePasajero);
+					SetDlgItemText(hwnd, IDC_EDIT3, auxBoleto3->dato->apellidoPPasajero);
+					SetDlgItemText(hwnd, IDC_EDIT4, auxBoleto3->dato->apellidoMPasajero);
 
 					//SetDlgItemText(hwnd, IDC_EDIT5, auxMed3->cedulaChar);
-					SetDlgItemText(hwnd, IDC_EDIT18, auxMed3->dato->vuelo);
+					SetDlgItemText(hwnd, IDC_EDIT18, auxBoleto3->dato->vuelo);
 
 					//SetDlgItemText(hwnd, IDC_EDIT8, auxMed3->telefonoChar);
 
@@ -2045,13 +2045,13 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			}
 			case IDC_BUTTON1: // Editar
 			{
-				GetDlgItemText(hwnd, IDC_EDIT2, auxMed3->dato->nombrePasajero, sizeof(auxMed3->dato->nombrePasajero));
-				GetDlgItemText(hwnd, IDC_EDIT3, auxMed3->dato->apellidoPPasajero, sizeof(auxMed3->dato->apellidoPPasajero));
-				GetDlgItemText(hwnd, IDC_EDIT4, auxMed3->dato->apellidoPPasajero, sizeof(auxMed3->dato->apellidoPPasajero));
+				GetDlgItemText(hwnd, IDC_EDIT2, auxBoleto3->dato->nombrePasajero, sizeof(auxBoleto3->dato->nombrePasajero));
+				GetDlgItemText(hwnd, IDC_EDIT3, auxBoleto3->dato->apellidoPPasajero, sizeof(auxBoleto3->dato->apellidoPPasajero));
+				GetDlgItemText(hwnd, IDC_EDIT4, auxBoleto3->dato->apellidoPPasajero, sizeof(auxBoleto3->dato->apellidoPPasajero));
 
 				//GetDlgItemText(hwnd, IDC_EDIT5, auxMed3->cedulaChar, sizeof(auxMed3->cedulaChar));
 				//auxMed3->cedulaNum = atoi(auxMed3->cedulaChar);
-				GetDlgItemText(hwnd, IDC_EDIT18, auxMed3->dato->vuelo, sizeof(auxMed3->dato->vuelo));
+				GetDlgItemText(hwnd, IDC_EDIT18, auxBoleto3->dato->vuelo, sizeof(auxBoleto3->dato->vuelo));
 			
 				//GetDlgItemText(hwnd, IDC_EDIT8, auxMed3->telefonoChar, sizeof(auxMed3->telefonoChar));
 				//auxMed3->estado = atoi(auxMed3->telefonoChar);
@@ -2101,11 +2101,11 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				*/
 
 				// Concatenación
-				strcpy_s(auxMed3->dato->nombreCompPasajero, auxMed3->dato->nombrePasajero);
-				strcat_s(auxMed3->dato->nombreCompPasajero, " ");
-				strcat_s(auxMed3->dato->nombreCompPasajero, auxMed3->dato->apellidoPPasajero);
-				strcat_s(auxMed3->dato->nombreCompPasajero, " ");
-				strcat_s(auxMed3->dato->nombreCompPasajero, auxMed3->dato->apellidoPPasajero);
+				strcpy_s(auxBoleto3->dato->nombreCompPasajero, auxBoleto3->dato->nombrePasajero);
+				strcat_s(auxBoleto3->dato->nombreCompPasajero, " ");
+				strcat_s(auxBoleto3->dato->nombreCompPasajero, auxBoleto3->dato->apellidoPPasajero);
+				strcat_s(auxBoleto3->dato->nombreCompPasajero, " ");
+				strcat_s(auxBoleto3->dato->nombreCompPasajero, auxBoleto3->dato->apellidoPPasajero);
 
 				//strcpy_s(auxMed3->foto,zFile);
 
@@ -2115,7 +2115,7 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			}
 			case IDC_BUTTON2: // Eliminar
 			{
-				if (auxMed3 == nullptr)
+				if (auxBoleto3 == nullptr)
 				{
 					MessageBox(NULL, "No se ha seleccionado a un medico, seleccione uno de la lista con doble click.", "AVISO", MB_OK | MB_ICONERROR);
 				}
@@ -2149,7 +2149,7 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						SetDlgItemText(hwnd, IDC_EDIT15, "");
 						SetDlgItemText(hwnd, IDC_EDIT16, "");
 
-						auxMed3 = nullptr;
+						auxBoleto3 = nullptr;
 
 						break;
 					}
@@ -2169,7 +2169,7 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						SetDlgItemText(hwnd, IDC_EDIT15, "");
 						SetDlgItemText(hwnd, IDC_EDIT16, "");
 
-						auxMed3 = nullptr;
+						auxBoleto3 = nullptr;
 
 						break;
 					}
@@ -2243,17 +2243,17 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 				SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 			}
-			auxMed3 = iniBoleto; // Medicos
+			auxBoleto3 = iniBoleto; // Medicos
 
-			while (auxMed3->sig != nullptr)
+			while (auxBoleto3->sig != nullptr)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->dato->nombreCompPasajero/*nombreCompM*/);
-				auxMed3 = auxMed3->sig;
+				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto3->dato->nombreCompPasajero/*nombreCompM*/);
+				auxBoleto3 = auxBoleto3->sig;
 			}
-			if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
+			if (auxBoleto3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->dato->nombreCompPasajero/*nombreCompM*/);
-				auxMed3 = auxMed3->sig;
+				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto3->dato->nombreCompPasajero/*nombreCompM*/);
+				auxBoleto3 = auxBoleto3->sig;
 			}
 
 			//FECHA
@@ -2317,14 +2317,14 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 							indice = SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETCURSEL, 0, 0);
 							SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETTEXT, indice, (LPARAM)num);
 
-							auxMed3 = iniBoleto;
+							auxBoleto3 = iniBoleto;
 
-							while (auxMed3->sig != nullptr && strcmp(auxMed3->dato->nombreCompPasajero, num) != 0)
+							while (auxBoleto3->sig != nullptr && strcmp(auxBoleto3->dato->nombreCompPasajero, num) != 0)
 							{
-								auxMed3 = auxMed3->sig;
+								auxBoleto3 = auxBoleto3->sig;
 
 							}
-							SetDlgItemText(hwnd, IDC_EDIT8, auxMed3->dato->nombreCompPasajero);
+							SetDlgItemText(hwnd, IDC_EDIT8, auxBoleto3->dato->nombreCompPasajero);
 							break;
 						}
 						default: break;
@@ -2417,17 +2417,17 @@ BOOL CALLBACK cDialog11(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 				SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 			}
-			auxMed3 = iniBoleto; // Medicos
+			auxBoleto3 = iniBoleto; // Medicos
 
-			while (auxMed3->sig != nullptr)
+			while (auxBoleto3->sig != nullptr)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->dato->nombreCompPasajero/*nombreCompM*/);
-				auxMed3 = auxMed3->sig;
+				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto3->dato->nombreCompPasajero/*nombreCompM*/);
+				auxBoleto3 = auxBoleto3->sig;
 			}
-			if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
+			if (auxBoleto3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxMed3->dato->nombreCompPasajero/*nombreCompM*/);
-				auxMed3 = auxMed3->sig;
+				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto3->dato->nombreCompPasajero/*nombreCompM*/);
+				auxBoleto3 = auxBoleto3->sig;
 			}
 
 			//FECHA
@@ -2538,7 +2538,7 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			//	auxPas3 = auxPas3->sig;
 			//}
 
-			if (auxMed3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
+			if (auxBoleto3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
 			{
 				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxPasajero3->dato->nombreComp/*nombreCompM*/);
 				auxPasajero3 = auxPasajero3->sig;
@@ -3145,6 +3145,183 @@ void leerUsuarios()
 		delete usuLeido;
 	}
 }
+#pragma region QuickSort
+void swapData(NodoUsuario* a, NodoUsuario* b) {
+	DatoUsuario* temp = a->dato;
+	a->dato = b->dato;
+	b->dato = temp;
+}
+NodoUsuario* lastNode(NodoUsuario* root) //Función para encontrar el último nodo
+{
+	while (root && root->sig)
+		root = root->sig;
+	return root;
+}
+NodoUsuario* partition(NodoUsuario* l, NodoUsuario* h)
+{
+	//Se toma el último elemento como pivote
+	// x = high (pivote)
+	char* x = h->dato->nick;
+	// i = low (recorrido)
+	NodoUsuario* i = l->ant;
+	
+
+	//Acomoda los elmentos menores a la izquierda y mayores a la derecha
+	for (NodoUsuario* j = l; j != h; j = j->sig)
+	{
+		if (_stricmp(j->dato->nick, x) <= 0)
+		{
+			// Si i = NULL, se convierte en l, si no, se avanza al siguiente nodo
+			i = (i == NULL) ? l : i->sig;
+			//Se intercambian los numeros
+			swapData(i, j);
+		}
+	}
+	//Se hace el mismo proceso con el pivote
+	i = (i == NULL) ? l : i->sig;
+	swapData(i, h);
+	return i;
+}
+void _quickSort(NodoUsuario* l, NodoUsuario* h) // Función recursiva
+{
+	if (h != NULL && l != h && l != h->sig)
+	{
+		NodoUsuario* p = partition(l, h);
+		_quickSort(l, p->ant);
+		_quickSort(p->sig, h);
+	}
+}
+void quickSort(NodoUsuario* head) // Función principal
+{
+	// Encuentra el último nodo
+	NodoUsuario* h = lastNode(head);
+
+	// Manda a llamar la función de QuickSort recursiva
+	_quickSort(head, h);
+}
+void printList(NodoUsuario* head)
+{
+	while (head)
+	{
+		std::cout << head->dato->nick << "\n";
+		head = head->sig;
+	}
+	std::cout << std::endl;
+}
+#pragma endregion
+#pragma region Arbol
+//Declaraciones de funciones
+int countNodes(NodoUsuario* head);
+NodoUsuario* sortedListToBSTRecur(NodoUsuario** head_ref, int n);
+
+NodoUsuario* sortedListToBST(NodoUsuario* head) //Función principal
+{
+	//Se cuenta los nodos de la lista
+	int n = countNodes(head);
+
+	//Se crea el arbol
+	return sortedListToBSTRecur(&head, n);
+}
+NodoUsuario* sortedListToBSTRecur(NodoUsuario** head_ref, int n) //Construye el arbol y devuelve la raíz
+{
+	//head_ref = Puntero al puntero del nodo head de la lista
+	//n = Numero de nodos de la lista
+		
+	// Caso base
+	if (n <= 0)
+		return NULL;
+
+	//Construye de forma recursiva el subarbol de la izquierda
+	NodoUsuario* left = sortedListToBSTRecur(head_ref, n / 2);
+
+	//Ahora head_ref apunta al nodo del medio, por lo que lo tomaremos como la raíz
+	NodoUsuario* root = *head_ref;
+
+	//Declaramos el puntero del subarbol de la izquierda 
+	root->ant = left;
+
+	/* Change head pointer of Linked List
+	for parent recursive calls */
+	*head_ref = (*head_ref)->sig;
+
+	//Construye el subarbol izquierdo y lo conecta con la raíz
+	//El número de nodos es el (total - subarbol izquierdo - 1)
+	root->sig = sortedListToBSTRecur(head_ref, n - n / 2 - 1);
+
+	return root;
+}
+int countNodes(NodoUsuario* head) //Cuenta los nodos de una lista
+{
+	int count = 0;
+	NodoUsuario* temp = head;
+	while (temp)
+	{
+		temp = temp->sig;
+		count++;
+	}
+	return count;
+}
+void BinaryTree2DoubleLinkedList(NodoUsuario* root, NodoUsuario** head)
+{
+	//Función recursiva que convierte una arbol a una lista
+	//root = Puntero a la raíz del arbol binario
+	//head = Puntero a la cabeza de la lista
+
+	// Caso base
+	if (root == NULL)
+		return;
+
+	//Se inicializa el nodo anteriormente visitado como null
+	//Es estático para que sea el igual en todas las llamadas recursivas
+	static NodoUsuario* ant = NULL;
+
+	//Se convierte el subarbol izquierdo de forma recursiva
+	BinaryTree2DoubleLinkedList(root->ant, head);
+
+	// Now convert this node
+	if (ant == NULL)
+		*head = root;
+	else {
+		root->ant = ant;
+		ant->ant = root;
+	}
+	ant = root;
+
+	//Se covierte ek subarbol derecho
+	BinaryTree2DoubleLinkedList(root->sig, head);
+}
+/*
+//Imprime el arbol en preorden
+void preOrder(NodoUsuario* node)
+{
+	if (node == NULL)
+		return;
+	std::cout << node->dato << " ";
+	preOrder(node->ant);
+	preOrder(node->sig);
+}
+// Funciones para crear y mostrar listas
+void push(NodoUsuario** head_ref, DatoUsuario* new_data)
+{
+
+NodoUsuario* new_node = new NodoUsuario();
+new_node->dato = new_data;
+new_node->ant = NULL;
+new_node->sig = (*head_ref);
+if ((*head_ref) != NULL)
+(*head_ref)->ant = new_node;
+(*head_ref) = new_node;
+}
+void printList(NodoUsuario* node)
+{
+	while (node != NULL)
+	{
+		std::cout << node->dato << " ";
+		node = node->sig;
+	}
+}
+*/
+#pragma endregion
 #pragma endregion
 
 //Listas de Vuelos (Especialidades)
@@ -3407,7 +3584,7 @@ void reporteVuelos()
 	}*/
 }
 #pragma region QuickSort
-void swapDataVuelo(NodoVuelo* a, NodoVuelo* b) {
+void swapData(NodoVuelo* a, NodoVuelo* b) {
 	DatoVuelo* temp = a->dato;
 	a->dato = b->dato;
 	b->dato = temp;
@@ -3434,12 +3611,12 @@ NodoVuelo* partition(NodoVuelo* l, NodoVuelo* h)
 			// Si i = NULL, se convierte en l, si no, se avanza al siguiente nodo
 			i = (i == NULL) ? l : i->sig;
 			//Se intercambian los numeros
-			swapDataVuelo(i, j);
+			swapData(i, j);
 		}
 	}
 	//Se hace el mismo proceso con el pivote
 	i = (i == NULL) ? l : i->sig;
-	swapDataVuelo(i, h);
+	swapData(i, h);
 	return i;
 }
 void _quickSort(NodoVuelo* l, NodoVuelo* h) // Función recursiva
@@ -3512,8 +3689,8 @@ void nuevoBoleto(NodoBoleto* nuevoMed)
 		pivote->ant = nullptr;
 
 		auxBoleto = pivote;
-		auxMed2 = auxBoleto;
-		auxMed3 = auxBoleto;
+		auxBoleto2 = auxBoleto;
+		auxBoleto3 = auxBoleto;
 		iniBoleto = pivote;
 	}
 	else
@@ -3712,8 +3889,8 @@ void nuevoBoleto(NodoBoleto* nuevoMed)
 		iniBoleto = auxBoleto;
 
 		auxBoleto = pivote;
-		auxMed2 = auxBoleto;
-		auxMed3 = auxBoleto;
+		auxBoleto2 = auxBoleto;
+		auxBoleto3 = auxBoleto;
 	}
 
 	MessageBox(NULL, "Se ha registrado al medico con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
@@ -3770,8 +3947,8 @@ void eliminarBoleto(char medicoNom[60])
 				delete auxBoleto;
 
 				auxBoleto = iniBoleto;
-				auxMed2 = auxBoleto;
-				auxMed3 = auxBoleto;
+				auxBoleto2 = auxBoleto;
+				auxBoleto3 = auxBoleto;
 			}
 			else
 			{ //Si es el primero y hay mas nodos
@@ -3792,8 +3969,8 @@ void eliminarBoleto(char medicoNom[60])
 				auxBoleto = start;
 				auxBoleto->ant = nullptr;
 
-				auxMed2 = auxBoleto;
-				auxMed3 = auxBoleto;
+				auxBoleto2 = auxBoleto;
+				auxBoleto3 = auxBoleto;
 				iniBoleto = auxBoleto;
 			}
 
@@ -3808,7 +3985,7 @@ void eliminarBoleto(char medicoNom[60])
 				delete auxBoleto;
 
 				auxBoleto = iniBoleto;
-				auxMed2 = auxBoleto;
+				auxBoleto2 = auxBoleto;
 			}
 			else
 			{ //Si es cualquier nodo que no sea el inicio o el último
@@ -3816,8 +3993,8 @@ void eliminarBoleto(char medicoNom[60])
 				auxBoleto->ant->sig = auxBoleto->sig;
 				delete auxBoleto;
 
-				auxMed2 = auxBoleto;
-				auxMed3 = auxBoleto;
+				auxBoleto2 = auxBoleto;
+				auxBoleto3 = auxBoleto;
 				auxBoleto = iniBoleto; //Para que auxMed no quede sin apuntar a nada, la apuntamos al inicio
 			}
 
@@ -4370,7 +4547,7 @@ void swapData(NodoVuelo* a, NodoVuelo* b) {
 	b->dato = temp;
 }
 */
-void swapDataPasajeros(NodoPasajero* a, NodoPasajero* b) {
+void swapData(NodoPasajero* a, NodoPasajero* b) {
 	DatoPasajero* temp = a->dato;
 	a->dato = b->dato;
 	b->dato = temp;
@@ -4387,7 +4564,7 @@ void heapify(NodoPasajero* head, int n, NodoPasajero* node) {
 		smallest = r;
 
 	if (smallest != node) {
-		swapDataPasajeros(node, smallest);
+		swapData(node, smallest);
 		heapify(head, n, smallest);
 	}
 }
@@ -4416,7 +4593,7 @@ void heapSort(NodoPasajero* head) {
 		for (int j = 0; j < i; j++) {
 			current = current->sig;
 		}
-		swapDataPasajeros(head, current);
+		swapData(head, current);
 
 		// call max heapify on the reduced heap
 		heapify(head, i, head);
