@@ -17,8 +17,7 @@ using namespace std;
 
 // Estructuras
 #pragma region Structs
-struct usuario
-{
+struct DatoUsuario {
 	int type;
 	char nick[30];
 	char nombre[30];
@@ -30,10 +29,14 @@ struct usuario
 	int genero;
 	char email[100];
 	char foto[500];
-	usuario* ant;
-	usuario* sig;
 };
-usuario* iniUsuario, * auxUsuario, * auxUsuario2, * auxUsuario3, * miUsuario = nullptr;
+struct NodoUsuario
+{
+	DatoUsuario* dato;
+	NodoUsuario* ant;
+	NodoUsuario* sig;
+};
+NodoUsuario* iniUsuario, * auxUsuario, * auxUsuario2, * auxUsuario3, * miUsuario = nullptr;
 
 struct DatoVuelo {
 	char usuarioRegistro[30];
@@ -166,7 +169,7 @@ BOOL CALLBACK cDialog14(HWND, UINT, WPARAM, LPARAM); // Pase abordar
 #pragma region Prototipos
 
 #pragma region Funciones de Listas Usuarios
-void nuevoUsuario(usuario* nuevo);
+void nuevoUsuario(NodoUsuario* nuevo);
 void eliminarUsuario(char nomUsu[30]);
 void escribirUsuarios();
 void leerUsuarios();
@@ -442,14 +445,14 @@ BOOL CALLBACK cDialog1(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						MessageBox(NULL, "No hay usuarios registrados", "AVISO", MB_OK | MB_ICONERROR);
 					}
 					else {
-						while (auxUsuario3->sig != nullptr && strcmp(usuBuscar, auxUsuario3->nick) != 0)
+						while (auxUsuario3->sig != nullptr && strcmp(usuBuscar, auxUsuario3->dato->nick) != 0)
 							auxUsuario3 = auxUsuario3->sig;
 
-						if (auxUsuario3->sig == nullptr && strcmp(usuBuscar, auxUsuario3->nick) != 0)
+						if (auxUsuario3->sig == nullptr && strcmp(usuBuscar, auxUsuario3->dato->nick) != 0)
 							MessageBox(NULL, "No se encontró el usuario.", "AVISO", MB_OK | MB_ICONERROR);
 						else
 						{
-							if (strcmp(passwordBuscar, auxUsuario3->password) == 0)
+							if (strcmp(passwordBuscar, auxUsuario3->dato->password) == 0)
 							{
 								miUsuario = auxUsuario3;
 								inicio = true;
@@ -543,28 +546,28 @@ BOOL CALLBACK cDialog2(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 					auxUsuario3 = iniUsuario;
 
-					while (auxUsuario3/*->sig*/ != nullptr && strcmp(usuBuscar, auxUsuario3->nick) != 0)
+					while (auxUsuario3/*->sig*/ != nullptr && strcmp(usuBuscar, auxUsuario3->dato->nick) != 0)
 					{
 						auxUsuario3 = auxUsuario3->sig;
 					}
-					if (auxUsuario3/*->sig*/ == nullptr || strcmp(usuBuscar, auxUsuario3->nick) != 0)
+					if (auxUsuario3/*->sig*/ == nullptr || strcmp(usuBuscar, auxUsuario3->dato->nick) != 0)
 					{
-						usuario* temp = new usuario;
-						GetDlgItemText(hwnd, IDC_EDIT1, temp->nick, sizeof(temp->nick));
-						GetDlgItemText(hwnd, IDC_EDIT2, temp->nombre, sizeof(temp->nombre));
-						GetDlgItemText(hwnd, IDC_EDIT3, temp->apellidoP, sizeof(temp->apellidoP));
-						GetDlgItemText(hwnd, IDC_EDIT4, temp->apellidoM, sizeof(temp->apellidoM));
-						GetDlgItemText(hwnd, IDC_EDIT5, temp->email, sizeof(temp->email));
-						GetDlgItemText(hwnd, IDC_EDIT6, temp->password, sizeof(temp->password));
+						NodoUsuario* temp = new NodoUsuario;
+						GetDlgItemText(hwnd, IDC_EDIT1, temp->dato->nick, sizeof(temp->dato->nick));
+						GetDlgItemText(hwnd, IDC_EDIT2, temp->dato->nombre, sizeof(temp->dato->nombre));
+						GetDlgItemText(hwnd, IDC_EDIT3, temp->dato->apellidoP, sizeof(temp->dato->apellidoP));
+						GetDlgItemText(hwnd, IDC_EDIT4, temp->dato->apellidoM, sizeof(temp->dato->apellidoM));
+						GetDlgItemText(hwnd, IDC_EDIT5, temp->dato->email, sizeof(temp->dato->email));
+						GetDlgItemText(hwnd, IDC_EDIT6, temp->dato->password, sizeof(temp->dato->password));
 						
 						//Genero
 						if (IDC_RADIO1 == BST_CHECKED)
 						{
-							temp->genero = 1;
+							temp->dato->genero = 1;
 						}
 						else
 						{
-							temp->genero = 0;
+							temp->dato->genero = 0;
 						}
 
 						//Se obtiene la fecha de nacimiento
@@ -572,9 +575,9 @@ BOOL CALLBACK cDialog2(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						SYSTEMTIME diaCumple = { 0 }; double dia;			
 						DateTime_GetSystemtime(hDia, &diaCumple);
 						SystemTimeToVariantTime(&diaCumple, &dia);
-						temp->nacimiento = dia;
+						temp->dato->nacimiento = dia;
 
-						strcpy_s(temp->foto, "");
+						strcpy_s(temp->dato->foto, "");
 
 						nuevoUsuario(temp);
 
@@ -591,7 +594,7 @@ BOOL CALLBACK cDialog2(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						{
 							auxUsuario3 = iniUsuario;
 
-							while (auxUsuario3->sig != nullptr && strcmp(usuBuscar, auxUsuario3->nick) != 0)
+							while (auxUsuario3->sig != nullptr && strcmp(usuBuscar, auxUsuario3->dato->nick) != 0)
 							{
 								auxUsuario3 = auxUsuario3->sig;
 							}
@@ -663,15 +666,15 @@ BOOL CALLBACK cDialog3(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			if (miUsuario != nullptr)
 			{
-				SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nick);
-				SetDlgItemText(hwnd, IDC_EDIT2, miUsuario->nombre);
-				SetDlgItemText(hwnd, IDC_EDIT3, miUsuario->apellidoP);
-				SetDlgItemText(hwnd, IDC_EDIT4, miUsuario->apellidoM);
-				SetDlgItemText(hwnd, IDC_EDIT8, miUsuario->email);
-				SetDlgItemText(hwnd, IDC_EDIT9, miUsuario->password);
+				SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->dato->nick);
+				SetDlgItemText(hwnd, IDC_EDIT2, miUsuario->dato->nombre);
+				SetDlgItemText(hwnd, IDC_EDIT3, miUsuario->dato->apellidoP);
+				SetDlgItemText(hwnd, IDC_EDIT4, miUsuario->dato->apellidoM);
+				SetDlgItemText(hwnd, IDC_EDIT8, miUsuario->dato->email);
+				SetDlgItemText(hwnd, IDC_EDIT9, miUsuario->dato->password);
 
 				//Genero
-				if (miUsuario->genero == 1)
+				if (miUsuario->dato->genero == 1)
 				{
 					SetDlgItemText(hwnd, IDC_EDIT5, "Masculino");
 				}
@@ -682,18 +685,18 @@ BOOL CALLBACK cDialog3(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 				//Edad/Nacimiento
 				char cadenaNacimiento[100];
-				sprintf_s(cadenaNacimiento, "%f", miUsuario->nacimiento);
+				sprintf_s(cadenaNacimiento, "%f", miUsuario->dato->nacimiento);
 				SetDlgItemText(hwnd, IDC_EDIT6, cadenaNacimiento);
-				sprintf_s(cadenaNacimiento, "%f", miUsuario->nacimiento);
+				sprintf_s(cadenaNacimiento, "%f", miUsuario->dato->nacimiento);
 				SetDlgItemText(hwnd, IDC_EDIT7, cadenaNacimiento);
 			}
 
-			if (miUsuario->foto != nullptr)
+			if (miUsuario->dato->foto != nullptr)
 			{
-				strcpy_s(zFile, miUsuario->foto); //Inicializar zfile con la dirección de memoria del puntero foto
+				strcpy_s(zFile, miUsuario->dato->foto); //Inicializar zfile con la dirección de memoria del puntero foto
 
 				HBITMAP bmp; //1
-				bmp = (HBITMAP)LoadImage(NULL, miUsuario->foto, IMAGE_BITMAP, 200, 200, LR_LOADFROMFILE); //2
+				bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 200, 200, LR_LOADFROMFILE); //2
 				SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 			}
 			break;
@@ -707,28 +710,28 @@ BOOL CALLBACK cDialog3(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 				case IDC_BUTTON1: // Guardar
 				{
-					GetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nick, sizeof(miUsuario->nick));
-					GetDlgItemText(hwnd, IDC_EDIT2, miUsuario->nombre, sizeof(miUsuario->nombre));
-					GetDlgItemText(hwnd, IDC_EDIT3, miUsuario->apellidoP, sizeof(miUsuario->apellidoP));
-					GetDlgItemText(hwnd, IDC_EDIT4, miUsuario->apellidoM, sizeof(miUsuario->apellidoM));
-					GetDlgItemText(hwnd, IDC_EDIT8, miUsuario->email, sizeof(miUsuario->email));
-					GetDlgItemText(hwnd, IDC_EDIT9, miUsuario->password, sizeof(miUsuario->password));
+					GetDlgItemText(hwnd, IDC_EDIT1, miUsuario->dato->nick, sizeof(miUsuario->dato->nick));
+					GetDlgItemText(hwnd, IDC_EDIT2, miUsuario->dato->nombre, sizeof(miUsuario->dato->nombre));
+					GetDlgItemText(hwnd, IDC_EDIT3, miUsuario->dato->apellidoP, sizeof(miUsuario->dato->apellidoP));
+					GetDlgItemText(hwnd, IDC_EDIT4, miUsuario->dato->apellidoM, sizeof(miUsuario->dato->apellidoM));
+					GetDlgItemText(hwnd, IDC_EDIT8, miUsuario->dato->email, sizeof(miUsuario->dato->email));
+					GetDlgItemText(hwnd, IDC_EDIT9, miUsuario->dato->password, sizeof(miUsuario->dato->password));
 
 					// Concatenación
-					strcpy_s(miUsuario->nombreComp, miUsuario->nombre);
-					strcat_s(miUsuario->nombreComp, " ");
-					strcat_s(miUsuario->nombreComp, miUsuario->apellidoP);
-					strcat_s(miUsuario->nombreComp, " ");
-					strcat_s(miUsuario->nombreComp, miUsuario->apellidoM);
+					strcpy_s(miUsuario->dato->nombreComp, miUsuario->dato->nombre);
+					strcat_s(miUsuario->dato->nombreComp, " ");
+					strcat_s(miUsuario->dato->nombreComp, miUsuario->dato->apellidoP);
+					strcat_s(miUsuario->dato->nombreComp, " ");
+					strcat_s(miUsuario->dato->nombreComp, miUsuario->dato->apellidoM);
 
 					//Genero
 					if (IDC_RADIO1 == BST_CHECKED)
 					{
-						miUsuario->genero = 1;
+						miUsuario->dato->genero = 1;
 					}
 					else
 					{
-						miUsuario->genero = 0;
+						miUsuario->dato->genero = 0;
 					}
 
 					//Se obtiene la fecha de nacimiento
@@ -736,9 +739,9 @@ BOOL CALLBACK cDialog3(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					SYSTEMTIME diaCumple = { 0 }; double dia;
 					DateTime_GetSystemtime(hDia, &diaCumple);
 					SystemTimeToVariantTime(&diaCumple, &dia);
-					miUsuario->nacimiento = dia;
+					miUsuario->dato->nacimiento = dia;
 
-					strcpy_s(miUsuario->foto, zFile);
+					strcpy_s(miUsuario->dato->foto, zFile);
 
 					MessageBox(NULL, "Cambios guardados.", "AVISO", MB_OK | MB_ICONINFORMATION);
 					break;
@@ -792,15 +795,15 @@ BOOL CALLBACK cDialog4(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			if (miUsuario != nullptr)
 			{
-				SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nombreComp);
+				SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->dato->nombreComp);
 			}
-			if (miUsuario->foto != nullptr)
+			if (miUsuario->dato->foto != nullptr)
 			{
-				strcpy_s(zFile, miUsuario->foto); //Inicializar zfile con la dirección de memoria del puntero foto
+				strcpy_s(zFile, miUsuario->dato->foto); //Inicializar zfile con la dirección de memoria del puntero foto
 
 			auxUsuario2 = iniUsuario;
 				HBITMAP bmp; //1
-				bmp = (HBITMAP)LoadImage(NULL, miUsuario->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
+				bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 				SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 			}
 
@@ -808,13 +811,13 @@ BOOL CALLBACK cDialog4(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 			while (auxUsuario2->sig != nullptr)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST1, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxUsuario2->nick);
+				SendDlgItemMessage(hwnd, IDC_LIST1, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxUsuario2->dato->nick);
 				auxUsuario2 = auxUsuario2->sig;
 			}
 
 			if (auxUsuario2->sig == nullptr/* || auxUsu2->ant == nullptr*/)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST1, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxUsuario2->nick);
+				SendDlgItemMessage(hwnd, IDC_LIST1, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxUsuario2->dato->nick);
 				auxUsuario2 = auxUsuario2->sig;
 			}
 
@@ -840,13 +843,13 @@ BOOL CALLBACK cDialog4(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 					auxUsuario2 = iniUsuario;
 
-					while (auxUsuario2->sig != nullptr && strcmp(auxUsuario2->nick, nombre) != 0)
+					while (auxUsuario2->sig != nullptr && strcmp(auxUsuario2->dato->nick, nombre) != 0)
 					{
 						auxUsuario2 = auxUsuario2->sig;
 					}
 
-					SetDlgItemText(hwnd, IDC_EDIT2, auxUsuario2->nick);
-					SetDlgItemText(hwnd, IDC_EDIT4, auxUsuario2->nombreComp);
+					SetDlgItemText(hwnd, IDC_EDIT2, auxUsuario2->dato->nick);
+					SetDlgItemText(hwnd, IDC_EDIT4, auxUsuario2->dato->nombreComp);
 
 					break;
 				}
@@ -874,23 +877,23 @@ BOOL CALLBACK cDialog4(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					{
 					case IDYES:
 					{
-						char usuario[30] = { 0 };
+						char NodoUsuario[30] = { 0 };
 						int indice = 0;
 						indice = SendDlgItemMessage(hwnd, IDC_LIST1, LB_GETCURSEL, 0, 0);
-						SendDlgItemMessage(hwnd, IDC_LIST1, LB_GETTEXT, indice, (LPARAM)usuario);
+						SendDlgItemMessage(hwnd, IDC_LIST1, LB_GETTEXT, indice, (LPARAM)NodoUsuario);
 
-						if (strcmp(miUsuario->nick, usuario) == 0)
+						if (strcmp(miUsuario->dato->nick, NodoUsuario) == 0)
 						{
 							MessageBox(NULL, "El usuario que inicio sesion será eliminado, se cerrará la sesion.", "AVISO", MB_OK | MB_ICONINFORMATION);
 
-							eliminarUsuario(usuario);
+							eliminarUsuario(NodoUsuario);
 
 							DestroyWindow(hwnd);
 							PostQuitMessage(0);
 						}
 						else
 						{
-							eliminarUsuario(usuario);
+							eliminarUsuario(NodoUsuario);
 
 							SendMessage(GetDlgItem(hwnd, IDC_LIST1), LB_DELETESTRING, indice, 0);
 							SetDlgItemText(hwnd, IDC_EDIT2, "");
@@ -950,14 +953,14 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		if (miUsuario != nullptr)
 		{
-			SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nombreComp);
+			SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->dato->nombreComp);
 		}
-		if (miUsuario->foto != nullptr)
+		if (miUsuario->dato->foto != nullptr)
 		{
-			strcpy_s(zFile, miUsuario->foto); //Inicializar zfile con la dirección de memoria del puntero foto
+			strcpy_s(zFile, miUsuario->dato->foto); //Inicializar zfile con la dirección de memoria del puntero foto
 
 			HBITMAP bmp; //1
-			bmp = (HBITMAP)LoadImage(NULL, miUsuario->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
+			bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 			SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 		}
 
@@ -1023,7 +1026,7 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				GetDlgItemText(hwnd, IDC_EDIT2, temp->dato->origen, sizeof(temp->dato->origen));
 				GetDlgItemText(hwnd, IDC_EDIT4, temp->dato->destino, sizeof(temp->dato->destino));
 				//GetDlgItemText(hwnd, IDC_EDIT3, temp->claveChar, sizeof(temp->claveChar));
-				strcpy_s(temp->dato->usuarioRegistro, miUsuario->nick);
+				strcpy_s(temp->dato->usuarioRegistro, miUsuario->dato->nick);
 				nuevoVuelo(temp);
 				SetDlgItemText(hwnd, IDC_EDIT2, "");
 				SetDlgItemText(hwnd, IDC_EDIT3, "");
@@ -1077,14 +1080,14 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		if (miUsuario != nullptr)
 		{
-			SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nombreComp);
+			SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->dato->nombreComp);
 		}
-		if (miUsuario->foto != nullptr)
+		if (miUsuario->dato->foto != nullptr)
 		{
-			strcpy_s(zFile, miUsuario->foto); //Inicializar zfile con la dirección de memoria del puntero foto
+			strcpy_s(zFile, miUsuario->dato->foto); //Inicializar zfile con la dirección de memoria del puntero foto
 
 			HBITMAP bmp; //1
-			bmp = (HBITMAP)LoadImage(NULL, miUsuario->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
+			bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 			SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 		}
 
@@ -1349,14 +1352,14 @@ BOOL CALLBACK cDialog7(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		if (miUsuario != nullptr)
 		{
-			SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nombreComp);
+			SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->dato->nombreComp);
 		}
-		if (miUsuario->foto != nullptr)
+		if (miUsuario->dato->foto != nullptr)
 		{
-			strcpy_s(zFile, miUsuario->foto); //Inicializar zfile con la dirección de memoria del puntero foto
+			strcpy_s(zFile, miUsuario->dato->foto); //Inicializar zfile con la dirección de memoria del puntero foto
 
 			HBITMAP bmp; //1
-			bmp = (HBITMAP)LoadImage(NULL, miUsuario->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
+			bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 			SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 		}
 
@@ -1688,7 +1691,7 @@ BOOL CALLBACK cDialog7(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					*/
 					
 					//strcpy_s(temp->foto, zFile);
-					strcpy_s(temp->dato->usuarioRegistro, miUsuario->nick);
+					strcpy_s(temp->dato->usuarioRegistro, miUsuario->dato->nick);
 
 					nuevoBoleto(temp);
 
@@ -1768,14 +1771,14 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			if (miUsuario != nullptr)
 			{
-				SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nombreComp);
+				SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->dato->nombreComp);
 			}
-			if (miUsuario->foto != nullptr)
+			if (miUsuario->dato->foto != nullptr)
 			{
-				strcpy_s(zFile, miUsuario->foto); //Inicializar zfile con la dirección de memoria del puntero foto
+				strcpy_s(zFile, miUsuario->dato->foto); //Inicializar zfile con la dirección de memoria del puntero foto
 
 				HBITMAP bmp; //1
-				bmp = (HBITMAP)LoadImage(NULL, miUsuario->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
+				bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 				SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 			}
 			auxMed3 = iniBoleto; // Medicos
@@ -2230,14 +2233,14 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			if (miUsuario != nullptr)
 			{
-				SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nombreComp);
+				SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->dato->nombreComp);
 			}
-			if (miUsuario->foto != nullptr);
+			if (miUsuario->dato->foto != nullptr);
 			{
-				strcpy_s(zFile, miUsuario->foto); //Inicializar zfile con la dirección de memoria del puntero foto
+				strcpy_s(zFile, miUsuario->dato->foto); //Inicializar zfile con la dirección de memoria del puntero foto
 
 				HBITMAP bmp; //1
-				bmp = (HBITMAP)LoadImage(NULL, miUsuario->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
+				bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 				SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 			}
 			auxMed3 = iniBoleto; // Medicos
@@ -2369,7 +2372,7 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						//GetDlgItemText(hwnd, IDC_EDIT7, temp->edadChar, sizeof(temp->edadChar));
 						//GetDlgItemText(hwnd, IDC_EDIT8, temp->pMedicoP, sizeof(temp->pMedicoP));
 
-						strcpy_s(temp->dato->usuarioRegistro, miUsuario->nick);
+						strcpy_s(temp->dato->usuarioRegistro, miUsuario->dato->nick);
 
 						nuevoPasajero(temp);
 
@@ -2404,14 +2407,14 @@ BOOL CALLBACK cDialog11(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case WM_INITDIALOG:
 		{
 			if (miUsuario != nullptr)
-				SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nombreComp);
+				SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->dato->nombreComp);
 
-			if (miUsuario->foto != nullptr)
+			if (miUsuario->dato->foto != nullptr)
 			{
-				strcpy_s(zFile, miUsuario->foto); //Inicializar zfile con la dirección de memoria del puntero foto
+				strcpy_s(zFile, miUsuario->dato->foto); //Inicializar zfile con la dirección de memoria del puntero foto
 
 				HBITMAP bmp; //1
-				bmp = (HBITMAP)LoadImage(NULL, miUsuario->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
+				bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 				SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 			}
 			auxMed3 = iniBoleto; // Medicos
@@ -2510,14 +2513,14 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case WM_INITDIALOG:
 		{
 			if (miUsuario != nullptr)
-				SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nombreComp);
+				SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->dato->nombreComp);
 
-			if (miUsuario->foto != nullptr)
+			if (miUsuario->dato->foto != nullptr)
 			{
-				strcpy_s(zFile, miUsuario->foto); //Inicializar zfile con la dirección de memoria del puntero foto
+				strcpy_s(zFile, miUsuario->dato->foto); //Inicializar zfile con la dirección de memoria del puntero foto
 
 				HBITMAP bmp; //1
-				bmp = (HBITMAP)LoadImage(NULL, miUsuario->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
+				bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 				SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 			}
 
@@ -2585,14 +2588,14 @@ BOOL CALLBACK cDialog13(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		if (miUsuario != nullptr)
 		{
-			SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nombreComp);
+			SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->dato->nombreComp);
 		}
-		if (miUsuario->foto != nullptr)
+		if (miUsuario->dato->foto != nullptr)
 		{
-			strcpy_s(zFile, miUsuario->foto); //Inicializar zfile con la dirección de memoria del puntero foto
+			strcpy_s(zFile, miUsuario->dato->foto); //Inicializar zfile con la dirección de memoria del puntero foto
 
 			HBITMAP bmp; //1
-			bmp = (HBITMAP)LoadImage(NULL, miUsuario->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
+			bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 			SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 		}
 
@@ -2645,14 +2648,14 @@ BOOL CALLBACK cDialog14(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		if (miUsuario != nullptr)
 		{
-			SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nombreComp);
+			SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->dato->nombreComp);
 		}
-		if (miUsuario->foto != nullptr)
+		if (miUsuario->dato->foto != nullptr)
 		{
-			strcpy_s(zFile, miUsuario->foto); //Inicializar zfile con la dirección de memoria del puntero foto
+			strcpy_s(zFile, miUsuario->dato->foto); //Inicializar zfile con la dirección de memoria del puntero foto
 
 			HBITMAP bmp; //1
-			bmp = (HBITMAP)LoadImage(NULL, miUsuario->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
+			bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 			SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 		}
 
@@ -2905,31 +2908,31 @@ bool cMenu(HWND hwnd, long opcion)
 #pragma region Funciones
 //Listas de Usuarios
 #pragma region Funciones de Listas Usuarios
-void nuevoUsuario(usuario* nuevo)
+void nuevoUsuario(NodoUsuario* nuevo)
 {
 	if (iniUsuario == nullptr)
 	{ //Si 'inicio->sig es igual a nullptr, o sea, apunta a nada, la lista esta vacia
-		iniUsuario = new usuario;
+		iniUsuario = new NodoUsuario;
 
-		strcpy_s(iniUsuario->nick, nuevo->nick);
-		strcpy_s(iniUsuario->nombre, nuevo->nombre);
-		strcpy_s(iniUsuario->apellidoP, nuevo->apellidoP);
-		strcpy_s(iniUsuario->apellidoM, nuevo->apellidoM);
-		strcpy_s(iniUsuario->email, nuevo->email);
-		strcpy_s(iniUsuario->password, nuevo->password);
+		strcpy_s(iniUsuario->dato->nick, nuevo->dato->nick);
+		strcpy_s(iniUsuario->dato->nombre, nuevo->dato->nombre);
+		strcpy_s(iniUsuario->dato->apellidoP, nuevo->dato->apellidoP);
+		strcpy_s(iniUsuario->dato->apellidoM, nuevo->dato->apellidoM);
+		strcpy_s(iniUsuario->dato->email, nuevo->dato->email);
+		strcpy_s(iniUsuario->dato->password, nuevo->dato->password);
 
 		// Concatenación
-		strcpy_s(iniUsuario->nombreComp, nuevo->nombre);
-		strcat_s(iniUsuario->nombreComp, " ");
-		strcat_s(iniUsuario->nombreComp, iniUsuario->apellidoP);
-		strcat_s(iniUsuario->nombreComp, " ");
-		strcat_s(iniUsuario->nombreComp, iniUsuario->apellidoM);
+		strcpy_s(iniUsuario->dato->nombreComp, nuevo->dato->nombre);
+		strcat_s(iniUsuario->dato->nombreComp, " ");
+		strcat_s(iniUsuario->dato->nombreComp, iniUsuario->dato->apellidoP);
+		strcat_s(iniUsuario->dato->nombreComp, " ");
+		strcat_s(iniUsuario->dato->nombreComp, iniUsuario->dato->apellidoM);
 
-		iniUsuario->nacimiento = nuevo->nacimiento;
+		iniUsuario->dato->nacimiento = nuevo->dato->nacimiento;
 
-		iniUsuario->genero = nuevo->genero;
+		iniUsuario->dato->genero = nuevo->dato->genero;
 
-		strcpy_s(iniUsuario->foto, nuevo->foto);
+		strcpy_s(iniUsuario->dato->foto, nuevo->dato->foto);
 
 		iniUsuario->sig = nullptr;
 		iniUsuario->ant = nullptr;
@@ -2947,30 +2950,30 @@ void nuevoUsuario(usuario* nuevo)
 			auxUsuario = auxUsuario->sig;
 		}
 
-		auxUsuario->sig = new usuario;
+		auxUsuario->sig = new NodoUsuario;
 		auxUsuario->sig->sig = nullptr;
 		auxUsuario->sig->ant = auxUsuario;
 		auxUsuario = auxUsuario->sig;
 
-		strcpy_s(auxUsuario->nick, nuevo->nick);
-		strcpy_s(auxUsuario->nombre, nuevo->nombre);
-		strcpy_s(auxUsuario->apellidoP, nuevo->apellidoP);
-		strcpy_s(auxUsuario->apellidoM, nuevo->apellidoM);
-		strcpy_s(auxUsuario->email, nuevo->email);
-		strcpy_s(auxUsuario->password, nuevo->password);
+		strcpy_s(auxUsuario->dato->nick, nuevo->dato->nick);
+		strcpy_s(auxUsuario->dato->nombre, nuevo->dato->nombre);
+		strcpy_s(auxUsuario->dato->apellidoP, nuevo->dato->apellidoP);
+		strcpy_s(auxUsuario->dato->apellidoM, nuevo->dato->apellidoM);
+		strcpy_s(auxUsuario->dato->email, nuevo->dato->email);
+		strcpy_s(auxUsuario->dato->password, nuevo->dato->password);
 
 		// Concatenación
-		strcpy_s(auxUsuario->nombreComp, nuevo->nombre);
-		strcat_s(auxUsuario->nombreComp, " ");
-		strcat_s(auxUsuario->nombreComp, auxUsuario->apellidoP);
-		strcat_s(auxUsuario->nombreComp, " ");
-		strcat_s(auxUsuario->nombreComp, auxUsuario->apellidoM);
+		strcpy_s(auxUsuario->dato->nombreComp, nuevo->dato->nombre);
+		strcat_s(auxUsuario->dato->nombreComp, " ");
+		strcat_s(auxUsuario->dato->nombreComp, auxUsuario->dato->apellidoP);
+		strcat_s(auxUsuario->dato->nombreComp, " ");
+		strcat_s(auxUsuario->dato->nombreComp, auxUsuario->dato->apellidoM);
 
-		auxUsuario->nacimiento = nuevo->nacimiento;
+		auxUsuario->dato->nacimiento = nuevo->dato->nacimiento;
 
-		auxUsuario->genero = nuevo->genero;
+		auxUsuario->dato->genero = nuevo->dato->genero;
 
-		strcpy_s(auxUsuario->foto, nuevo->foto);
+		strcpy_s(auxUsuario->dato->foto, nuevo->dato->foto);
 
 		auxUsuario2 = auxUsuario;
 		auxUsuario3 = auxUsuario;
@@ -2982,7 +2985,7 @@ void nuevoUsuario(usuario* nuevo)
 }
 void eliminarUsuario(char nomUsu[30])
 {
-	usuario* start;
+	NodoUsuario* start;
 	auxUsuario = iniUsuario;
 
 	if (auxUsuario == nullptr)
@@ -2991,12 +2994,12 @@ void eliminarUsuario(char nomUsu[30])
 	}
 	else
 	{
-		while (auxUsuario->sig != nullptr && strcmp(auxUsuario->nick, nomUsu) != 0)
+		while (auxUsuario->sig != nullptr && strcmp(auxUsuario->dato->nick, nomUsu) != 0)
 		{ //Nos movemos en el arreglo para buscar el usuario
 
 			auxUsuario = auxUsuario->sig;
 		}
-		if (auxUsuario->sig == nullptr && strcmp(auxUsuario->nick, nomUsu) != 0)
+		if (auxUsuario->sig == nullptr && strcmp(auxUsuario->dato->nick, nomUsu) != 0)
 		{
 			MessageBox(0, "Usuario no encontrado", "AVISO", MB_OK);
 		}
@@ -3089,7 +3092,7 @@ void escribirUsuarios()
 				return;
 			}
 
-			escribir.write((char*)auxUsuario, sizeof(usuario));
+			escribir.write((char*)auxUsuario, sizeof(NodoUsuario));
 			auxUsuario = auxUsuario->sig;
 		}
 
@@ -3112,9 +3115,9 @@ void leerUsuarios()
 
 	if (leer.is_open())
 	{
-		usuario* usuLeido = new usuario;
+		NodoUsuario* usuLeido = new NodoUsuario;
 
-		while (!leer.read((char*)usuLeido, sizeof(usuario)).eof())
+		while (!leer.read((char*)usuLeido, sizeof(NodoUsuario)).eof())
 		{
 			while (auxUsuario != nullptr && auxUsuario->sig != nullptr)
 			{
@@ -3135,7 +3138,7 @@ void leerUsuarios()
 				auxUsuario->sig = nullptr;
 			}
 
-			usuLeido = new usuario;
+			usuLeido = new NodoUsuario;
 		}
 
 		leer.close();
