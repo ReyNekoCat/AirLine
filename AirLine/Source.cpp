@@ -2910,6 +2910,48 @@ bool cMenu(HWND hwnd, long opcion)
 // Funciones
 #pragma region Funciones
 //Genéricas
+char* formatoFecha(LPSYSTEMTIME Sys, char* buff) {
+	std::string strMessage;
+	CString cstrMessage;
+
+	cstrMessage.Format(_T("%d-%02d-%02d %02d:%02d:%02d.%03d"),
+		Sys->wYear,
+		Sys->wMonth,
+		Sys->wDay,
+		Sys->wHour,
+		Sys->wMinute,
+		Sys->wSecond,
+		Sys->wMilliseconds);
+
+	strMessage = CT2A(cstrMessage.GetString());
+	std::cout << "System time = " << strMessage << std::endl;
+
+	std::ostringstream ossMessage;
+	ossMessage
+		<< Sys->wYear << "-"
+		<< std::setw(2) << std::setfill('0') << Sys->wMonth << "-"
+		<< std::setw(2) << std::setfill('0') << Sys->wDay << " "
+		<< std::setw(2) << std::setfill('0') << Sys->wHour << ":"
+		<< std::setw(2) << std::setfill('0') << Sys->wMinute << ":"
+		<< std::setw(2) << std::setfill('0') << Sys->wSecond << "."
+		<< std::setw(3) << std::setfill('0') << Sys->wMilliseconds;
+
+	strMessage = ossMessage.str();
+	std::cout << "System time = " << strMessage << std::endl;
+
+	sprintf_s(buff,
+		100,
+		"%d-%02d-%02d %02d:%02d:%02d",
+		Sys->wYear,
+		Sys->wMonth,
+		Sys->wDay,
+		Sys->wHour,
+		Sys->wMinute,
+		Sys->wSecond,
+		Sys->wMilliseconds);
+
+	return buff;
+}
 char* formatoEdad(LPSYSTEMTIME Sys, char* buff) {
 
 	std::string strMessage;
