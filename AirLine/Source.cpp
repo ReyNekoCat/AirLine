@@ -9,7 +9,10 @@
 #include "commctrl.h"
 #include <stdio.h>
 #include <cstdlib>
-//#include <bits/stdc++.h>
+#include <iomanip>
+#include <sstream>
+#include <atlstr.h>
+#include <format>  
 #include <oleauto.h> //Administrar fechas
 //#include <winuser.h>
 
@@ -2906,6 +2909,27 @@ bool cMenu(HWND hwnd, long opcion)
 
 // Funciones
 #pragma region Funciones
+//Genéricas
+char* formatoEdad(LPSYSTEMTIME Sys, char* buff) {
+
+	std::string strMessage;
+	CString cstrMessage;
+
+	cstrMessage.Format(_T("%d"), Sys->wYear);
+
+	strMessage = CT2A(cstrMessage.GetString());
+	std::cout << "System time = " << strMessage << std::endl;
+
+	std::ostringstream ossMessage;
+	ossMessage << Sys->wYear;
+
+	strMessage = ossMessage.str();
+	std::cout << "System time = " << strMessage << std::endl;
+
+	sprintf_s(buff, 100, "%d", Sys->wYear);
+	return buff;
+}
+
 //Listas de Usuarios
 #pragma region Funciones de Listas Usuarios
 void nuevoUsuario(NodoUsuario* nuevo)
@@ -3380,7 +3404,6 @@ NodoUsuario* deleteTreeNodeByNick(NodoUsuario* root, char* nick) //Borra el nodo
 	delete succ;
 	return root;
 }
-
 /*
 //Imprime el arbol en preorden
 void preOrder(NodoUsuario* node)
@@ -4711,5 +4734,6 @@ void printList(NodoVuelo* head) {
 */
 #pragma enregion
 
+#pragma endregion
 #pragma endregion
 #pragma endregion

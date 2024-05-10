@@ -37,8 +37,8 @@
 */
 ////// ::: USUARIOS ::: //
 /*	X El usuario administrador, puede ser uno solo, y el dato de ese usuario y contraseña debe estar guardado en un archivo texto.
-	X Para poder ingresar a la aplicación se debe contar con usuarios registrados, los cuales debe agregar un usuario administrador.	
-		X Se requiere ser usuario registrado para ingresar a la aplicación
+	Y Para poder ingresar a la aplicación se debe contar con usuarios registrados, los cuales debe agregar un usuario administrador.	
+		Y Se requiere ser usuario registrado para ingresar a la aplicación
 	X Se debe habilitar un checkbox para que se permita recordar el último usuario que ingresó a la aplicación.
 	X Solo se deben permitir registro de usuarios mayores a 18 años.
 	X El nombre de usuario y su fotografía se deben mostrar en todas las pantallas del proyecto.
@@ -125,7 +125,7 @@
 	Y Se deben de utilizar al menos los métodos de ordenamiento HeapSort y QuickSort, en la entidad que elija el alumno.
 		- Vuelos y Pasajeros
 	Y La entidad de usuarios debe de ser gestionada con un árbol binario.
-	X Para las búsquedas de información, se debe de utilizar el método de búsqueda binaria.
+	Y Para las búsquedas de información, se debe de utilizar el método de búsqueda binaria.
 */
 ////// ::: REGISTRO ::: //
 /*	- Registro de alguna entidad se refiere a altas, bajas y cambios.
