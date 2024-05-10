@@ -2952,24 +2952,14 @@ char* formatoFecha(LPSYSTEMTIME Sys, char* buff) {
 
 	return buff;
 }
-char* formatoEdad(LPSYSTEMTIME Sys, char* buff) {
 
-	std::string strMessage;
-	CString cstrMessage;
-
-	cstrMessage.Format(_T("%d"), Sys->wYear);
-
-	strMessage = CT2A(cstrMessage.GetString());
-	std::cout << "System time = " << strMessage << std::endl;
-
-	std::ostringstream ossMessage;
-	ossMessage << Sys->wYear;
-
-	strMessage = ossMessage.str();
-	std::cout << "System time = " << strMessage << std::endl;
-
-	sprintf_s(buff, 100, "%d", Sys->wYear);
-	return buff;
+int formatoEdad(double cumple) {
+	SYSTEMTIME SysNow = { 0 };
+	double now = 0;
+	GetSystemTime(&SysNow);
+	SystemTimeToVariantTime(&SysNow, &now);
+	VariantTimeToSystemTime(now - cumple, &SysNow);
+	return (SysNow.wYear - 1900);
 }
 
 //Listas de Usuarios
