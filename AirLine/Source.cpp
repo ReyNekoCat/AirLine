@@ -3213,7 +3213,7 @@ void printList(NodoUsuario* head)
 //Declaraciones de funciones
 int countNodes(NodoUsuario* head);
 NodoUsuario* sortedListToBSTRecur(NodoUsuario** head_ref, int n);
-
+//Coonversiones
 NodoUsuario* sortedListToBST(NodoUsuario* head) //Función principal
 {
 	//Se cuenta los nodos de la lista
@@ -3290,6 +3290,97 @@ void BinaryTree2DoubleLinkedList(NodoUsuario* root, NodoUsuario** head)
 	//Se covierte ek subarbol derecho
 	BinaryTree2DoubleLinkedList(root->sig, head);
 }
+//Operaciones
+NodoUsuario* newNode(DatoUsuario* data)
+{
+	NodoUsuario* new_node = new NodoUsuario;
+	new_node->dato = data;
+	new_node->ant = new_node->sig = NULL;
+	return (new_node);
+}
+struct NodoUsuario* insertTree(struct NodoUsuario* nodo, DatoUsuario* data)
+{
+	// Caso Base: Si está vacío, devuelve u nuevo nodo
+	if (nodo == NULL)
+		return newNode(data);
+
+	//Se usa de forma recursiva para atravesar todo el arbol
+	if ((_stricmp(data->nick, nodo->dato->nick) < 0))
+		nodo->ant = insertTree(nodo->ant, data);
+	else if (_stricmp(data->nick, nodo->dato->nick) > 0)
+		nodo->sig = insertTree(nodo->sig, data);
+
+	// Return the (unchanged) node pointer
+	return nodo;
+}
+struct NodoUsuario* searchTree(struct NodoUsuario* root, DatoUsuario* data) //Busca un nick en el arbol
+{
+	// Casos Base: raíz es null o el nick está en la raíz
+	if (root == NULL || _stricmp(root->dato->nick, data->nick) == 0)
+		return root;
+
+	// El nick es más "grande" que el de la raíz
+	if (_stricmp(root->dato->nick, data->nick) < 0)
+		return searchTree(root->sig, data);
+
+	// El nick es más "pequeño" que el de la raíz
+	return searchTree(root->ant, data);
+}
+NodoUsuario* deleteTreeNodeByNick(NodoUsuario* root, char* nick) //Borra el nodo con el
+{
+	// Base case
+	if (root == NULL)
+		return root;
+
+	// If the key to be deleted is smaller than the root's key,
+	// then it lies in the left subtree
+	
+	if (_stricmp(nick, root->dato->nick) < 0) {
+		root->ant = deleteTreeNodeByNick(root->ant, nick);
+		return root;
+	}
+	// If the key to be deleted is greater than the root's key,
+	// then it lies in the right subtree
+	else if (_stricmp(nick, root->dato->nick) > 0) {
+		root->sig = deleteTreeNodeByNick(root->sig, nick);
+		return root;
+	}
+
+	// If key is same as root's key, then this is the node to be deleted
+	// Node with only one child or no child
+	if (root->ant == NULL) { 
+		NodoUsuario* temp = root->sig;
+		delete root;
+		return temp;
+	}
+	else if (root->sig == NULL) {
+		NodoUsuario* temp = root->ant;
+		delete root;
+		return temp;
+	}
+
+	// Node with two children: Get the inorder successor (smallest
+	// in the right subtree)
+	NodoUsuario* succParent = root;
+	NodoUsuario* succ = root->sig;
+	while (succ->ant != NULL) {
+		succParent = succ;
+		succ = succ->ant;
+	}
+
+	// Copy the inorder successor's content to this node
+	root->dato = succ->dato;
+
+	// Delete the inorder successor
+	if (succParent->ant == succ)
+		succParent->ant = succ->sig;
+	else
+		succParent->sig = succ->sig;
+
+	delete succ;
+	return root;
+}
+
 /*
 //Imprime el arbol en preorden
 void preOrder(NodoUsuario* node)
@@ -3299,6 +3390,15 @@ void preOrder(NodoUsuario* node)
 	std::cout << node->dato << " ";
 	preOrder(node->ant);
 	preOrder(node->sig);
+}
+//Imprime en inorden
+void inorder(NodoUsuario* root)
+{
+	if (root != NULL) {
+		inorder(root->ant);
+		printf("%d ", root->dato->nick);
+		inorder(root->sig);
+	}
 }
 // Funciones para crear y mostrar listas
 void push(NodoUsuario** head_ref, DatoUsuario* new_data)
@@ -4552,10 +4652,10 @@ void swapData(NodoPasajero* a, NodoPasajero* b) {
 	a->dato = b->dato;
 	b->dato = temp;
 }
-void heapify(NodoPasajero* head, int n, NodoPasajero* node) {
-	NodoPasajero* smallest = node;
-	NodoPasajero* l = (node->sig != nullptr) ? node->sig : nullptr;
-	NodoPasajero* r = (node->sig != nullptr && node->sig->sig != nullptr) ? node->sig->sig : nullptr;
+void heapify(NodoPasajero* head, int n, NodoPasajero* NodoUsuario) {
+	NodoPasajero* smallest = NodoUsuario;
+	NodoPasajero* l = (NodoUsuario->sig != nullptr) ? NodoUsuario->sig : nullptr;
+	NodoPasajero* r = (NodoUsuario->sig != nullptr && NodoUsuario->sig->sig != nullptr) ? NodoUsuario->sig->sig : nullptr;
 
 	if (l != nullptr && l->dato->num < smallest->dato->num)
 		smallest = l;
@@ -4563,8 +4663,8 @@ void heapify(NodoPasajero* head, int n, NodoPasajero* node) {
 	if (r != nullptr && r->dato->num < smallest->dato->num)
 		smallest = r;
 
-	if (smallest != node) {
-		swapData(node, smallest);
+	if (smallest != NodoUsuario) {
+		swapData(NodoUsuario, smallest);
 		heapify(head, n, smallest);
 	}
 }
