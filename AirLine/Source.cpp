@@ -555,7 +555,9 @@ BOOL CALLBACK cDialog2(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					}
 					if (auxUsuario3/*->sig*/ == nullptr || strcmp(usuBuscar, auxUsuario3->dato->nick) != 0)
 					{
+						DatoUsuario* data = new DatoUsuario;
 						NodoUsuario* temp = new NodoUsuario;
+						temp->dato = data;
 						GetDlgItemText(hwnd, IDC_EDIT1, temp->dato->nick, sizeof(temp->dato->nick));
 						GetDlgItemText(hwnd, IDC_EDIT2, temp->dato->nombre, sizeof(temp->dato->nombre));
 						GetDlgItemText(hwnd, IDC_EDIT3, temp->dato->apellidoP, sizeof(temp->dato->apellidoP));
@@ -2969,7 +2971,8 @@ void nuevoUsuario(NodoUsuario* nuevo)
 	if (iniUsuario == nullptr)
 	{ //Si 'inicio->sig es igual a nullptr, o sea, apunta a nada, la lista esta vacia
 		iniUsuario = new NodoUsuario;
-
+		DatoUsuario* data = new DatoUsuario;
+		iniUsuario->dato = data;
 		strcpy_s(iniUsuario->dato->nick, nuevo->dato->nick);
 		strcpy_s(iniUsuario->dato->nombre, nuevo->dato->nombre);
 		strcpy_s(iniUsuario->dato->apellidoP, nuevo->dato->apellidoP);
@@ -3148,7 +3151,7 @@ void escribirUsuarios()
 				return;
 			}
 
-			escribir.write((char*)auxUsuario, sizeof(NodoUsuario));
+			escribir.write((char*)auxUsuario->dato, sizeof(DatoUsuario));
 			auxUsuario = auxUsuario->sig;
 		}
 
@@ -3159,9 +3162,7 @@ void leerUsuarios()
 {
 	auxUsuario = iniUsuario;
 
-	ifstream leer;
-	leer.open("Usuarios.bin", ios::in | ios::binary);
-
+	ifstream leer("Usuarios.bin", ios::binary);
 
 	if (!leer.is_open())
 	{
@@ -3171,9 +3172,9 @@ void leerUsuarios()
 
 	if (leer.is_open())
 	{
-		NodoUsuario* usuLeido = new NodoUsuario;
+		DatoUsuario* usuLeido = new DatoUsuario;
 
-		while (!leer.read((char*)usuLeido, sizeof(NodoUsuario)).eof())
+		while (!leer.read((char*)usuLeido, sizeof(DatoUsuario)).eof())
 		{
 			while (auxUsuario != nullptr && auxUsuario->sig != nullptr)
 			{
@@ -3181,22 +3182,25 @@ void leerUsuarios()
 			}
 			if (auxUsuario == nullptr)
 			{
-				iniUsuario = usuLeido;
+				//Acá estaba el error
+				iniUsuario = new NodoUsuario;
+				iniUsuario->dato = usuLeido;
 				iniUsuario->sig = nullptr;
 				iniUsuario->ant = nullptr;
 				auxUsuario = iniUsuario;
 			}
 			else
 			{
-				auxUsuario->sig = usuLeido;
+				iniUsuario = new NodoUsuario;
+				iniUsuario->dato = usuLeido;
+
+				auxUsuario->sig = iniUsuario;
 				auxUsuario->sig->ant = auxUsuario;
 				auxUsuario = auxUsuario->sig;
 				auxUsuario->sig = nullptr;
 			}
-
-			usuLeido = new NodoUsuario;
+			usuLeido = new DatoUsuario;
 		}
-
 		leer.close();
 		delete usuLeido;
 	}

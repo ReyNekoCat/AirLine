@@ -41,8 +41,8 @@
 		Y Se requiere ser usuario registrado para ingresar a la aplicación
 	X Se debe habilitar un checkbox para que se permita recordar el último usuario que ingresó a la aplicación.
 	X Solo se deben permitir registro de usuarios mayores a 18 años.
-	X El nombre de usuario y su fotografía se deben mostrar en todas las pantallas del proyecto.
-	X Al registrar a cada usuario se debe guardar la fecha y hora del registro.
+	Z El nombre de usuario y su fotografía se deben mostrar en todas las pantallas del proyecto.
+	Y Al registrar a cada usuario se debe guardar la fecha y hora del registro.
 	- Los datos de los usuarios son:
 		▪ Nombre de usuario
 		▪ Correo electrónico
@@ -67,17 +67,17 @@
 		X Precio en cada clase
 	X Por cada vuelo, solo se pueden admitir a un 10% pasajeros menores de 12 años, y un 15% de pasajeros mayores de 60 años.
 		X Estos porcentajes pueden cambiar por cada vuelo.
-	X Se debe guardar usuario, fecha y hora del registro de cada vuelo.
+	Y Se debe guardar usuario, fecha y hora del registro de cada vuelo.
 	X Los vuelos también pueden ser cancelados antes de la fecha y hora de la realización del vuelo
 		X Se debe de contar con una pantalla o esta misma donde se confirme la realización de cada vuelo y la cantidad de pasajeros que abordaron.
 */	
 ////// ::: PASAJEROS ::: //
 /*	-Se debe tener una pantalla para registrar a los pasajeros.
-	X De los pasajeros es necesario guardar sus datos generales completos, como: 
-		X Nombre completo
-		X Fecha de nacimiento
-		X Género
-		X Nacionalidad.
+	Y De los pasajeros es necesario guardar sus datos generales completos, como: 
+		Y Nombre completo
+		Y Fecha de nacimiento
+		Y Género
+		Y Nacionalidad.
 	X Se debe guardar usuario, fecha y hora del registro de cada pasajero.
 */
 ////// ::: BOLETOS ::: //
