@@ -207,6 +207,9 @@ NodoVuelo* partition(NodoVuelo*, NodoVuelo*);
 void _quickSort(NodoVuelo*, NodoVuelo*);
 void quickSort(NodoVuelo*);
 void printList(NodoVuelo*);
+
+void preOrderList(NodoUsuario*, HWND);
+void inOrderList(NodoUsuario*, HWND);
 #pragma endregion
 
 #pragma region Funciones de Listas Boletos (Medicos)
@@ -237,6 +240,7 @@ int WINAPI WinMain(
 	) {
 	hInstanceGlobal = hInstance;
 	leerUsuarios();
+	//Se transforma a un arbol
 	iniUsuario = sortedListToBST(iniUsuario);
 	leerVuelos();
 	leerBoletos();
@@ -424,7 +428,7 @@ int WINAPI WinMain(
 		DispatchMessage(&msg); // Envía el evento traducido a mi dialogo
 	}
 
-	
+	//Se vuelve a transformar a lista
 	iniUsuario = BinaryTree2DoubleLinkedList(iniUsuario);
 	//quickSort(iniUsuario); //Parece no ser necesario
 	escribirUsuarios();
@@ -622,6 +626,7 @@ BOOL CALLBACK cDialog2(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 						//nuevoUsuarioLista(temp);
 						insertTree(iniUsuario, temp);
+						//MessageBox(NULL, "Se ha registrado el usuario con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
 
 						SetDlgItemText(hwnd, IDC_EDIT1, "");
 						SetDlgItemText(hwnd, IDC_EDIT2, "");
@@ -831,78 +836,64 @@ BOOL CALLBACK cDialog4(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
-		case WM_INITDIALOG:
+	case WM_INITDIALOG:
+	{
+		if (miUsuario != nullptr)
 		{
-			if (miUsuario != nullptr)
+			SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->dato->nombreComp);
+		}
+		if (miUsuario->dato->foto != nullptr)
+		{
+			strcpy_s(zFile, miUsuario->dato->foto); //Inicializar zfile con la dirección de memoria del puntero foto
+
+			HBITMAP bmp; //1
+			bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
+			SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
+		}
+
+		// Recorrer el árbol en preorden y agregar los nombres de usuario al ListBox
+		preOrderList(iniUsuario, hwnd);
+
+		break;
+	}
+	case WM_COMMAND:
+	{
+		long opcion = LOWORD(wParam);
+		cMenu(hwnd, opcion);
+
+		switch (LOWORD(wParam))
+		{
+		case IDC_LIST1:
+		{
+			switch (HIWORD(wParam))
 			{
-				SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->dato->nombreComp);
+			case LBN_DBLCLK: //Al dar doble clic en el ListBox 
+			{
+				char nombre[30] = { 0 };
+				int indice = 0;
+				indice = SendDlgItemMessage(hwnd, IDC_LIST1, LB_GETCURSEL, 0, 0);
+				SendDlgItemMessage(hwnd, IDC_LIST1, LB_GETTEXT, indice, (LPARAM)nombre);
+
+				// Buscar el usuario en el árbol
+				DatoUsuario data;
+				strcpy_s(data.nick, nombre);
+				auxUsuario2 = searchTree(iniUsuario, &data);
+
+				SetDlgItemText(hwnd, IDC_EDIT2, auxUsuario2->dato->nick);
+				SetDlgItemText(hwnd, IDC_EDIT4, auxUsuario2->dato->nombreComp);
+
+				break;
 			}
-			if (miUsuario->dato->foto != nullptr)
-			{
-				strcpy_s(zFile, miUsuario->dato->foto); //Inicializar zfile con la dirección de memoria del puntero foto
 
-			auxUsuario2 = iniUsuario;
-				HBITMAP bmp; //1
-				bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
-				SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
+			default:
+			{
+				break;
 			}
 
-			auxUsuario2 = iniUsuario;
-
-			while (auxUsuario2->sig != nullptr)
-			{
-				SendDlgItemMessage(hwnd, IDC_LIST1, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxUsuario2->dato->nick);
-				auxUsuario2 = auxUsuario2->sig;
-			}
-
-			if (auxUsuario2->sig == nullptr/* || auxUsu2->ant == nullptr*/)
-			{
-				SendDlgItemMessage(hwnd, IDC_LIST1, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxUsuario2->dato->nick);
-				auxUsuario2 = auxUsuario2->sig;
 			}
 
 			break;
 		}
-		case WM_COMMAND:
-		{
-			long opcion = LOWORD(wParam);
-			cMenu(hwnd, opcion);
-
-			switch (LOWORD(wParam))
-			{
-			case IDC_LIST1:
-			{
-				switch (HIWORD(wParam))
-				{
-				case LBN_DBLCLK: //Al dar doble clic en el ListBox 
-				{
-					char nombre[30] = { 0 };
-					int indice = 0;
-					indice = SendDlgItemMessage(hwnd, IDC_LIST1, LB_GETCURSEL, 0, 0);
-					SendDlgItemMessage(hwnd, IDC_LIST1, LB_GETTEXT, indice, (LPARAM)nombre);
-
-					auxUsuario2 = iniUsuario;
-
-					while (auxUsuario2->sig != nullptr && strcmp(auxUsuario2->dato->nick, nombre) != 0)
-					{
-						auxUsuario2 = auxUsuario2->sig;
-					}
-
-					SetDlgItemText(hwnd, IDC_EDIT2, auxUsuario2->dato->nick);
-					SetDlgItemText(hwnd, IDC_EDIT4, auxUsuario2->dato->nombreComp);
-
-					break;
-				}
-
-				default:
-				{
-					break;
-				}
-
-				}
-
-				break;
-			}
 			case IDC_BUTTON1: // Eliminar
 			{
 				if (auxUsuario2 == nullptr)
@@ -917,23 +908,23 @@ BOOL CALLBACK cDialog4(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					{
 					case IDYES:
 					{
-						char NodoUsuario[30] = { 0 };
+						char NickUsuario[30] = { 0 };
 						int indice = 0;
 						indice = SendDlgItemMessage(hwnd, IDC_LIST1, LB_GETCURSEL, 0, 0);
-						SendDlgItemMessage(hwnd, IDC_LIST1, LB_GETTEXT, indice, (LPARAM)NodoUsuario);
+						SendDlgItemMessage(hwnd, IDC_LIST1, LB_GETTEXT, indice, (LPARAM)NickUsuario);
 
-						if (strcmp(miUsuario->dato->nick, NodoUsuario) == 0)
+						if (strcmp(miUsuario->dato->nick, NickUsuario) == 0)
 						{
 							MessageBox(NULL, "El usuario que inicio sesion será eliminado, se cerrará la sesion.", "AVISO", MB_OK | MB_ICONINFORMATION);
 
-							eliminarUsuarioLista(NodoUsuario);
-
+							iniUsuario = deleteTreeNodeByNick(iniUsuario, NickUsuario);
+							
 							DestroyWindow(hwnd);
 							PostQuitMessage(0);
 						}
 						else
 						{
-							eliminarUsuarioLista(NodoUsuario);
+							iniUsuario = deleteTreeNodeByNick(iniUsuario, NickUsuario);
 
 							SendMessage(GetDlgItem(hwnd, IDC_LIST1), LB_DELETESTRING, indice, 0);
 							SetDlgItemText(hwnd, IDC_EDIT2, "");
@@ -2999,22 +2990,79 @@ int formatoEdad(double cumple) {
 //Listas de Usuarios
 #pragma region Funciones de Listas Usuarios
 
-void nuevoUsuarioLista(NodoUsuario* nuevo) {
-	if (nuevo == nullptr || nuevo->dato == nullptr || nuevo->dato->nick[0] == '\0') {
-		return;
-	}
+void nuevoUsuarioLista(NodoUsuario* nuevo)
+{
+	if (iniUsuario == nullptr)
+	{ //Si 'inicio->sig es igual a nullptr, o sea, apunta a nada, la lista esta vacia
+		iniUsuario = new NodoUsuario;
+		DatoUsuario* data = new DatoUsuario;
+		iniUsuario->dato = data;
 
-	if (iniUsuario == nullptr) {
-		iniUsuario = nuevo;
+		strcpy_s(iniUsuario->dato->nick, nuevo->dato->nick);
+		strcpy_s(iniUsuario->dato->nombre, nuevo->dato->nombre);
+		strcpy_s(iniUsuario->dato->apellidoP, nuevo->dato->apellidoP);
+		strcpy_s(iniUsuario->dato->apellidoM, nuevo->dato->apellidoM);
+		strcpy_s(iniUsuario->dato->email, nuevo->dato->email);
+		strcpy_s(iniUsuario->dato->password, nuevo->dato->password);
+
+		// Concatenación
+		strcpy_s(iniUsuario->dato->nombreComp, nuevo->dato->nombre);
+		strcat_s(iniUsuario->dato->nombreComp, " ");
+		strcat_s(iniUsuario->dato->nombreComp, iniUsuario->dato->apellidoP);
+		strcat_s(iniUsuario->dato->nombreComp, " ");
+		strcat_s(iniUsuario->dato->nombreComp, iniUsuario->dato->apellidoM);
+
+		iniUsuario->dato->nacimiento = nuevo->dato->nacimiento;
+
+		iniUsuario->dato->genero = nuevo->dato->genero;
+
+		strcpy_s(iniUsuario->dato->foto, nuevo->dato->foto);
+
+		iniUsuario->sig = nullptr;
+		iniUsuario->ant = nullptr;
+		auxUsuario2 = auxUsuario;
+		auxUsuario3 = auxUsuario;
+		auxUsuario = iniUsuario;
 	}
-	else {
-		NodoUsuario* aux = iniUsuario;
-		while (aux->sig != nullptr) {
-			aux = aux->sig;
+	else
+	{
+		auxUsuario = iniUsuario; //Checar
+		while (auxUsuario->sig != nullptr)
+		{
+			auxUsuario = auxUsuario->sig;
 		}
-		aux->sig = nuevo;
-		nuevo->ant = aux;
+
+		auxUsuario->sig = new NodoUsuario;
+		auxUsuario->sig->sig = nullptr;
+		auxUsuario->sig->ant = auxUsuario;
+		auxUsuario = auxUsuario->sig;
+
+		DatoUsuario* data = new DatoUsuario;
+		auxUsuario->dato = data;
+
+		strcpy_s(auxUsuario->dato->nick, nuevo->dato->nick);
+		strcpy_s(auxUsuario->dato->nombre, nuevo->dato->nombre);
+		strcpy_s(auxUsuario->dato->apellidoP, nuevo->dato->apellidoP);
+		strcpy_s(auxUsuario->dato->apellidoM, nuevo->dato->apellidoM);
+		strcpy_s(auxUsuario->dato->email, nuevo->dato->email);
+		strcpy_s(auxUsuario->dato->password, nuevo->dato->password);
+
+		// Concatenación
+		strcpy_s(auxUsuario->dato->nombreComp, nuevo->dato->nombre);
+		strcat_s(auxUsuario->dato->nombreComp, " ");
+		strcat_s(auxUsuario->dato->nombreComp, auxUsuario->dato->apellidoP);
+		strcat_s(auxUsuario->dato->nombreComp, " ");
+		strcat_s(auxUsuario->dato->nombreComp, auxUsuario->dato->apellidoM);
+
+		auxUsuario->dato->nacimiento = nuevo->dato->nacimiento;
+		auxUsuario->dato->genero = nuevo->dato->genero;
+		strcpy_s(auxUsuario->dato->foto, nuevo->dato->foto);
+
+		auxUsuario2 = auxUsuario;
+		auxUsuario3 = auxUsuario;
+		auxUsuario = iniUsuario;
 	}
+	//MessageBox(NULL, "Se ha registrado el usuario con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
 }
 void eliminarUsuarioLista(char nomUsu[30])
 {
@@ -3359,7 +3407,6 @@ void insertTree(NodoUsuario*& nodo, NodoUsuario* nuevoNodo)
 	else if (_stricmp(nuevoNodo->dato->nick, nodo->dato->nick) > 0)
 		insertTree(nodo->sig, nuevoNodo);
 }
-
 struct NodoUsuario* searchTree(struct NodoUsuario* root, DatoUsuario* data) //Busca un nick en el arbol
 {
 	// Casos Base: raíz es null o el nick está en la raíz
@@ -3427,25 +3474,25 @@ NodoUsuario* deleteTreeNodeByNick(NodoUsuario* root, char* nick) //Borra el nodo
 	delete succ;
 	return root;
 }
-/*
-//Imprime el arbol en preorden
-void preOrder(NodoUsuario* node)
+
+//Funciones para mostrar el arbol en un ListBox
+void preOrderList(NodoUsuario* node, HWND hwnd)
 {
 	if (node == NULL)
 		return;
-	std::cout << node->dato << " ";
-	preOrder(node->ant);
-	preOrder(node->sig);
+	SendDlgItemMessage(hwnd, IDC_LIST1, LB_ADDSTRING, (WPARAM)0, (LPARAM)node->dato->nick);
+	preOrderList(node->ant, hwnd);
+	preOrderList(node->sig, hwnd);
 }
-//Imprime en inorden
-void inorder(NodoUsuario* root)
+void inOrderList(NodoUsuario* root, HWND hwnd)
 {
 	if (root != NULL) {
-		inorder(root->ant);
-		printf("%d ", root->dato->nick);
-		inorder(root->sig);
+		inOrderList(root->ant, hwnd);
+		SendDlgItemMessage(hwnd, IDC_LIST1, LB_ADDSTRING, (WPARAM)0, (LPARAM)root->dato->nick);
+		inOrderList(root->sig, hwnd);
 	}
 }
+/*
 // Funciones para crear y mostrar listas
 void push(NodoUsuario** head_ref, DatoUsuario* new_data)
 {
