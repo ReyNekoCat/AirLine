@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Español (México) resources
+// Spanish (Mexico) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESM)
 LANGUAGE LANG_SPANISH, SUBLANG_SPANISH_MEXICAN
@@ -55,7 +55,7 @@ BEGIN
     PUSHBUTTON      "Salir",IDC_BUTTON3,203,256,50,15
     EDITTEXT        IDC_EDIT3,130,100,123,15,ES_AUTOHSCROLL,WS_EX_CLIENTEDGE
     EDITTEXT        IDC_EDIT4,130,125,123,15,ES_AUTOHSCROLL,WS_EX_CLIENTEDGE
-    EDITTEXT        IDC_EDIT5,130,200,123,16,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_CLIENTEDGE
+    EDITTEXT        IDC_EDIT5,130,200,123,16,ES_AUTOHSCROLL,WS_EX_CLIENTEDGE
     CTEXT           "Nombre/s:",IDC_STATIC,56,75,64,15,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
     CTEXT           "Apellido paterno:",IDC_STATIC,56,100,64,15,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
     CTEXT           "Apellido materno:",IDC_STATIC,56,125,64,15,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
@@ -1004,12 +1004,12 @@ BEGIN
     END
 END
 
-#endif    // Español (México) resources
+#endif    // Spanish (Mexico) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Español (España, alfabetización internacional) resources
+// Spanish (Spain, International Sort) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESN)
 LANGUAGE LANG_SPANISH, SUBLANG_SPANISH_MODERN
@@ -1040,7 +1040,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // Español (España, alfabetización internacional) resources
+#endif    // Spanish (Spain, International Sort) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

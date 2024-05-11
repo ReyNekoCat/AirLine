@@ -457,7 +457,6 @@ BOOL CALLBACK cDialog1(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			if (!contrasena.empty()) {
 				SetDlgItemText(hwnd, IDC_EDIT2, contrasena.c_str());
 			}
-
 		}
 		case WM_COMMAND:
 		{
@@ -621,6 +620,8 @@ BOOL CALLBACK cDialog2(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						temp->dato->nacimiento = dia;
 
 						strcpy_s(temp->dato->foto, "");
+						temp->sig = nullptr;
+						temp->ant = nullptr;
 
 						nuevoUsuario(temp);
 
@@ -3004,82 +3005,22 @@ int formatoEdad(double cumple) {
 //Listas de Usuarios
 #pragma region Funciones de Listas Usuarios
 
-void nuevoUsuario(NodoUsuario* nuevo)
-{
-	if (iniUsuario == nullptr)
-	{ //Si 'inicio->sig es igual a nullptr, o sea, apunta a nada, la lista esta vacia
-		iniUsuario = new NodoUsuario;
-		DatoUsuario* data = new DatoUsuario;
-		iniUsuario->dato = data;
-
-		strcpy_s(iniUsuario->dato->nick, nuevo->dato->nick);
-		strcpy_s(iniUsuario->dato->nombre, nuevo->dato->nombre);
-		strcpy_s(iniUsuario->dato->apellidoP, nuevo->dato->apellidoP);
-		strcpy_s(iniUsuario->dato->apellidoM, nuevo->dato->apellidoM);
-		strcpy_s(iniUsuario->dato->email, nuevo->dato->email);
-		strcpy_s(iniUsuario->dato->password, nuevo->dato->password);
-
-		// Concatenación
-		strcpy_s(iniUsuario->dato->nombreComp, nuevo->dato->nombre);
-		strcat_s(iniUsuario->dato->nombreComp, " ");
-		strcat_s(iniUsuario->dato->nombreComp, iniUsuario->dato->apellidoP);
-		strcat_s(iniUsuario->dato->nombreComp, " ");
-		strcat_s(iniUsuario->dato->nombreComp, iniUsuario->dato->apellidoM);
-
-		iniUsuario->dato->nacimiento = nuevo->dato->nacimiento;
-
-		iniUsuario->dato->genero = nuevo->dato->genero;
-
-		strcpy_s(iniUsuario->dato->foto, nuevo->dato->foto);
-
-		iniUsuario->sig = nullptr;
-		iniUsuario->ant = nullptr;
-		auxUsuario2 = auxUsuario;
-		auxUsuario3 = auxUsuario;
-		auxUsuario = iniUsuario;
+void nuevoUsuario(NodoUsuario* nuevo) {
+	if (nuevo == nullptr || nuevo->dato == nullptr || nuevo->dato->nick[0] == '\0') {
+		return;
 	}
-	else
-	{
-		auxUsuario = iniUsuario; //Checar
-		while (auxUsuario->sig != nullptr)
-		{
-			auxUsuario = auxUsuario->sig;
+
+	if (iniUsuario == nullptr) {
+		iniUsuario = nuevo;
+	}
+	else {
+		NodoUsuario* aux = iniUsuario;
+		while (aux->sig != nullptr) {
+			aux = aux->sig;
 		}
-
-		auxUsuario->sig = new NodoUsuario;
-		auxUsuario->sig->sig = nullptr;
-		auxUsuario->sig->ant = auxUsuario;
-		auxUsuario = auxUsuario->sig;
-
-		DatoUsuario* data = new DatoUsuario;
-		auxUsuario->dato = data;
-
-		strcpy_s(auxUsuario->dato->nick, nuevo->dato->nick);
-		strcpy_s(auxUsuario->dato->nombre, nuevo->dato->nombre);
-		strcpy_s(auxUsuario->dato->apellidoP, nuevo->dato->apellidoP);
-		strcpy_s(auxUsuario->dato->apellidoM, nuevo->dato->apellidoM);
-		strcpy_s(auxUsuario->dato->email, nuevo->dato->email);
-		strcpy_s(auxUsuario->dato->password, nuevo->dato->password);
-
-		// Concatenación
-		strcpy_s(auxUsuario->dato->nombreComp, nuevo->dato->nombre);
-		strcat_s(auxUsuario->dato->nombreComp, " ");
-		strcat_s(auxUsuario->dato->nombreComp, auxUsuario->dato->apellidoP);
-		strcat_s(auxUsuario->dato->nombreComp, " ");
-		strcat_s(auxUsuario->dato->nombreComp, auxUsuario->dato->apellidoM);
-
-		auxUsuario->dato->nacimiento = nuevo->dato->nacimiento;
-
-		auxUsuario->dato->genero = nuevo->dato->genero;
-
-		strcpy_s(auxUsuario->dato->foto, nuevo->dato->foto);
-
-		auxUsuario2 = auxUsuario;
-		auxUsuario3 = auxUsuario;
-		auxUsuario = iniUsuario;
+		aux->sig = nuevo;
+		nuevo->ant = aux;
 	}
-	MessageBox(NULL, "Se ha registrado el usuario con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
-	/*int opc = MessageBox(hwnd, (LPCWSTR)L"¿Seguro que desea eliminar este usuario?", (LPCWSTR)L"AVISO", MB_YESNO | MB_ICONQUESTION);*/
 }
 void eliminarUsuario(char nomUsu[30])
 {
@@ -3158,80 +3099,62 @@ void eliminarUsuario(char nomUsu[30])
 		}
 	}
 }
-void escribirUsuarios()
-{
-	// Abre el archivo para escritura binaria
-	ofstream escribir("Usuarios.bin", ios::out | ios::binary | ios::trunc);
+void escribirUsuarios() {
+	ofstream archivo("Usuarios.bin", ios::binary | ios::out | ios::trunc);
+	NodoUsuario* aux = iniUsuario;
 
-	if (!escribir.is_open())
-	{
-		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
-		return;
-	}
-
-	// Apunta al inicio de la lista
-	auxUsuario = iniUsuario;
-
-	while (auxUsuario != nullptr)
-	{
-		// Escribe los datos del usuario en el archivo
-		escribir.write(reinterpret_cast<char*>(auxUsuario->dato), sizeof(DatoUsuario));
-
-		// Avanza al siguiente nodo de la lista
-		auxUsuario = auxUsuario->sig;
-	}
-
-	// Cierra el archivo después de escribir
-	escribir.close();
-}
-void leerUsuarios()
-{
-	iniUsuario = new NodoUsuario;
-	DatoUsuario* iniData = new DatoUsuario;
-	iniUsuario->dato = iniData;
-	iniUsuario->sig = nullptr;
-	iniUsuario->ant = nullptr;
-	auxUsuario = iniUsuario;
-	ifstream leer;
-	leer.open("Usuarios.bin", ios::in | ios::binary);
-	if (!leer.is_open())
-	{
-		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
-		return;
-	}
-
-	if (leer.is_open())
-	{
-		NodoUsuario* usuLeido = new NodoUsuario;
-		DatoUsuario* dataLeido = new DatoUsuario;
-		usuLeido->dato = dataLeido;
-
-		while (!leer.read((char*)usuLeido->dato, sizeof(DatoUsuario)).eof())
-		{
-			while (auxUsuario != nullptr && auxUsuario->sig != nullptr)
-			{
-				auxUsuario = auxUsuario->sig;
-			}
-			if (auxUsuario == nullptr)
-			{
-				iniUsuario->dato = usuLeido->dato;
-				iniUsuario->sig = nullptr;
-				iniUsuario->ant = nullptr;
-				auxUsuario = iniUsuario;
-			}
-			else
-			{
-				auxUsuario->sig = usuLeido;
-				auxUsuario->sig->ant = auxUsuario;
-				auxUsuario = auxUsuario->sig;
-				auxUsuario->sig = nullptr;
-			}
-			usuLeido = new NodoUsuario;
-			usuLeido->dato = new DatoUsuario;
+	while (aux != nullptr) {
+		if (aux->dato != nullptr && aux->dato->nick[0] != '\0') {
+			archivo.write(reinterpret_cast<char*>(&aux->dato->type), sizeof(aux->dato->type));
+			archivo.write(aux->dato->nick, sizeof(aux->dato->nick));
+			archivo.write(aux->dato->nombre, sizeof(aux->dato->nombre));
+			archivo.write(aux->dato->apellidoP, sizeof(aux->dato->apellidoP));
+			archivo.write(aux->dato->apellidoM, sizeof(aux->dato->apellidoM));
+			archivo.write(aux->dato->nombreComp, sizeof(aux->dato->nombreComp));
+			archivo.write(aux->dato->password, sizeof(aux->dato->password));
+			archivo.write(reinterpret_cast<char*>(&aux->dato->nacimiento), sizeof(aux->dato->nacimiento));
+			archivo.write(reinterpret_cast<char*>(&aux->dato->genero), sizeof(aux->dato->genero));
+			archivo.write(aux->dato->email, sizeof(aux->dato->email));
+			archivo.write(aux->dato->foto, sizeof(aux->dato->foto));
 		}
-		leer.close();
-		delete usuLeido;
+		aux = aux->sig;
 	}
+	archivo.close();
+	// Reiniciamos aux a iniUsuario para asegurar que iniUsuario apunta al inicio de la lista
+	aux = iniUsuario;
+}
+void leerUsuarios() {
+	ifstream archivo("Usuarios.bin", ios::binary);
+	DatoUsuario* dato;
+
+	while (archivo) {
+		dato = new DatoUsuario;
+		archivo.read(reinterpret_cast<char*>(&dato->type), sizeof(dato->type));
+		archivo.read(dato->nick, sizeof(dato->nick));
+		archivo.read(dato->nombre, sizeof(dato->nombre));
+		archivo.read(dato->apellidoP, sizeof(dato->apellidoP));
+		archivo.read(dato->apellidoM, sizeof(dato->apellidoM));
+		archivo.read(dato->nombreComp, sizeof(dato->nombreComp));
+		archivo.read(dato->password, sizeof(dato->password));
+		archivo.read(reinterpret_cast<char*>(&dato->nacimiento), sizeof(dato->nacimiento));
+		archivo.read(reinterpret_cast<char*>(&dato->genero), sizeof(dato->genero));
+		archivo.read(dato->email, sizeof(dato->email));
+		archivo.read(dato->foto, sizeof(dato->foto));
+
+		if (archivo) {
+			NodoUsuario* nuevo = new NodoUsuario;
+			nuevo->dato = dato;
+			nuevo->ant = nullptr;
+			nuevo->sig = nullptr;
+			nuevoUsuario(nuevo);
+		}
+		else {
+			delete dato;
+		}
+	}
+	archivo.close();
+	// Reiniciamos aux a iniUsuario para asegurar que iniUsuario apunta al inicio de la lista
+	NodoUsuario* aux = iniUsuario;
 }
 #pragma region QuickSort
 void swapData(NodoUsuario* a, NodoUsuario* b) {
