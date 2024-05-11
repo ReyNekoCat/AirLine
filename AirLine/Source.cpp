@@ -172,8 +172,8 @@ BOOL CALLBACK cDialog14(HWND, UINT, WPARAM, LPARAM); // Pase abordar
 #pragma region Prototipos
 
 #pragma region Funciones de Listas Usuarios
-void nuevoUsuario(NodoUsuario* nuevo);
-void eliminarUsuario(char nomUsu[30]);
+void nuevoUsuarioLista(NodoUsuario* nuevo);
+void eliminarUsuarioLista(char nomUsu[30]);
 void escribirUsuarios();
 void leerUsuarios();
 //QuickSort
@@ -187,10 +187,10 @@ void printList(NodoUsuario*);
 NodoUsuario* sortedListToBST(NodoUsuario*);
 NodoUsuario* sortedListToBSTRecur(NodoUsuario**, int);
 int countNodes(NodoUsuario*);
-void BinaryTree2DoubleLinkedList(NodoUsuario*, NodoUsuario**);
+NodoUsuario* BinaryTree2DoubleLinkedList(NodoUsuario*);
 NodoUsuario* newNode(DatoUsuario*);
-struct NodoUsuario* insertTree(struct NodoUsuario*, DatoUsuario*);
-struct NodoUsuario* searchTree(struct NodoUsuario*, DatoUsuario*);
+void insertTree(NodoUsuario*&, NodoUsuario*);
+NodoUsuario* searchTree(struct NodoUsuario*, DatoUsuario*);
 NodoUsuario* deleteTreeNodeByNick(NodoUsuario*, char*);
 #pragma endregion
 
@@ -237,7 +237,7 @@ int WINAPI WinMain(
 	) {
 	hInstanceGlobal = hInstance;
 	leerUsuarios();
-	//sortedListToBST(iniUsuario);
+	iniUsuario = sortedListToBST(iniUsuario);
 	leerVuelos();
 	leerBoletos();
 	leerPasajeros();
@@ -425,7 +425,8 @@ int WINAPI WinMain(
 	}
 
 	
-	//quickSort(iniUsuario);
+	iniUsuario = BinaryTree2DoubleLinkedList(iniUsuario);
+	//quickSort(iniUsuario); //Parece no ser necesario
 	escribirUsuarios();
 	escribirVuelo();
 	escribirBoletos();
@@ -482,43 +483,39 @@ BOOL CALLBACK cDialog1(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					GetDlgItemText(hwnd, IDC_EDIT1, usuBuscar, sizeof(usuBuscar));
 					GetDlgItemText(hwnd, IDC_EDIT2, passwordBuscar, sizeof(passwordBuscar));
 
-					auxUsuario3 = iniUsuario;
+					DatoUsuario usuarioBuscar;
+					strcpy_s(usuarioBuscar.nick, sizeof(usuarioBuscar.nick), usuBuscar);
 
-					if (iniUsuario == nullptr)
+					auxUsuario3 = searchTree(iniUsuario, &usuarioBuscar);
+
+					if (auxUsuario3 == nullptr)
 					{
-						MessageBox(NULL, "No hay usuarios registrados", "AVISO", MB_OK | MB_ICONERROR);
+						MessageBox(NULL, "No se encontró el usuario.", "AVISO", MB_OK | MB_ICONERROR);
 					}
-					else {
-						while (auxUsuario3->sig != nullptr && strcmp(usuBuscar, auxUsuario3->dato->nick) != 0)
-							auxUsuario3 = auxUsuario3->sig;
-
-						if (auxUsuario3->sig == nullptr && strcmp(usuBuscar, auxUsuario3->dato->nick) != 0)
-							MessageBox(NULL, "No se encontró el usuario.", "AVISO", MB_OK | MB_ICONERROR);
-						else
+					else
+					{
+						if (strcmp(passwordBuscar, auxUsuario3->dato->password) == 0)
 						{
-							if (strcmp(passwordBuscar, auxUsuario3->dato->password) == 0)
-							{
-								miUsuario = auxUsuario3;
-								inicio = true;
-								// Guardar el usuario y la contraseña en un archivo para recordarlo
-								if (recordar) {
-									ofstream archivo("UsuarioCheck.txt");
-									archivo << miUsuario->dato->nick << "," << miUsuario->dato->password;
-									archivo.close();
-								}
-
-								/*EndDialog(hwnd, 0);
-								DialogBox(hInstGlobal, MAKEINTRESOURCE(105), hwnd, procVPrincipal);*/
-
-								EndDialog(hwnd, 0);
-								HWND hDialog3 = CreateDialog(hInstanceGlobal, MAKEINTRESOURCE(IDD_DIALOG3), 0, cDialog3);
-
-								ShowWindow(hDialog3, SW_SHOW);
-								UpdateWindow(hDialog3);
+							miUsuario = auxUsuario3;
+							inicio = true;
+							// Guardar el usuario y la contraseña en un archivo para recordarlo
+							if (recordar) {
+								ofstream archivo("UsuarioCheck.txt");
+								archivo << miUsuario->dato->nick << "," << miUsuario->dato->password;
+								archivo.close();
 							}
-							else
-								MessageBox(NULL, "Contraseña incorrecta", "AVISO", MB_OK | MB_ICONERROR);
+
+							/*EndDialog(hwnd, 0);
+							DialogBox(hInstGlobal, MAKEINTRESOURCE(105), hwnd, procVPrincipal);*/
+
+							EndDialog(hwnd, 0);
+							HWND hDialog3 = CreateDialog(hInstanceGlobal, MAKEINTRESOURCE(IDD_DIALOG3), 0, cDialog3);
+
+							ShowWindow(hDialog3, SW_SHOW);
+							UpdateWindow(hDialog3);
 						}
+						else
+							MessageBox(NULL, "Contraseña incorrecta", "AVISO", MB_OK | MB_ICONERROR);
 					}
 					break;
 				}
@@ -623,7 +620,8 @@ BOOL CALLBACK cDialog2(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						temp->sig = nullptr;
 						temp->ant = nullptr;
 
-						nuevoUsuario(temp);
+						//nuevoUsuarioLista(temp);
+						insertTree(iniUsuario, temp);
 
 						SetDlgItemText(hwnd, IDC_EDIT1, "");
 						SetDlgItemText(hwnd, IDC_EDIT2, "");
@@ -631,8 +629,6 @@ BOOL CALLBACK cDialog2(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						SetDlgItemText(hwnd, IDC_EDIT4, "");
 						SetDlgItemText(hwnd, IDC_EDIT5, "");
 						SetDlgItemText(hwnd, IDC_EDIT6, "");
-
-						
 
 						if (miUsuario == nullptr) //Registro desde la pagina de inicio
 						{
@@ -930,14 +926,14 @@ BOOL CALLBACK cDialog4(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						{
 							MessageBox(NULL, "El usuario que inicio sesion será eliminado, se cerrará la sesion.", "AVISO", MB_OK | MB_ICONINFORMATION);
 
-							eliminarUsuario(NodoUsuario);
+							eliminarUsuarioLista(NodoUsuario);
 
 							DestroyWindow(hwnd);
 							PostQuitMessage(0);
 						}
 						else
 						{
-							eliminarUsuario(NodoUsuario);
+							eliminarUsuarioLista(NodoUsuario);
 
 							SendMessage(GetDlgItem(hwnd, IDC_LIST1), LB_DELETESTRING, indice, 0);
 							SetDlgItemText(hwnd, IDC_EDIT2, "");
@@ -982,9 +978,7 @@ BOOL CALLBACK cDialog4(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			break;
 		}
-
 	}
-
 	return false;  // Un callback siempre retorna falso
 }
 
@@ -3005,7 +2999,7 @@ int formatoEdad(double cumple) {
 //Listas de Usuarios
 #pragma region Funciones de Listas Usuarios
 
-void nuevoUsuario(NodoUsuario* nuevo) {
+void nuevoUsuarioLista(NodoUsuario* nuevo) {
 	if (nuevo == nullptr || nuevo->dato == nullptr || nuevo->dato->nick[0] == '\0') {
 		return;
 	}
@@ -3022,7 +3016,7 @@ void nuevoUsuario(NodoUsuario* nuevo) {
 		nuevo->ant = aux;
 	}
 }
-void eliminarUsuario(char nomUsu[30])
+void eliminarUsuarioLista(char nomUsu[30])
 {
 	NodoUsuario* start;
 	auxUsuario = iniUsuario;
@@ -3146,7 +3140,7 @@ void leerUsuarios() {
 			nuevo->dato = dato;
 			nuevo->ant = nullptr;
 			nuevo->sig = nullptr;
-			nuevoUsuario(nuevo);
+			nuevoUsuarioLista(nuevo);
 		}
 		else {
 			delete dato;
@@ -3269,7 +3263,36 @@ int countNodes(NodoUsuario* head) //Cuenta los nodos de una lista
 	}
 	return count;
 }
-void BinaryTree2DoubleLinkedList(NodoUsuario* root, NodoUsuario** head)
+NodoUsuario* BinaryTree2DoubleLinkedList(NodoUsuario* root)
+{
+	// Caso base
+	if (root == NULL)
+		return NULL;
+
+	// Nodo estático para mantener el último nodo visitado
+	static NodoUsuario* ant = NULL;
+
+	// Convertir el subárbol izquierdo de forma recursiva
+	BinaryTree2DoubleLinkedList(root->ant);
+
+	// Ahora convertir este nodo
+	if (ant != NULL) {
+		root->ant = ant;  // Hacer que el nodo actual sea el siguiente del último nodo visitado
+		ant->sig = root;  // Hacer que el último nodo visitado sea el anterior del nodo actual
+	}
+	else {
+		// Si ant es NULL, entonces este nodo es el primer nodo de la lista
+		iniUsuario = root;
+	}
+
+	ant = root;  // Actualizar el último nodo visitado al nodo actual
+
+	// Convertir el subárbol derecho de forma recursiva
+	BinaryTree2DoubleLinkedList(root->sig);
+
+	return iniUsuario;  // Devolver el primer nodo de la lista
+}
+/*void BinaryTree2DoubleLinkedListDobleNode(NodoUsuario* root, NodoUsuario** head)
 {
 	//Función recursiva que convierte una arbol a una lista
 	//root = Puntero a la raíz del arbol binario
@@ -3284,7 +3307,7 @@ void BinaryTree2DoubleLinkedList(NodoUsuario* root, NodoUsuario** head)
 	static NodoUsuario* ant = NULL;
 
 	//Se convierte el subarbol izquierdo de forma recursiva
-	BinaryTree2DoubleLinkedList(root->ant, head);
+	BinaryTree2DoubleLinkedListDobleNode(root->ant, head);
 
 	// Now convert this node
 	if (ant == NULL)
@@ -3296,8 +3319,8 @@ void BinaryTree2DoubleLinkedList(NodoUsuario* root, NodoUsuario** head)
 	ant = root;
 
 	//Se covierte ek subarbol derecho
-	BinaryTree2DoubleLinkedList(root->sig, head);
-}
+	BinaryTree2DoubleLinkedListDobleNode(root->sig, head);
+}*/
 //Operaciones
 NodoUsuario* newNode(DatoUsuario* data)
 {
@@ -3306,7 +3329,7 @@ NodoUsuario* newNode(DatoUsuario* data)
 	new_node->ant = new_node->sig = NULL;
 	return (new_node);
 }
-struct NodoUsuario* insertTree(struct NodoUsuario* nodo, DatoUsuario* data)
+struct NodoUsuario* insertTreeDato(struct NodoUsuario* nodo, DatoUsuario* data)
 {
 	// Caso Base: Si está vacío, devuelve u nuevo nodo
 	if (nodo == NULL)
@@ -3314,13 +3337,29 @@ struct NodoUsuario* insertTree(struct NodoUsuario* nodo, DatoUsuario* data)
 
 	//Se usa de forma recursiva para atravesar todo el arbol
 	if ((_stricmp(data->nick, nodo->dato->nick) < 0))
-		nodo->ant = insertTree(nodo->ant, data);
+		nodo->ant = insertTreeDato(nodo->ant, data);
 	else if (_stricmp(data->nick, nodo->dato->nick) > 0)
-		nodo->sig = insertTree(nodo->sig, data);
+		nodo->sig = insertTreeDato(nodo->sig, data);
 
 	// Return the (unchanged) node pointer
 	return nodo;
 }
+void insertTree(NodoUsuario*& nodo, NodoUsuario* nuevoNodo)
+{
+	// Caso Base: Si está vacío, asigna el nuevo nodo
+	if (nodo == NULL)
+	{
+		nodo = nuevoNodo;
+		return;
+	}
+
+	//Se usa de forma recursiva para atravesar todo el arbol
+	if ((_stricmp(nuevoNodo->dato->nick, nodo->dato->nick) < 0))
+		insertTree(nodo->ant, nuevoNodo);
+	else if (_stricmp(nuevoNodo->dato->nick, nodo->dato->nick) > 0)
+		insertTree(nodo->sig, nuevoNodo);
+}
+
 struct NodoUsuario* searchTree(struct NodoUsuario* root, DatoUsuario* data) //Busca un nick en el arbol
 {
 	// Casos Base: raíz es null o el nick está en la raíz
