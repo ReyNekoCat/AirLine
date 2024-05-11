@@ -176,6 +176,22 @@ void nuevoUsuario(NodoUsuario* nuevo);
 void eliminarUsuario(char nomUsu[30]);
 void escribirUsuarios();
 void leerUsuarios();
+//QuickSort
+void swapData(NodoUsuario*, NodoUsuario*);
+NodoUsuario* lastNode(NodoUsuario*);
+NodoUsuario* partition(NodoUsuario*, NodoUsuario*);
+void _quickSort(NodoUsuario*, NodoUsuario*);
+void quickSort(NodoUsuario*);
+void printList(NodoUsuario*);
+//Arbol
+NodoUsuario* sortedListToBST(NodoUsuario*);
+NodoUsuario* sortedListToBSTRecur(NodoUsuario**, int);
+int countNodes(NodoUsuario*);
+void BinaryTree2DoubleLinkedList(NodoUsuario*, NodoUsuario**);
+NodoUsuario* newNode(DatoUsuario*);
+struct NodoUsuario* insertTree(struct NodoUsuario*, DatoUsuario*);
+struct NodoUsuario* searchTree(struct NodoUsuario*, DatoUsuario*);
+NodoUsuario* deleteTreeNodeByNick(NodoUsuario*, char*);
 #pragma endregion
 
 #pragma region Funciones de Listas Vuelos (Especialidades)
@@ -184,6 +200,13 @@ void eliminarVuelo(char vuelo[30]);
 void escribirVuelo();
 void leerVuelos();
 void reporteVuelos(); //Antes Boletos/Medicos
+//QuickSort
+void swapData(NodoVuelo*, NodoVuelo*);
+NodoVuelo* lastNode(NodoVuelo*);
+NodoVuelo* partition(NodoVuelo*, NodoVuelo*);
+void _quickSort(NodoVuelo*, NodoVuelo*);
+void quickSort(NodoVuelo*);
+void printList(NodoVuelo*);
 #pragma endregion
 
 #pragma region Funciones de Listas Boletos (Medicos)
@@ -199,14 +222,10 @@ void eliminarPasajero(char NodoPasajero[60]);
 void escribirPasajeros();
 void leerPasajeros();
 void reportePasajeros(); //No es necesario
-#pragma endregion
 
-#pragma region Funciones de Arbol Boletos (Medicos)
-//medico *crearNodo(medico* nuevoMed);
-//void nuevoMed(medico*& pivote, medico* nuevoMed);
-//bool buscarMed(medico *pivote, medico* busqueda);
-//#pragma endregion
-
+void swapData(NodoPasajero* a, NodoPasajero* b);
+void heapify(NodoPasajero* head, int n, NodoPasajero* NodoUsuario);
+void heapSort(NodoPasajero* head);
 #pragma endregion
 
 // Puntero - Handler
@@ -218,6 +237,7 @@ int WINAPI WinMain(
 	) {
 	hInstanceGlobal = hInstance;
 	leerUsuarios();
+	//sortedListToBST(iniUsuario);
 	leerVuelos();
 	leerBoletos();
 	leerPasajeros();
@@ -404,6 +424,8 @@ int WINAPI WinMain(
 		DispatchMessage(&msg); // Envía el evento traducido a mi dialogo
 	}
 
+	
+	//quickSort(iniUsuario);
 	escribirUsuarios();
 	escribirVuelo();
 	escribirBoletos();
@@ -418,6 +440,25 @@ BOOL CALLBACK cDialog1(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
+		case WM_INITDIALOG:
+		{
+			ifstream archivo("UsuarioCheck.txt");
+			string linea;
+			getline(archivo, linea);
+			archivo.close();
+
+			size_t pos = linea.find(",");
+			string usuario = linea.substr(0, pos);
+			string contrasena = linea.substr(pos + 1);
+
+			if (!usuario.empty()) {
+				SetDlgItemText(hwnd, IDC_EDIT1, usuario.c_str());
+			}
+			if (!contrasena.empty()) {
+				SetDlgItemText(hwnd, IDC_EDIT2, contrasena.c_str());
+			}
+
+		}
 		case WM_COMMAND:
 		{
 			switch (LOWORD(wParam))
@@ -435,6 +476,7 @@ BOOL CALLBACK cDialog1(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				}
 				case IDC_BUTTON2: // Iniciar sesion
 				{
+					BOOL recordar = IsDlgButtonChecked(hwnd, IDC_CHECK1);
 					char usuBuscar[30];
 					char passwordBuscar[15];
 
@@ -459,6 +501,12 @@ BOOL CALLBACK cDialog1(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 							{
 								miUsuario = auxUsuario3;
 								inicio = true;
+								// Guardar el usuario y la contraseña en un archivo para recordarlo
+								if (recordar) {
+									ofstream archivo("UsuarioCheck.txt");
+									archivo << miUsuario->dato->nick << "," << miUsuario->dato->password;
+									archivo.close();
+								}
 
 								/*EndDialog(hwnd, 0);
 								DialogBox(hInstGlobal, MAKEINTRESOURCE(105), hwnd, procVPrincipal);*/
@@ -494,16 +542,6 @@ BOOL CALLBACK cDialog1(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			}
 		break;
 		}
-	//case WM_CLOSE:  //Cerrar ventana
-	//{
-	//	DestroyWindow(hwnd);
-	//	break;
-	//}
-	//case WM_DESTROY:
-	//{
-	//	PostQuitMessage(1);  //Sólo se usa para cerrar la ventana principal
-	//	break;
-	//}
 		default: break;
 	}
 	return false;  // Un callback siempre retorna falso
@@ -2861,7 +2899,7 @@ bool cMenu(HWND hwnd, long opcion)
 	}
 	case ID_SALIR_INICIO: // Inicio
 	{
-		int opc = MessageBox(hwnd, "¿Seguro que desea salir?", "AVISO", MB_YESNO | MB_ICONQUESTION);
+		int opc = MessageBox(hwnd, "¿Seguro que desea volver al inicio?", "AVISO", MB_YESNO | MB_ICONQUESTION);
 		switch (opc)
 		{
 		case IDYES:
@@ -2965,246 +3003,6 @@ int formatoEdad(double cumple) {
 
 //Listas de Usuarios
 #pragma region Funciones de Listas Usuarios
-/*
-void nuevoUsuario(NodoUsuario* nuevo)
-{
-
-
-	if (iniUsuario == nullptr)
-	{ //Si 'inicio->sig es igual a nullptr, o sea, apunta a nada, la lista esta vacia
-		iniUsuario = new NodoUsuario;
-		DatoUsuario* data = new DatoUsuario;
-		iniUsuario->dato = data;
-		auxUsuario = iniUsuario;
-
-		strcpy_s(iniUsuario->dato->nick, nuevo->dato->nick);
-		strcpy_s(iniUsuario->dato->nombre, nuevo->dato->nombre);
-		strcpy_s(iniUsuario->dato->apellidoP, nuevo->dato->apellidoP);
-		strcpy_s(iniUsuario->dato->apellidoM, nuevo->dato->apellidoM);
-		strcpy_s(iniUsuario->dato->email, nuevo->dato->email);
-		strcpy_s(iniUsuario->dato->password, nuevo->dato->password);
-
-		// Concatenación
-		strcpy_s(iniUsuario->dato->nombreComp, nuevo->dato->nombre);
-		strcat_s(iniUsuario->dato->nombreComp, " ");
-		strcat_s(iniUsuario->dato->nombreComp, iniUsuario->dato->apellidoP);
-		strcat_s(iniUsuario->dato->nombreComp, " ");
-		strcat_s(iniUsuario->dato->nombreComp, iniUsuario->dato->apellidoM);
-
-		iniUsuario->dato->nacimiento = nuevo->dato->nacimiento;
-
-		iniUsuario->dato->genero = nuevo->dato->genero;
-
-		strcpy_s(iniUsuario->dato->foto, nuevo->dato->foto);
-
-		iniUsuario->sig = nullptr;
-		iniUsuario->ant = nullptr;
-
-		auxUsuario2 = auxUsuario;
-		auxUsuario3 = auxUsuario;
-		auxUsuario = iniUsuario;
-	}
-	else
-	{
-		while (auxUsuario->sig != nullptr)
-		{
-			auxUsuario = auxUsuario->sig;
-		}
-
-		auxUsuario->sig = new NodoUsuario;
-		auxUsuario->sig->sig = nullptr;
-		auxUsuario->sig->ant = auxUsuario;
-		auxUsuario = auxUsuario->sig;
-
-		strcpy_s(auxUsuario->dato->nick, nuevo->dato->nick);
-		strcpy_s(auxUsuario->dato->nombre, nuevo->dato->nombre);
-		strcpy_s(auxUsuario->dato->apellidoP, nuevo->dato->apellidoP);
-		strcpy_s(auxUsuario->dato->apellidoM, nuevo->dato->apellidoM);
-		strcpy_s(auxUsuario->dato->email, nuevo->dato->email);
-		strcpy_s(auxUsuario->dato->password, nuevo->dato->password);
-
-		// Concatenación
-		strcpy_s(auxUsuario->dato->nombreComp, nuevo->dato->nombre);
-		strcat_s(auxUsuario->dato->nombreComp, " ");
-		strcat_s(auxUsuario->dato->nombreComp, auxUsuario->dato->apellidoP);
-		strcat_s(auxUsuario->dato->nombreComp, " ");
-		strcat_s(auxUsuario->dato->nombreComp, auxUsuario->dato->apellidoM);
-
-		auxUsuario->dato->nacimiento = nuevo->dato->nacimiento;
-
-		auxUsuario->dato->genero = nuevo->dato->genero;
-
-		strcpy_s(auxUsuario->dato->foto, nuevo->dato->foto);
-
-		auxUsuario2 = auxUsuario;
-		auxUsuario3 = auxUsuario;
-		auxUsuario = iniUsuario;
-	}
-
-	MessageBox(NULL, "Se ha registrado el usuario con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
-	//int opc = MessageBox(hwnd, (LPCWSTR)L"¿Seguro que desea eliminar este usuario?", (LPCWSTR)L"AVISO", MB_YESNO | MB_ICONQUESTION);
-}
-void eliminarUsuario(char nomUsu[30])
-{
-	NodoUsuario* start;
-	auxUsuario = iniUsuario;
-
-	if (auxUsuario == nullptr)
-	{
-		MessageBox(0, "La lista esta vacia.", "AVISO", MB_OK);
-	}
-	else
-	{
-		while (auxUsuario->sig != nullptr && strcmp(auxUsuario->dato->nick, nomUsu) != 0)
-		{ //Nos movemos en el arreglo para buscar el usuario
-
-			auxUsuario = auxUsuario->sig;
-		}
-		if (auxUsuario->sig == nullptr && strcmp(auxUsuario->dato->nick, nomUsu) != 0)
-		{
-			MessageBox(0, "Usuario no encontrado", "AVISO", MB_OK);
-		}
-		else if (auxUsuario == iniUsuario)
-		{	//El nodo es el primero 
-
-			if (auxUsuario->sig == nullptr)
-			{ //Si es el primero y unico nodo
-				//delete auxEsp;		//Eliminamos el primer nodo
-				//inicio = nullptr;
-				//auxEsp = inicio;
-
-				iniUsuario = nullptr;
-				delete auxUsuario;
-
-				auxUsuario = iniUsuario;
-				auxUsuario2 = auxUsuario;
-				//auxUsu3 = auxUsu;
-			}
-			else
-			{ //Si es el primero y hay mas nodos
-
-				//inicio = auxEsp->sig;	//Cambiamos el puntero 'inicio' al segundo nodo, que ahora es nuestro primer elemento
-				//delete auxEsp;			//Eliminamos el primer nodo		
-				//auxEsp = inicio;			//Para que auxEsp no quede sin apuntar a nada, la apuntamos al inicio
-				//auxEsp->ant = nullptr;
-
-				//inicio = iniEsp->sig;
-				//auxEsp->sig->ant = nullptr;
-				//delete auxEsp;
-				//auxEsp = iniEsp;
-
-				start = iniUsuario->sig;
-				auxUsuario->sig->ant = nullptr;
-				delete auxUsuario;
-				auxUsuario = start;
-				auxUsuario->ant = nullptr;
-
-				auxUsuario = iniUsuario;
-				auxUsuario2 = auxUsuario;
-				//auxUsu3 = auxUsu;
-			}
-			MessageBox(0, "Usuario eliminado", "AVISO", MB_OK);
-		}
-		else
-		{
-			if (auxUsuario->sig == nullptr)
-			{ //Si el nodo es el último
-				auxUsuario->ant->sig = nullptr;	//Antes de eliminar, el penultumo nodo, su puntero siguiente, lo igualamos a nullptr
-				delete auxUsuario;
-
-				auxUsuario = iniUsuario;
-				auxUsuario2 = auxUsuario;
-				//auxUsu3 = auxUsu;
-			}
-			else
-			{ //Si es cualquier nodo que no sea el inicio o el último
-				auxUsuario->sig->ant = auxUsuario->ant;
-				auxUsuario->ant->sig = auxUsuario->sig;
-				delete auxUsuario;
-
-				auxUsuario = iniUsuario;
-				auxUsuario2 = auxUsuario;
-				//auxUsu3 = auxUsu; //Para que auxEsp no quede sin apuntar a nada, la apuntamos al inicio
-			}
-			MessageBox(0, "Usuario eliminado", "AVISO", MB_OK);
-		}
-	}
-}
-void escribirUsuarios()
-{
-	auxUsuario = iniUsuario;
-
-	ofstream escribir("Usuarios.bin", ios::out | ios::binary | ios::trunc);
-
-	if (!escribir.is_open())
-	{
-		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
-		return;
-	}
-
-	if (escribir.is_open())
-	{
-		while (auxUsuario != nullptr)
-		{
-			if (escribir.bad())
-			{
-				MessageBox(NULL, "Ocurrió un error durante la escritura", "Error", MB_OK | MB_ICONERROR);
-				return;
-			}
-			escribir.write((char*)auxUsuario->dato, sizeof(DatoUsuario));
-			auxUsuario = auxUsuario->sig;
-		}
-		escribir.close();
-	}
-}
-void leerUsuarios()
-{
-	auxUsuario = iniUsuario;
-
-	ifstream leer("Usuarios.bin", ios::binary);
-
-	if (!leer.is_open())
-	{
-		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
-		return;
-	}
-
-	if (leer.is_open())
-	{
-		DatoUsuario* usuLeido = new DatoUsuario;
-
-		while (!leer.read((char*)usuLeido, sizeof(DatoUsuario)).eof())
-		{
-			while (auxUsuario != nullptr && auxUsuario->sig != nullptr)
-			{
-				auxUsuario = auxUsuario->sig;
-			}
-			if (auxUsuario == nullptr)
-			{
-				//Acá estaba el error
-				iniUsuario = new NodoUsuario;
-				iniUsuario->dato = usuLeido;
-				iniUsuario->sig = nullptr;
-				iniUsuario->ant = nullptr;
-				auxUsuario = iniUsuario;
-			}
-			else
-			{
-				iniUsuario = new NodoUsuario;
-				iniUsuario->dato = usuLeido;
-
-				auxUsuario->sig = iniUsuario;
-				auxUsuario->sig->ant = auxUsuario;
-				auxUsuario = auxUsuario->sig;
-				auxUsuario->sig = nullptr;
-			}
-			usuLeido = new DatoUsuario;
-		}
-		leer.close();
-		delete usuLeido;
-	}
-}
-*/
 
 void nuevoUsuario(NodoUsuario* nuevo)
 {
@@ -3283,7 +3081,6 @@ void nuevoUsuario(NodoUsuario* nuevo)
 	MessageBox(NULL, "Se ha registrado el usuario con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
 	/*int opc = MessageBox(hwnd, (LPCWSTR)L"¿Seguro que desea eliminar este usuario?", (LPCWSTR)L"AVISO", MB_YESNO | MB_ICONQUESTION);*/
 }
-
 void eliminarUsuario(char nomUsu[30])
 {
 	NodoUsuario* start;
@@ -3363,31 +3160,29 @@ void eliminarUsuario(char nomUsu[30])
 }
 void escribirUsuarios()
 {
-	auxUsuario = iniUsuario;
-	ofstream escribir;
-	escribir.open("Usuarios.bin", ios::out | ios::binary | ios::trunc);
+	// Abre el archivo para escritura binaria
+	ofstream escribir("Usuarios.bin", ios::out | ios::binary | ios::trunc);
 
 	if (!escribir.is_open())
 	{
 		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
 		return;
 	}
-	if (escribir.is_open())
+
+	// Apunta al inicio de la lista
+	auxUsuario = iniUsuario;
+
+	while (auxUsuario != nullptr)
 	{
-		while (auxUsuario != nullptr)
-		{
-			if (escribir.bad())
-			{
-				MessageBox(NULL, "Ocurrió un error durante la escritura", "Error", MB_OK | MB_ICONERROR);
-				return;
-			}
+		// Escribe los datos del usuario en el archivo
+		escribir.write(reinterpret_cast<char*>(auxUsuario->dato), sizeof(DatoUsuario));
 
-			escribir.write((char*)auxUsuario->dato, sizeof(DatoUsuario));
-			auxUsuario = auxUsuario->sig;
-		}
-
-		escribir.close();
+		// Avanza al siguiente nodo de la lista
+		auxUsuario = auxUsuario->sig;
 	}
+
+	// Cierra el archivo después de escribir
+	escribir.close();
 }
 void leerUsuarios()
 {
@@ -3431,11 +3226,9 @@ void leerUsuarios()
 				auxUsuario = auxUsuario->sig;
 				auxUsuario->sig = nullptr;
 			}
-
 			usuLeido = new NodoUsuario;
 			usuLeido->dato = new DatoUsuario;
 		}
-
 		leer.close();
 		delete usuLeido;
 	}
@@ -3505,10 +3298,7 @@ void printList(NodoUsuario* head)
 }
 #pragma endregion
 #pragma region Arbol
-//Declaraciones de funciones
-int countNodes(NodoUsuario* head);
-NodoUsuario* sortedListToBSTRecur(NodoUsuario** head_ref, int n);
-//Coonversiones
+//Conversiones
 NodoUsuario* sortedListToBST(NodoUsuario* head) //Función principal
 {
 	//Se cuenta los nodos de la lista
