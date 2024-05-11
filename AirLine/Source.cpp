@@ -142,7 +142,6 @@ struct dias
 dias* ini3, * aux3 = nullptr;
 
 #pragma endregion
-
 #pragma endregion
 
 HINSTANCE hInstanceGlobal = 0;
@@ -170,6 +169,11 @@ BOOL CALLBACK cDialog14(HWND, UINT, WPARAM, LPARAM); // Pase abordar
 
 //Prototipos
 #pragma region Prototipos
+#pragma region Generales
+char* formatoFecha(LPSYSTEMTIME, char*);
+int formatoEdad(double fecha);
+bool adminComprobation(NodoUsuario*);
+#pragma endregion
 
 #pragma region Funciones de Listas Usuarios
 void nuevoUsuarioLista(NodoUsuario* nuevo);
@@ -582,92 +586,97 @@ BOOL CALLBACK cDialog2(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				case IDC_BUTTON2: // Registrarse
 				{
 					char usuBuscar[30];
-
 					GetDlgItemText(hwnd, IDC_EDIT1, usuBuscar, sizeof(usuBuscar));
 
-					auxUsuario3 = iniUsuario;
+					DatoUsuario dataBuscar;
+					strcpy_s(dataBuscar.nick, usuBuscar);
 
-					while (auxUsuario3/*->sig*/ != nullptr && strcmp(usuBuscar, auxUsuario3->dato->nick) != 0)
+					// Buscar el usuario en el árbol
+					NodoUsuario* usuarioExistente = searchTree(iniUsuario, &dataBuscar);
+
+					// Si el usuario ya existe, mostrar un mensaje de error
+					if (usuarioExistente != NULL)
 					{
-						auxUsuario3 = auxUsuario3->sig;
+						MessageBox(NULL, "El nombre de usuario no esta disponible, pruebe con uno diferente.", "AVISO", MB_OK | MB_ICONINFORMATION);
+						break;
 					}
-					if (auxUsuario3/*->sig*/ == nullptr || strcmp(usuBuscar, auxUsuario3->dato->nick) != 0)
-					{
-						DatoUsuario* data = new DatoUsuario;
-						NodoUsuario* temp = new NodoUsuario;
-						temp->dato = data;
-						GetDlgItemText(hwnd, IDC_EDIT1, temp->dato->nick, sizeof(temp->dato->nick));
-						GetDlgItemText(hwnd, IDC_EDIT2, temp->dato->nombre, sizeof(temp->dato->nombre));
-						GetDlgItemText(hwnd, IDC_EDIT3, temp->dato->apellidoP, sizeof(temp->dato->apellidoP));
-						GetDlgItemText(hwnd, IDC_EDIT4, temp->dato->apellidoM, sizeof(temp->dato->apellidoM));
-						GetDlgItemText(hwnd, IDC_EDIT5, temp->dato->email, sizeof(temp->dato->email));
-						GetDlgItemText(hwnd, IDC_EDIT6, temp->dato->password, sizeof(temp->dato->password));
+					DatoUsuario* data = new DatoUsuario;
+					NodoUsuario* temp = new NodoUsuario;
+					temp->dato = data;
+					GetDlgItemText(hwnd, IDC_EDIT1, temp->dato->nick, sizeof(temp->dato->nick));
+					GetDlgItemText(hwnd, IDC_EDIT2, temp->dato->nombre, sizeof(temp->dato->nombre));
+					GetDlgItemText(hwnd, IDC_EDIT3, temp->dato->apellidoP, sizeof(temp->dato->apellidoP));
+					GetDlgItemText(hwnd, IDC_EDIT4, temp->dato->apellidoM, sizeof(temp->dato->apellidoM));
+					GetDlgItemText(hwnd, IDC_EDIT5, temp->dato->email, sizeof(temp->dato->email));
+					GetDlgItemText(hwnd, IDC_EDIT6, temp->dato->password, sizeof(temp->dato->password));
 						
-						//Genero
-						if (IDC_RADIO1 == BST_CHECKED)
-						{
-							temp->dato->genero = 1;
-						}
-						else
-						{
-							temp->dato->genero = 0;
-						}
-
-						//Se obtiene la fecha de nacimiento
-						HWND hDia = GetDlgItem(hwnd, IDC_DATETIMEPICKER1);
-						SYSTEMTIME diaCumple = { 0 }; double dia;			
-						DateTime_GetSystemtime(hDia, &diaCumple);
-						SystemTimeToVariantTime(&diaCumple, &dia);
-						temp->dato->nacimiento = dia;
-
-						strcpy_s(temp->dato->foto, "");
-						temp->sig = nullptr;
-						temp->ant = nullptr;
-
-						//nuevoUsuarioLista(temp);
-						insertTree(iniUsuario, temp);
-						//MessageBox(NULL, "Se ha registrado el usuario con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
-
-						SetDlgItemText(hwnd, IDC_EDIT1, "");
-						SetDlgItemText(hwnd, IDC_EDIT2, "");
-						SetDlgItemText(hwnd, IDC_EDIT3, "");
-						SetDlgItemText(hwnd, IDC_EDIT4, "");
-						SetDlgItemText(hwnd, IDC_EDIT5, "");
-						SetDlgItemText(hwnd, IDC_EDIT6, "");
-
-						if (miUsuario == nullptr) //Registro desde la pagina de inicio
-						{
-							auxUsuario3 = iniUsuario;
-
-							while (auxUsuario3->sig != nullptr && strcmp(usuBuscar, auxUsuario3->dato->nick) != 0)
-							{
-								auxUsuario3 = auxUsuario3->sig;
-							}
-
-							miUsuario = auxUsuario3;
-							inicio = true;
-
-							EndDialog(hwnd, 0);
-
-							HWND hDialog3 = CreateDialog(hInstanceGlobal, MAKEINTRESOURCE(IDD_DIALOG3), 0, cDialog3);
-
-							ShowWindow(hDialog3, SW_SHOW);
-							UpdateWindow(hDialog3);
-						}
-						else //Registro como administrador
-						{
-							EndDialog(hwnd, 0);
-
-							HWND hDialog3 = CreateDialog(hInstanceGlobal, MAKEINTRESOURCE(IDD_DIALOG3), 0, cDialog3);
-
-							ShowWindow(hDialog3, SW_SHOW);
-							UpdateWindow(hDialog3);
-						}
-
+					//Genero
+					if (IDC_RADIO1 == BST_CHECKED)
+					{
+						temp->dato->genero = 1;
 					}
 					else
 					{
-						MessageBox(NULL, "El nombre de usuario no esta disponible, pruebe con uno diferente.", "AVISO", MB_OK | MB_ICONINFORMATION);
+						temp->dato->genero = 0;
+					}
+
+					//Se obtiene la fecha de nacimiento
+					HWND hDia = GetDlgItem(hwnd, IDC_DATETIMEPICKER1);
+					SYSTEMTIME diaCumple = { 0 }; double dia;			
+					DateTime_GetSystemtime(hDia, &diaCumple);
+					SystemTimeToVariantTime(&diaCumple, &dia);
+					temp->dato->nacimiento = dia;
+
+					strcpy_s(temp->dato->foto, "");
+					temp->sig = nullptr;
+					temp->ant = nullptr;
+
+					//Se revisa si es el primer usuario
+					if (iniUsuario == nullptr)
+					{
+						//Se guarda el nick y la contraseña en un archivo
+						ofstream archivo("UsuarioAdmin.txt");
+						archivo << temp->dato->nick << "," << temp->dato->password;
+						archivo.close();
+					}
+					//nuevoUsuarioLista(temp);
+					insertTree(iniUsuario, temp);
+					MessageBox(NULL, "Se ha registrado el usuario con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
+
+					SetDlgItemText(hwnd, IDC_EDIT1, "");
+					SetDlgItemText(hwnd, IDC_EDIT2, "");
+					SetDlgItemText(hwnd, IDC_EDIT3, "");
+					SetDlgItemText(hwnd, IDC_EDIT4, "");
+					SetDlgItemText(hwnd, IDC_EDIT5, "");
+					SetDlgItemText(hwnd, IDC_EDIT6, "");
+
+					if (miUsuario == nullptr) //Registro desde la pagina de inicio
+					{
+						auxUsuario3 = iniUsuario;
+
+						while (auxUsuario3->sig != nullptr && strcmp(usuBuscar, auxUsuario3->dato->nick) != 0)
+						{
+							auxUsuario3 = auxUsuario3->sig;
+						}
+
+						miUsuario = auxUsuario3;
+						inicio = true;
+
+						EndDialog(hwnd, 0);
+
+						HWND hDialog3 = CreateDialog(hInstanceGlobal, MAKEINTRESOURCE(IDD_DIALOG3), 0, cDialog3);
+
+						ShowWindow(hDialog3, SW_SHOW);
+						UpdateWindow(hDialog3);
+					}
+					else //Registro como administrador
+					{
+						EndDialog(hwnd, 0);
+
+						HWND hDialog3 = CreateDialog(hInstanceGlobal, MAKEINTRESOURCE(IDD_DIALOG3), 0, cDialog3);
+
+						ShowWindow(hDialog3, SW_SHOW);
+						UpdateWindow(hDialog3);
 					}
 
 					break;
@@ -683,22 +692,16 @@ BOOL CALLBACK cDialog2(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 							DestroyWindow(hwnd);
 							PostQuitMessage(0);
 						}
-
 						default: break;
 					}
-
 					break;
 				}
-
 				default: break;
 			}
-
 			break;
 		}
-
 		default: break;
 	}
-
 	return false;  // Un callback siempre retorna falso
 }
 
@@ -730,10 +733,15 @@ BOOL CALLBACK cDialog3(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 				//Edad/Nacimiento
 				char cadenaNacimiento[100];
-				sprintf_s(cadenaNacimiento, "%f", miUsuario->dato->nacimiento);
+				SYSTEMTIME cumple = { 0 };
+				VariantTimeToSystemTime(miUsuario->dato->nacimiento, &cumple);
+				formatoFecha(&cumple, cadenaNacimiento);
+				//sprintf_s(cadenaNacimiento, "%f", miUsuario->dato->nacimiento);
 				SetDlgItemText(hwnd, IDC_EDIT6, cadenaNacimiento);
-				sprintf_s(cadenaNacimiento, "%f", miUsuario->dato->nacimiento);
-				SetDlgItemText(hwnd, IDC_EDIT7, cadenaNacimiento);
+				
+				//sprintf_s(cadenaNacimiento, "%f", miUsuario->dato->nacimiento);
+				//SetDlgItemText(hwnd, IDC_EDIT7, cadenaNacimiento);
+				SetDlgItemInt(hwnd, IDC_EDIT7, formatoEdad(miUsuario->dato->nacimiento), false);
 			}
 
 			if (miUsuario->dato->foto != nullptr)
@@ -755,12 +763,26 @@ BOOL CALLBACK cDialog3(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 				case IDC_BUTTON1: // Guardar
 				{
+					//Se guarda el usuario y contraseña en un auxiliar
+					NodoUsuario* auxNodo = new NodoUsuario;
+					auxNodo->dato = new DatoUsuario;
+					strcpy_s(auxNodo->dato->nick, sizeof(auxNodo->dato->nick), miUsuario->dato->nick);
+					strcpy_s(auxNodo->dato->password, sizeof(auxNodo->dato->password), miUsuario->dato->password);
+					
 					GetDlgItemText(hwnd, IDC_EDIT1, miUsuario->dato->nick, sizeof(miUsuario->dato->nick));
 					GetDlgItemText(hwnd, IDC_EDIT2, miUsuario->dato->nombre, sizeof(miUsuario->dato->nombre));
 					GetDlgItemText(hwnd, IDC_EDIT3, miUsuario->dato->apellidoP, sizeof(miUsuario->dato->apellidoP));
 					GetDlgItemText(hwnd, IDC_EDIT4, miUsuario->dato->apellidoM, sizeof(miUsuario->dato->apellidoM));
 					GetDlgItemText(hwnd, IDC_EDIT8, miUsuario->dato->email, sizeof(miUsuario->dato->email));
 					GetDlgItemText(hwnd, IDC_EDIT9, miUsuario->dato->password, sizeof(miUsuario->dato->password));
+
+					//Si el nick anterior era el del admin, se actualiza el archivo
+					if (adminComprobation(auxNodo))
+					{
+						ofstream archivo("UsuarioAdmin.txt");
+						archivo << miUsuario->dato->nick << "," << miUsuario->dato->password;
+						archivo.close();
+					}
 
 					// Concatenación
 					strcpy_s(miUsuario->dato->nombreComp, miUsuario->dato->nombre);
@@ -788,6 +810,7 @@ BOOL CALLBACK cDialog3(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 					strcpy_s(miUsuario->dato->foto, zFile);
 
+					
 					MessageBox(NULL, "Cambios guardados.", "AVISO", MB_OK | MB_ICONINFORMATION);
 					break;
 
@@ -2272,19 +2295,20 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 				SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 			}
-			auxBoleto3 = iniBoleto; // Medicos
+			auxBoleto3 = iniBoleto;
 
-			while (auxBoleto3->sig != nullptr)
-			{
-				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto3->dato->nombreCompPasajero/*nombreCompM*/);
-				auxBoleto3 = auxBoleto3->sig;
-			}
-			if (auxBoleto3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
-			{
-				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto3->dato->nombreCompPasajero/*nombreCompM*/);
-				auxBoleto3 = auxBoleto3->sig;
-			}
-
+			if (auxBoleto3 != nullptr) {
+				while (auxBoleto3->sig != nullptr)
+				{
+					SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto3->dato->nombreCompPasajero/*nombreCompM*/);
+					auxBoleto3 = auxBoleto3->sig;
+				}
+				if (auxBoleto3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
+				{
+					SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto3->dato->nombreCompPasajero/*nombreCompM*/);
+					auxBoleto3 = auxBoleto3->sig;
+				}
+			}	
 			//FECHA
 			SYSTEMTIME fechaHoy;
 			ZeroMemory(&fechaHoy, sizeof(fechaHoy));
@@ -2447,18 +2471,19 @@ BOOL CALLBACK cDialog11(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 			}
 			auxBoleto3 = iniBoleto; // Medicos
-
-			while (auxBoleto3->sig != nullptr)
-			{
-				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto3->dato->nombreCompPasajero/*nombreCompM*/);
-				auxBoleto3 = auxBoleto3->sig;
+			if (auxBoleto3 != nullptr) {
+				while (auxBoleto3->sig != nullptr)
+				{
+					SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto3->dato->nombreCompPasajero/*nombreCompM*/);
+					auxBoleto3 = auxBoleto3->sig;
+				}
+				if (auxBoleto3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
+				{
+					SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto3->dato->nombreCompPasajero/*nombreCompM*/);
+					auxBoleto3 = auxBoleto3->sig;
+				}
 			}
-			if (auxBoleto3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
-			{
-				SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto3->dato->nombreCompPasajero/*nombreCompM*/);
-				auxBoleto3 = auxBoleto3->sig;
-			}
-
+			
 			//FECHA
 			SYSTEMTIME fechaHoy;
 			ZeroMemory(&fechaHoy, sizeof(fechaHoy));
@@ -2935,7 +2960,7 @@ bool cMenu(HWND hwnd, long opcion)
 
 // Funciones
 #pragma region Funciones
-//Genéricas
+//Generales
 char* formatoFecha(LPSYSTEMTIME Sys, char* buff) {
 	std::string strMessage;
 	CString cstrMessage;
@@ -2986,10 +3011,22 @@ int formatoEdad(double cumple) {
 	VariantTimeToSystemTime(now - cumple, &SysNow);
 	return (SysNow.wYear - 1900);
 }
+bool adminComprobation(NodoUsuario* miUsu) {
+	ifstream archivo("UsuarioAdmin.txt");
+	string linea;
+	getline(archivo, linea);
+	archivo.close();
 
+	size_t pos = linea.find(",");
+	string usuario = linea.substr(0, pos);
+
+	if (strcmp(miUsu->dato->nick, usuario.c_str()) == 0)
+		return true;
+	else
+		return false;
+}
 //Listas de Usuarios
 #pragma region Funciones de Listas Usuarios
-
 void nuevoUsuarioLista(NodoUsuario* nuevo)
 {
 	if (iniUsuario == nullptr)
@@ -3013,9 +3050,7 @@ void nuevoUsuarioLista(NodoUsuario* nuevo)
 		strcat_s(iniUsuario->dato->nombreComp, iniUsuario->dato->apellidoM);
 
 		iniUsuario->dato->nacimiento = nuevo->dato->nacimiento;
-
 		iniUsuario->dato->genero = nuevo->dato->genero;
-
 		strcpy_s(iniUsuario->dato->foto, nuevo->dato->foto);
 
 		iniUsuario->sig = nullptr;
@@ -3026,12 +3061,11 @@ void nuevoUsuarioLista(NodoUsuario* nuevo)
 	}
 	else
 	{
-		auxUsuario = iniUsuario; //Checar
+		auxUsuario = iniUsuario;
 		while (auxUsuario->sig != nullptr)
 		{
 			auxUsuario = auxUsuario->sig;
 		}
-
 		auxUsuario->sig = new NodoUsuario;
 		auxUsuario->sig->sig = nullptr;
 		auxUsuario->sig->ant = auxUsuario;
@@ -3690,8 +3724,6 @@ void escribirVuelo()
 }
 void leerVuelos()
 {
-	auxVuelo = iniVuelo;
-
 	ifstream leer("Vuelos.bin", ios::binary);
 
 	if (!leer.is_open())
@@ -3702,34 +3734,37 @@ void leerVuelos()
 
 	if (leer.is_open())
 	{
-		NodoVuelo* espLeida = new NodoVuelo;
+		NodoVuelo* nuevo = nullptr;
 
-		while (!leer.read((char*)espLeida, sizeof(NodoVuelo)).eof())
+		while (true)
 		{
-			while (auxVuelo != nullptr && auxVuelo->sig != nullptr)
+			nuevo = new NodoVuelo;
+			nuevo->dato = new DatoVuelo;
+
+			if (!leer.read((char*)nuevo->dato, sizeof(DatoVuelo)))
 			{
-				auxVuelo = auxVuelo->sig;
+				delete nuevo->dato;
+				delete nuevo;
+				break;
 			}
-			if (auxVuelo == nullptr)
+
+			if (iniVuelo == nullptr)
 			{
-				iniVuelo = espLeida;
+				iniVuelo = nuevo;
 				iniVuelo->sig = nullptr;
 				iniVuelo->ant = nullptr;
 				auxVuelo = iniVuelo;
 			}
 			else
 			{
-				auxVuelo->sig = espLeida;
+				auxVuelo->sig = nuevo;
 				auxVuelo->sig->ant = auxVuelo;
 				auxVuelo = auxVuelo->sig;
 				auxVuelo->sig = nullptr;
 			}
-
-			espLeida = new NodoVuelo;
 		}
 
 		leer.close();
-		delete espLeida;
 	}
 }
 void reporteVuelos()
@@ -3843,18 +3878,18 @@ void printList(NodoVuelo* head)
 
 //Listas de Boletos (Medicos)
 #pragma region Funciones de Listas Boletos (Medicos)
-void nuevoBoleto(NodoBoleto* nuevoMed)
+void nuevoBoleto(NodoBoleto* nuevoBoleto)
 {
 	if (pivote == nullptr)
 	{ //Si 'inicio->sig es igual a nullptr, o sea, apunta a nada, la lista esta vacia
 		pivote = new NodoBoleto;
 
-		strcpy_s(pivote->dato->nombrePasajero, nuevoMed->dato->nombrePasajero);
-		strcpy_s(pivote->dato->apellidoPPasajero, nuevoMed->dato->apellidoPPasajero);
-		strcpy_s(pivote->dato->apellidoMPasajero, nuevoMed->dato->apellidoMPasajero);
+		strcpy_s(pivote->dato->nombrePasajero, nuevoBoleto->dato->nombrePasajero);
+		strcpy_s(pivote->dato->apellidoPPasajero, nuevoBoleto->dato->apellidoPPasajero);
+		strcpy_s(pivote->dato->apellidoMPasajero, nuevoBoleto->dato->apellidoMPasajero);
 
 		// Concatenación
-		strcpy_s(pivote->dato->nombreCompPasajero, nuevoMed->dato->nombrePasajero);
+		strcpy_s(pivote->dato->nombreCompPasajero, nuevoBoleto->dato->nombrePasajero);
 		strcat_s(pivote->dato->nombreCompPasajero, " ");
 		strcat_s(pivote->dato->nombreCompPasajero, pivote->dato->apellidoPPasajero);
 		strcat_s(pivote->dato->nombreCompPasajero, " ");
@@ -3868,15 +3903,15 @@ void nuevoBoleto(NodoBoleto* nuevoMed)
 		//pivote->estado = atoi(pivote->telefonoChar);
 
 		//strcpy_s(pivote->hoararioChar, nuevoMed->hoararioChar);
-		pivote->dato->pase = nuevoMed->dato->pase;
+		pivote->dato->pase = nuevoBoleto->dato->pase;
 		//strcpy_s(pivote->diasChar, nuevoMed->diasChar);
 		//pivote->diasNum = nuevoMed->diasNum;
 
-		strcpy_s(pivote->dato->vuelo, nuevoMed->dato->vuelo);
+		strcpy_s(pivote->dato->vuelo, nuevoBoleto->dato->vuelo);
 
 		//strcpy_s(pivote->foto, nuevoMed->foto);
 
-		strcpy_s(pivote->dato->usuarioRegistro, nuevoMed->dato->usuarioRegistro);
+		strcpy_s(pivote->dato->usuarioRegistro, nuevoBoleto->dato->usuarioRegistro);
 
 		pivote->sig = nullptr;
 		pivote->ant = nullptr;
@@ -4045,12 +4080,12 @@ void nuevoBoleto(NodoBoleto* nuevoMed)
 		*/
 
 
-		strcpy_s(auxBoleto->dato->nombrePasajero, nuevoMed->dato->nombrePasajero);
-		strcpy_s(auxBoleto->dato->apellidoPPasajero, nuevoMed->dato->apellidoPPasajero);
-		strcpy_s(auxBoleto->dato->apellidoMPasajero, nuevoMed->dato->apellidoMPasajero);
+		strcpy_s(auxBoleto->dato->nombrePasajero, nuevoBoleto->dato->nombrePasajero);
+		strcpy_s(auxBoleto->dato->apellidoPPasajero, nuevoBoleto->dato->apellidoPPasajero);
+		strcpy_s(auxBoleto->dato->apellidoMPasajero, nuevoBoleto->dato->apellidoMPasajero);
 
 		// Concatenación
-		strcpy_s(auxBoleto->dato->nombreCompPasajero, nuevoMed->dato->nombrePasajero);
+		strcpy_s(auxBoleto->dato->nombreCompPasajero, nuevoBoleto->dato->nombrePasajero);
 		strcat_s(auxBoleto->dato->nombreCompPasajero, " ");
 		strcat_s(auxBoleto->dato->nombreCompPasajero, auxBoleto->dato->apellidoPPasajero);
 		strcat_s(auxBoleto->dato->nombreCompPasajero, " ");
@@ -4064,15 +4099,15 @@ void nuevoBoleto(NodoBoleto* nuevoMed)
 		//auxMed->estado = atoi(auxMed->telefonoChar);
 
 		//strcpy_s(auxMed->hoararioChar, nuevoMed->hoararioChar);
-		auxBoleto->dato->pase = nuevoMed->dato->pase;
+		auxBoleto->dato->pase = nuevoBoleto->dato->pase;
 		//strcpy_s(auxMed->diasChar, nuevoMed->diasChar);
 		//auxMed->diasNum = nuevoMed->diasNum;
 
-		strcpy_s(auxBoleto->dato->vuelo, nuevoMed->dato->vuelo);
+		strcpy_s(auxBoleto->dato->vuelo, nuevoBoleto->dato->vuelo);
 
 		//strcpy_s(auxMed->foto, nuevoMed->foto);
 
-		strcpy_s(auxBoleto->dato->usuarioRegistro, nuevoMed->dato->usuarioRegistro);
+		strcpy_s(auxBoleto->dato->usuarioRegistro, nuevoBoleto->dato->usuarioRegistro);
 
 		while (auxBoleto->ant != nullptr)
 		{
@@ -4089,7 +4124,7 @@ void nuevoBoleto(NodoBoleto* nuevoMed)
 	MessageBox(NULL, "Se ha registrado al medico con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
 	/*int opc = MessageBox(hwnd, (LPCWSTR)L"¿Seguro que desea eliminar este usuario?", (LPCWSTR)L"AVISO", MB_YESNO | MB_ICONQUESTION);*/
 }
-void eliminarBoleto(char medicoNom[60])
+void eliminarBoleto(char pasajeroNom[60])
 {
 	NodoBoleto* start;
 	auxBoleto = iniBoleto;
@@ -4100,13 +4135,13 @@ void eliminarBoleto(char medicoNom[60])
 	}
 	else
 	{
-		while (auxBoleto->sig != nullptr && strcmp(auxBoleto->dato->nombreCompPasajero, medicoNom) != 0)
+		while (auxBoleto->sig != nullptr && strcmp(auxBoleto->dato->nombreCompPasajero, pasajeroNom) != 0)
 		{ //Nos movemos en el arreglo para buscar el usuario
 
 			auxBoleto = auxBoleto->sig;
 		}
 
-		if (auxBoleto->sig == nullptr || strcmp(auxBoleto->dato->nombreCompPasajero, medicoNom) != 0)
+		if (auxBoleto->sig == nullptr || strcmp(auxBoleto->dato->nombreCompPasajero, pasajeroNom) != 0)
 		{
 			MessageBox(0, "Medico no encontrado", "AVISO", MB_OK);
 		}
