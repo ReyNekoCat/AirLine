@@ -237,9 +237,9 @@ void leerBoletos();
 void swapData(NodoBoleto*, NodoBoleto*);
 NodoBoleto* lastNode(NodoBoleto*);
 
-NodoBoleto* partitionVuelo(NodoBoleto*, NodoBoleto*);
-void _quickSortAsiento(NodoBoleto*, NodoBoleto*);
-void quickSortAsiento(NodoBoleto*);
+NodoBoleto* partitionNumVuelo(NodoBoleto*, NodoBoleto*);
+void _quickSortNumAsiento(NodoBoleto*, NodoBoleto*);
+void quickSortNumAsiento(NodoBoleto*);
 //void printListAsiento(NodoBoleto*);
 #pragma endregion
 
@@ -510,7 +510,7 @@ BOOL CALLBACK cDialog1(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 					GetDlgItemText(hwnd, IDC_EDIT1, usuBuscar, sizeof(usuBuscar));
 					GetDlgItemText(hwnd, IDC_EDIT2, passwordBuscar, sizeof(passwordBuscar));
-
+					
 					DatoUsuario usuarioBuscar;
 					strcpy_s(usuarioBuscar.nick, sizeof(usuarioBuscar.nick), usuBuscar);
 
@@ -1853,7 +1853,7 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 				SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 			}
-			auxBoleto3 = iniBoleto; // Medicos
+			auxBoleto3 = iniBoleto; // Boletos
 
 			while (auxBoleto3->sig != nullptr)
 			{
@@ -3839,14 +3839,6 @@ void reporteVuelos()
 		}
 	}*/
 }
-void imprimirPasajerosPorVuelo(NodoBoleto* inicioBoletos, int numVuelo) {
-	for (NodoBoleto* nodo = inicioBoletos; nodo != NULL; nodo = nodo->sig) {
-		if (nodo->dato->numVuelo == numVuelo) {
-			// Se encontró un boleto con el número de vuelo proporcionado
-			std::cout << nodo->dato->nombreCompPasajero << std::endl;
-		}
-	}
-}
 #pragma region QuickSort
 //Generales
 void swapData(NodoVuelo* a, NodoVuelo* b) {
@@ -4388,7 +4380,7 @@ NodoBoleto* lastNode(NodoBoleto* root) {
 	return root;
 }
 //Específicas
-NodoBoleto* partitionAsiento(NodoBoleto* l, NodoBoleto* h) {
+NodoBoleto* partitionNumAsiento(NodoBoleto* l, NodoBoleto* h) {
 	int x = h->dato->num;
 	NodoBoleto* i = l->ant;
 
@@ -4403,18 +4395,85 @@ NodoBoleto* partitionAsiento(NodoBoleto* l, NodoBoleto* h) {
 	swapData(i, h);
 	return i;
 }
-void _quickSortAsiento(NodoBoleto* l, NodoBoleto* h) {
+void _quickSortNumAsiento(NodoBoleto* l, NodoBoleto* h) {
 	if (h != NULL && l != h && l != h->sig) {
-		NodoBoleto* p = partitionAsiento(l, h);
-		_quickSortAsiento(l, p->ant);
-		_quickSortAsiento(p->sig, h);
+		NodoBoleto* p = partitionNumAsiento(l, h);
+		_quickSortNumAsiento(l, p->ant);
+		_quickSortNumAsiento(p->sig, h);
 	}
 }
-void quickSortAsiento(NodoBoleto* head) {
+void quickSortNumAsiento(NodoBoleto* head) {
 	NodoBoleto* h = lastNode(head);
-	_quickSortAsiento(head, h);
+	_quickSortNumAsiento(head, h);
 }
-/*
+
+NodoBoleto* partitionNumVuelo(NodoBoleto* l, NodoBoleto* h) {
+	int x = h->dato->numVuelo;
+	NodoBoleto* i = l->ant;
+
+	for (NodoBoleto* j = l; j != h; j = j->sig) {
+		if (j->dato->numVuelo <= x) {
+			i = (i == NULL) ? l : i->sig;
+			swapData(i, j);
+		}
+	}
+
+	i = (i == NULL) ? l : i->sig;
+	swapData(i, h);
+	return i;
+}
+void _quickSortNumVuelo(NodoBoleto* l, NodoBoleto* h) {
+	if (h != NULL && l != h && l != h->sig) {
+		NodoBoleto* p = partitionNumVuelo(l, h);
+		_quickSortNumVuelo(l, p->ant);
+		_quickSortNumVuelo(p->sig, h);
+	}
+}
+void quickSortNumVuelo(NodoBoleto* head) {
+	NodoBoleto* h = lastNode(head);
+	_quickSortNumVuelo(head, h);
+}
+
+NodoBoleto* partitionNomPasajero(NodoBoleto* l, NodoBoleto* h)
+{
+	char* x = h->dato->nombreCompPasajero;
+	NodoBoleto* i = l->ant;
+
+	for (NodoBoleto* j = l; j != h; j = j->sig)
+	{
+		if (_stricmp(j->dato->nombreCompPasajero, x) <= 0)
+		{
+			i = (i == NULL) ? l : i->sig;
+			swapData(i, j);
+		}
+	}
+	i = (i == NULL) ? l : i->sig;
+	swapData(i, h);
+	return i;
+}
+void _quickSortNomPasajero(NodoBoleto* l, NodoBoleto* h)
+{
+	if (h != NULL && l != h && l != h->sig)
+	{
+		NodoBoleto* p = partitionNomPasajero(l, h);
+		_quickSortNomPasajero(l, p->ant);
+		_quickSortNomPasajero(p->sig, h);
+	}
+}
+void quickSortNomPasajero(NodoBoleto* head)
+{
+	NodoBoleto* h = lastNode(head);
+	_quickSortNomPasajero(head, h);
+}
+
+void printBoletosDeVueloList(HWND hwnd, int List, NodoBoleto* iniBoletos, int numVuelo) {
+	for (NodoBoleto* nodo = iniBoletos; nodo != NULL; nodo = nodo->sig) {
+		if (nodo->dato->numVuelo == numVuelo) {
+			// Se encontró un boleto con el número de vuelo proporcionado
+			SendDlgItemMessage(hwnd, List, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo3->dato->origen);
+		}
+	}
+}
 void printList(NodoBoleto* head) {
 	while (head) {
 		std::cout << head->dato->num << "\n";
@@ -4422,7 +4481,6 @@ void printList(NodoBoleto* head) {
 	}
 	std::cout << std::endl;
 }
-*/
 #pragma	endregion
 #pragma endregion
 
