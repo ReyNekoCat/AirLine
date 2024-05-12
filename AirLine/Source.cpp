@@ -32,6 +32,7 @@ struct DatoUsuario {
 	int genero;
 	char email[100];
 	char foto[500];
+	double registro;
 };
 struct NodoUsuario
 {
@@ -69,6 +70,7 @@ struct DatoBoleto {
 	int clase;
 	int pase;
 	int estado;
+	double registroBoleto;
 	double registroPase;
 	char usuarioRegistro[30];
 	//char diasChar[30];
@@ -631,6 +633,11 @@ BOOL CALLBACK cDialog2(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					temp->sig = nullptr;
 					temp->ant = nullptr;
 
+					//Registro
+					SYSTEMTIME fecha = { 0 };
+					GetLocalTime(&fecha);
+					SystemTimeToVariantTime(&fecha, &temp->dato->registro);
+
 					//Se revisa si es el primer usuario
 					if (iniUsuario == nullptr)
 					{
@@ -809,7 +816,6 @@ BOOL CALLBACK cDialog3(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					miUsuario->dato->nacimiento = dia;
 
 					strcpy_s(miUsuario->dato->foto, zFile);
-
 					
 					MessageBox(NULL, "Cambios guardados.", "AVISO", MB_OK | MB_ICONINFORMATION);
 					break;
@@ -1015,7 +1021,6 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 			SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 		}
-
 		break;
 	}
 	case WM_COMMAND:
@@ -1047,7 +1052,6 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				/*auxEsp3 = auxEsp3->ant;*/
 
 				tempNum->dato->num = auxVuelo3->dato->num;
-
 				tempNum->dato->num = tempNum->dato->num + 1;
 
 				// ::: ANTERIOR ::: // 
@@ -1080,20 +1084,19 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				//GetDlgItemText(hwnd, IDC_EDIT3, temp->claveChar, sizeof(temp->claveChar));
 				strcpy_s(temp->dato->usuarioRegistro, miUsuario->dato->nick);
 				nuevoVuelo(temp);
+
 				SetDlgItemText(hwnd, IDC_EDIT2, "");
 				SetDlgItemText(hwnd, IDC_EDIT3, "");
 				SetDlgItemText(hwnd, IDC_EDIT4, "");
 
 				EndDialog(hwnd, 0);
-
 				HWND hDialog5 = CreateDialog(hInstanceGlobal, MAKEINTRESOURCE(IDD_DIALOG5), 0, cDialog5);
-
 				ShowWindow(hDialog5, SW_SHOW);
 				UpdateWindow(hDialog5);
 			}
 			else
 			{
-				MessageBox(NULL, "La especialidad ya esta registrada.", "AVISO", MB_OK | MB_ICONINFORMATION);
+				MessageBox(NULL, "El vuelo ya esta registrado.", "AVISO", MB_OK | MB_ICONINFORMATION);
 			}
 
 			break;
@@ -1142,7 +1145,6 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 			SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 		}
-
 		auxVuelo2 = iniVuelo;
 		auxVuelo2 = iniVuelo;
 
@@ -3052,6 +3054,7 @@ void nuevoUsuarioLista(NodoUsuario* nuevo)
 		iniUsuario->dato->nacimiento = nuevo->dato->nacimiento;
 		iniUsuario->dato->genero = nuevo->dato->genero;
 		strcpy_s(iniUsuario->dato->foto, nuevo->dato->foto);
+		iniUsuario->dato->registro = nuevo->dato->registro;
 
 		iniUsuario->sig = nullptr;
 		iniUsuario->ant = nullptr;
@@ -3091,6 +3094,7 @@ void nuevoUsuarioLista(NodoUsuario* nuevo)
 		auxUsuario->dato->nacimiento = nuevo->dato->nacimiento;
 		auxUsuario->dato->genero = nuevo->dato->genero;
 		strcpy_s(auxUsuario->dato->foto, nuevo->dato->foto);
+		auxUsuario->dato->registro = nuevo->dato->registro;
 
 		auxUsuario2 = auxUsuario;
 		auxUsuario3 = auxUsuario;
@@ -3192,6 +3196,7 @@ void escribirUsuarios() {
 			archivo.write(reinterpret_cast<char*>(&aux->dato->genero), sizeof(aux->dato->genero));
 			archivo.write(aux->dato->email, sizeof(aux->dato->email));
 			archivo.write(aux->dato->foto, sizeof(aux->dato->foto));
+			archivo.write(reinterpret_cast<char*>(&aux->dato->registro), sizeof(aux->dato->registro));
 		}
 		aux = aux->sig;
 	}
@@ -3216,6 +3221,7 @@ void leerUsuarios() {
 		archivo.read(reinterpret_cast<char*>(&dato->genero), sizeof(dato->genero));
 		archivo.read(dato->email, sizeof(dato->email));
 		archivo.read(dato->foto, sizeof(dato->foto));
+		archivo.read(reinterpret_cast<char*>(&dato->registro), sizeof(dato->registro));
 
 		if (archivo) {
 			NodoUsuario* nuevo = new NodoUsuario;

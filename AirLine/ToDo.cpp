@@ -36,13 +36,13 @@
 	X La opción de la gestión de usuarios solo estará disponible para el usuario administrador.                                 
 */
 ////// ::: USUARIOS ::: //
-/*	X El usuario administrador, puede ser uno solo, y el dato de ese usuario y contraseña debe estar guardado en un archivo texto.
+/*	Y El usuario administrador, puede ser uno solo, y el dato de ese usuario y contraseña debe estar guardado en un archivo texto.
 	Y Para poder ingresar a la aplicación se debe contar con usuarios registrados, los cuales debe agregar un usuario administrador.	
 		Y Se requiere ser usuario registrado para ingresar a la aplicación
-	X Se debe habilitar un checkbox para que se permita recordar el último usuario que ingresó a la aplicación.
+	Z Se debe habilitar un checkbox para que se permita recordar el último usuario que ingresó a la aplicación.
 	X Solo se deben permitir registro de usuarios mayores a 18 años.
 	Z El nombre de usuario y su fotografía se deben mostrar en todas las pantallas del proyecto.
-	Y Al registrar a cada usuario se debe guardar la fecha y hora del registro.
+	Y Al registrar a cada usuario se debe guardar la fecha y hora del registro. (Ver donde se va a mostrar)
 	- Los datos de los usuarios son:
 		▪ Nombre de usuario
 		▪ Correo electrónico
@@ -60,7 +60,7 @@
 		X Un vuelo va desde un origen a un destino
 		X A una fecha y hora concreta
 		X Solo es posible programar vuelos hasta los próximos 6 meses
-		X Tiene # de vuelo que se debe generar automáticamente
+		Z Tiene # de vuelo que se debe generar automáticamente
 		X En qué tipo de avión
 		X La cantidad de asientos disponibles
 		X En clase turista o en clase ejecutiva
@@ -129,9 +129,9 @@
 */
 ////// ::: REGISTRO ::: //
 /*	- Registro de alguna entidad se refiere a altas, bajas y cambios.
-	X Cuando se realicen cambios se deben de mostrar los datos anteriores
-		X Además de capturar los nuevos.
-	X Todas las entidades deben guardar la clave del usuario que está registrando los datos.
+	Y Cuando se realicen cambios se deben de mostrar los datos anteriores
+		Y Además de capturar los nuevos.
+	Y Todas las entidades deben guardar la clave del usuario que está registrando los datos.
 	X Los nombres completos tanto de usuarios y pasajeros se deben de guardar de forma separada como:
 		- Nombre(s)
 		- Apellido paterno
