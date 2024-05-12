@@ -18,6 +18,18 @@
 
 using namespace std;
 
+struct DatoUsuario;
+struct NodoUsuario;
+
+struct DatoVuelo;
+struct NodoVuelo;
+
+struct DatoBoleto;
+struct NodoBoleto;
+
+struct DatoPasajero;
+struct NodoPasajero;
+
 // Estructuras
 #pragma region Structs
 struct DatoUsuario {
@@ -65,7 +77,7 @@ struct DatoBoleto {
 	char apellidoPPasajero[30];
 	char apellidoMPasajero[30];
 	char nombreCompPasajero[60];
-	char vuelo[50];
+	int numVuelo;
 	int num;
 	int clase;
 	int pase;
@@ -94,8 +106,6 @@ struct DatoPasajero {
 	int num;
 	double nacimiento;
 	double registro;
-	//char genero[20];
-	//char fecha[100];
 };
 struct NodoPasajero
 {
@@ -223,6 +233,13 @@ void nuevoBoleto(NodoBoleto* nuevoMed);
 void eliminarBoleto(char medicoNom[60]);
 void escribirBoletos();
 void leerBoletos();
+
+void swapData(NodoBoleto*, NodoBoleto*);
+NodoBoleto* lastNode(NodoBoleto*);
+NodoBoleto* partition(NodoBoleto*, NodoBoleto*);
+void _quickSort(NodoBoleto*, NodoBoleto*);
+void quickSort(NodoBoleto*);
+void printList(NodoBoleto*);
 #pragma endregion
 
 #pragma region Funciones de Listas Pasajeros (Pacientes)
@@ -1670,19 +1687,20 @@ BOOL CALLBACK cDialog7(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			//GetDlgItemText(hwnd, IDC_EDIT14, temp->numConsultorioChar, sizeof(temp->numConsultorioChar));
 			//GetDlgItemText(hwnd, IDC_EDIT15, temp->hoararioChar, sizeof(temp->hoararioChar));
 			//GetDlgItemText(hwnd, IDC_EDIT16, temp->diasChar, sizeof(temp->diasChar));
-			GetDlgItemText(hwnd, IDC_EDIT17, temp->dato->vuelo, sizeof(temp->dato->vuelo));
+			temp->dato->numVuelo = GetDlgItemInt(hwnd, IDC_EDIT17, 0, 0);
 			//strcpy_s(temp->foto, zFile);
 
-			if (//strcmp(temp->foto, "") != 0 &
-				strcmp(temp->dato->nombrePasajero, "") != 0 &
-				strcmp(temp->dato->apellidoPPasajero, "") != 0 &
-				strcmp(temp->dato->apellidoMPasajero, "") != 0 &
-				//strcmp(temp->cedulaChar, "") != 0 &
-				//strcmp(temp->telefonoChar, "") != 0 &
-				//strcmp(temp->numConsultorioChar, "") != 0 &
-				//strcmp(temp->hoararioChar, "") != 0 &
-				//strcmp(temp->diasChar, "") != 0 &
-				strcmp(temp->dato->vuelo, "") != 0)
+			if	(//strcmp(temp->foto, "") != 0 &
+				strcmp(temp->dato->nombrePasajero, "") != 0 &&
+				strcmp(temp->dato->apellidoPPasajero, "") != 0 &&
+				strcmp(temp->dato->apellidoMPasajero, "") != 0 //&&
+				//strcmp(temp->cedulaChar, "") != 0 &&
+				//strcmp(temp->telefonoChar, "") != 0 &&
+				//strcmp(temp->numConsultorioChar, "") != 0 &&
+				//strcmp(temp->hoararioChar, "") != 0 &&
+				//strcmp(temp->diasChar, "") != 0 &&
+				//temp->dato->numVuelo != 0
+				)
 			{
 				//while (auxMed2/*->sig*/ != nullptr && strcmp(medBuscar, auxMed2->cedulaChar) != 0)
 				{
@@ -1701,8 +1719,7 @@ BOOL CALLBACK cDialog7(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					//GetDlgItemText(hwnd, IDC_EDIT14, temp->numConsultorioChar, sizeof(temp->numConsultorioChar));
 					//GetDlgItemText(hwnd, IDC_EDIT15, temp->hoararioChar, sizeof(temp->hoararioChar));
 					//GetDlgItemText(hwnd, IDC_EDIT16, temp->diasChar, sizeof(temp->diasChar));
-					GetDlgItemText(hwnd, IDC_EDIT17, temp->dato->vuelo, sizeof(temp->dato->vuelo));
-
+					temp->dato->numVuelo = GetDlgItemInt(hwnd, IDC_EDIT17, 0, 0);
 					// Horario
 					/*
 					* if (strcmp(temp->hoararioChar, "6am - 6pm") == 0)
@@ -2071,10 +2088,10 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					SetDlgItemText(hwnd, IDC_EDIT4, auxBoleto3->dato->apellidoMPasajero);
 
 					//SetDlgItemText(hwnd, IDC_EDIT5, auxMed3->cedulaChar);
-					SetDlgItemText(hwnd, IDC_EDIT18, auxBoleto3->dato->vuelo);
-
+					//SetDlgItemText(hwnd, IDC_EDIT18, auxBoleto3->dato->numVuelo);
+					SetDlgItemInt(hwnd, IDC_EDIT18, auxBoleto3->dato->numVuelo, 0);
+					
 					//SetDlgItemText(hwnd, IDC_EDIT8, auxMed3->telefonoChar);
-
 					//SetDlgItemText(hwnd, IDC_EDIT17, auxMed3->numConsultorioChar);
 					//SetDlgItemText(hwnd, IDC_EDIT15, auxMed3->hoararioChar);
 					//SetDlgItemText(hwnd, IDC_EDIT16, auxMed3->diasChar);
@@ -2105,8 +2122,9 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 				//GetDlgItemText(hwnd, IDC_EDIT5, auxMed3->cedulaChar, sizeof(auxMed3->cedulaChar));
 				//auxMed3->cedulaNum = atoi(auxMed3->cedulaChar);
-				GetDlgItemText(hwnd, IDC_EDIT18, auxBoleto3->dato->vuelo, sizeof(auxBoleto3->dato->vuelo));
-			
+				//GetDlgItemText(hwnd, IDC_EDIT18, auxBoleto3->dato->numVuelo, sizeof(auxBoleto3->dato->numVuelo));
+				auxBoleto3->dato->numVuelo = GetDlgItemInt(hwnd, IDC_EDIT18, 0, 0);
+
 				//GetDlgItemText(hwnd, IDC_EDIT8, auxMed3->telefonoChar, sizeof(auxMed3->telefonoChar));
 				//auxMed3->estado = atoi(auxMed3->telefonoChar);
 
@@ -3514,7 +3532,6 @@ NodoUsuario* deleteTreeNodeByNick(NodoUsuario* root, char* nick) //Borra el nodo
 	delete succ;
 	return root;
 }
-
 //Funciones para mostrar el arbol en un ListBox
 void preOrderList(NodoUsuario* node, HWND hwnd)
 {
@@ -3913,7 +3930,7 @@ void nuevoBoleto(NodoBoleto* nuevoBoleto)
 		//strcpy_s(pivote->diasChar, nuevoMed->diasChar);
 		//pivote->diasNum = nuevoMed->diasNum;
 
-		strcpy_s(pivote->dato->vuelo, nuevoBoleto->dato->vuelo);
+		pivote->dato->numVuelo = nuevoBoleto->dato->numVuelo;
 
 		//strcpy_s(pivote->foto, nuevoMed->foto);
 
@@ -4109,7 +4126,7 @@ void nuevoBoleto(NodoBoleto* nuevoBoleto)
 		//strcpy_s(auxMed->diasChar, nuevoMed->diasChar);
 		//auxMed->diasNum = nuevoMed->diasNum;
 
-		strcpy_s(auxBoleto->dato->vuelo, nuevoBoleto->dato->vuelo);
+		auxBoleto->dato->numVuelo = nuevoBoleto->dato->numVuelo;
 
 		//strcpy_s(auxMed->foto, nuevoMed->foto);
 
@@ -4311,6 +4328,82 @@ void leerBoletos()
 		delete medLeido;
 	}
 }
+NodoBoleto* binarySearchNombre(NodoBoleto* head, const char* nombrePasajeroComp) {
+	NodoBoleto* start = head;
+	NodoBoleto* end = NULL;
+	do {
+		// Encuentra el punto medio
+		NodoBoleto* slow = start;
+		NodoBoleto* fast = start->sig;
+		while (fast != end) {
+			fast = fast->sig;
+			if (fast != end) {
+				slow = slow->sig;
+				fast = fast->sig;
+			}
+		}
+		// Comprueba si el nombre del pasajero en el punto medio coincide con el nombre proporcionado
+		if (strcmp(slow->dato->nombreCompPasajero, nombrePasajeroComp) == 0) {
+			return slow;
+		}
+		// Si el nombre del pasajero en el punto medio es mayor que el nombre proporcionado, busca en la primera mitad
+		else if (strcmp(slow->dato->nombreCompPasajero, nombrePasajeroComp) > 0) {
+			end = slow;
+		}
+		// Si el nombre del pasajero en el punto medio es menor que el nombre proporcionado, busca en la segunda mitad
+		else {
+			start = slow->sig;
+		}
+	} while (end == NULL || end != start);
+	// No se encontró ningún boleto con el nombre del pasajero proporcionado
+	return NULL;
+}
+
+#pragma region QuickSort
+void swapData(NodoBoleto* a, NodoBoleto* b) {
+	DatoBoleto* temp = a->dato;
+	a->dato = b->dato;
+	b->dato = temp;
+}
+NodoBoleto* lastNode(NodoBoleto* root) {
+	while (root && root->sig)
+		root = root->sig;
+	return root;
+}
+NodoBoleto* partition(NodoBoleto* l, NodoBoleto* h) {
+	int x = h->dato->num;
+	NodoBoleto* i = l->ant;
+
+	for (NodoBoleto* j = l; j != h; j = j->sig) {
+		if (j->dato->num <= x) {
+			i = (i == NULL) ? l : i->sig;
+			swapData(i, j);
+		}
+	}
+
+	i = (i == NULL) ? l : i->sig;
+	swapData(i, h);
+	return i;
+}
+void _quickSort(NodoBoleto* l, NodoBoleto* h) {
+	if (h != NULL && l != h && l != h->sig) {
+		NodoBoleto* p = partition(l, h);
+		_quickSort(l, p->ant);
+		_quickSort(p->sig, h);
+	}
+}
+void quickSort(NodoBoleto* head) {
+	NodoBoleto* h = lastNode(head);
+	_quickSort(head, h);
+}
+void printList(NodoBoleto* head) {
+	while (head) {
+		std::cout << head->dato->num << "\n";
+		head = head->sig;
+	}
+	std::cout << std::endl;
+}
+#pragma	endregion
 #pragma endregion
 
 //Listas de Pasajeros (Pacientes)
@@ -4774,13 +4867,6 @@ void reportePasajeros()
 	}*/
 }
 #pragma region HeapSort
-/*
-void swapData(NodoVuelo* a, NodoVuelo* b) {
-	DatoVuelo* temp = a->dato;
-	a->dato = b->dato;
-	b->dato = temp;
-}
-*/
 void swapData(NodoPasajero* a, NodoPasajero* b) {
 	DatoPasajero* temp = a->dato;
 	a->dato = b->dato;

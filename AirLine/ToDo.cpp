@@ -16,7 +16,7 @@
 */
 ////// ::: ENTREGA 2 ::: //
 /*	 /	Req. / Puntos / Info. /
-   Y	Sí		5       Ingreso al sistema por usuario y contraseña, *recordar usuario.
+   Z	Sí		5       Ingreso al sistema por usuario y contraseña, *recordar usuario.
    Z	No		5		Registro de Usuarios
    Y	Sí		10		Registro de Vuelos
    Y	Sí		10		Registro de Pasajeros
@@ -26,7 +26,7 @@
    X	No		10		Cancelación de boletos comprados
    X	Sí		10		Manifiesto
    Y	No		10		Reporte de Vuelos
-   X	Sí		10		Uso apropiado de métodos de ordenamiento y búsqueda binaria en listas ligadas.
+   Y	Sí		10		Uso apropiado de métodos de ordenamiento y búsqueda binaria en listas ligadas.
    Y	Sí		5		Guardado de información en archivos binarios.
 */	
 				/// :::: DESCRIPCIONES DEL PROYECTO :::: ///
