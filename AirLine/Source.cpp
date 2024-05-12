@@ -81,7 +81,7 @@ struct DatoBoleto {
 	int num;
 	int clase;
 	int pase;
-	int estado;
+	int status;
 	double registroBoleto;
 	double registroPase;
 	char usuarioRegistro[30];
@@ -3839,6 +3839,43 @@ void reporteVuelos()
 		}
 	}*/
 }
+void printVuelosEnRango(HWND hwnd, int List, NodoVuelo* iniVuelos, DATE inicioDate, DATE finDate) {
+	for (NodoVuelo* nodo = iniVuelos; nodo != NULL; nodo = nodo->sig) {
+		// Comprobar si la fecha del vuelo está dentro del rango
+		if (nodo->dato->fecha >= inicioDate && nodo->dato->fecha <= finDate) {
+			// Convertir el número de vuelo a una cadena
+			char numVueloStr[10];
+			sprintf(numVueloStr, "%d", nodo->dato->num);
+
+			// Agregar el número de vuelo al ListBox
+			SendDlgItemMessage(hwnd, List, LB_ADDSTRING, 0, (LPARAM)numVueloStr);
+		}
+	}
+}
+void generarReportePasajerosVuelo(NodoBoleto* iniBoletos, int numVuelo, const char* nombreArchivo) {
+	// Abrir el archivo de texto para escritura
+	FILE* archivo = fopen(nombreArchivo, "w");
+	if (archivo == NULL) {
+		printf("No se pudo abrir el archivo %s\n", nombreArchivo);
+		return;
+	}
+	for (NodoBoleto* nodo = iniBoletos; nodo != NULL; nodo = nodo->sig) {
+		if (nodo->dato->numVuelo == numVuelo && nodo->dato->status == 1) {
+			// Se encontró un boleto con el número de vuelo proporcionado y status 1
+			NodoPasajero* pasajero = binarySearchNombrePasajero(iniPasajero, nodo->dato->nombreCompPasajero);
+			if (pasajero != NULL) {
+				// Escribir los datos del pasajero en el archivo			
+				int edad = formatoEdad(pasajero->dato->nacimiento);
+				char edadStr[4];
+				sprintf(edadStr, "%d", edad);
+				fprintf(archivo, "Nombre: %s, Edad: %s, Nacionalidad: %s\n",
+					pasajero->dato->nombreComp, edadStr, pasajero->dato->nacionalidad);
+			}
+		}
+	}
+	// Cerrar el archivo
+	fclose(archivo);
+}
 #pragma region QuickSort
 //Generales
 void swapData(NodoVuelo* a, NodoVuelo* b) {
@@ -4337,7 +4374,7 @@ void leerBoletos()
 		delete medLeido;
 	}
 }
-NodoBoleto* binarySearchNombre(NodoBoleto* head, const char* nombrePasajeroComp) {
+NodoBoleto* binarySearchNombreBoleto(NodoBoleto* head, const char* nombrePasajeroComp) {
 	NodoBoleto* start = head;
 	NodoBoleto* end = NULL;
 	do {
@@ -4944,6 +4981,37 @@ void reportePasajeros()
 		}
 	}*/
 }
+NodoPasajero* binarySearchNombrePasajero(NodoPasajero* head, const char* nombrePasajeroComp) {
+	NodoPasajero* start = head;
+	NodoPasajero* end = NULL;
+	do {
+		// Encuentra el punto medio
+		NodoPasajero* slow = start;
+		NodoPasajero* fast = start->sig;
+		while (fast != end) {
+			fast = fast->sig;
+			if (fast != end) {
+				slow = slow->sig;
+				fast = fast->sig;
+			}
+		}
+		// Comprueba si el nombre del pasajero en el punto medio coincide con el nombre proporcionado
+		if (strcmp(slow->dato->nombreComp, nombrePasajeroComp) == 0) {
+			return slow;
+		}
+		// Si el nombre del pasajero en el punto medio es mayor que el nombre proporcionado, busca en la primera mitad
+		else if (strcmp(slow->dato->nombreComp, nombrePasajeroComp) > 0) {
+			end = slow;
+		}
+		// Si el nombre del pasajero en el punto medio es menor que el nombre proporcionado, busca en la segunda mitad
+		else {
+			start = slow->sig;
+		}
+	} while (end == NULL || end != start);
+	// No se encontró ningún pasajero con el nombre proporcionado
+	return NULL;
+}
+
 #pragma region HeapSort
 void swapData(NodoPasajero* a, NodoPasajero* b) {
 	DatoPasajero* temp = a->dato;

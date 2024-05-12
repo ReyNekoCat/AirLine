@@ -24,7 +24,7 @@
    X	Sí		5		Pases de abordar
    X 	Sí		10		Cancelación/Confirmación de Vuelos
    X	No		10		Cancelación de boletos comprados
-   X	Sí		10		Manifiesto
+   Y	Sí		10		Manifiesto
    Y	No		10		Reporte de Vuelos
    Y	Sí		10		Uso apropiado de métodos de ordenamiento y búsqueda binaria en listas ligadas.
    Y	Sí		5		Guardado de información en archivos binarios.
@@ -102,11 +102,11 @@
 */
 ////// ::: MANIFIESTO ::: //
 /*	- Se debe tener una pantalla donde se muestren todos los vuelos realizados
-		X Se debe elegir uno y se deben mostrar la lista de pasajeros que realizaron el vuelo.
-	X Se debe tener la opción de ordenar por número de asiento (ordenamientos)
-		- O de ordenar por apellidos y nombre de los pasajeros 
+		Y Se debe elegir uno y se deben mostrar la lista de pasajeros que realizaron el vuelo.
+	Y Se debe tener la opción de ordenar por número de asiento (ordenamientos)
+		- O de ordenar por apellidos y nombre de los pasajeros
 	X En la parte superior del manifiesto deben de venir los datos del vuelo 
-		X Además de mostrar al lado la lista de pasajeros.
+		Y Además de mostrar al lado la lista de pasajeros.
 	- Los datos del manifiesto deben de incluir:
 		X Nombre completo del pasajero
 		X Edad
@@ -132,17 +132,17 @@
 	Y Cuando se realicen cambios se deben de mostrar los datos anteriores
 		Y Además de capturar los nuevos.
 	Y Todas las entidades deben guardar la clave del usuario que está registrando los datos.
-	X Los nombres completos tanto de usuarios y pasajeros se deben de guardar de forma separada como:
+	Y Los nombres completos tanto de usuarios y pasajeros se deben de guardar de forma separada como:
 		- Nombre(s)
 		- Apellido paterno
 		- Apellido materno
 */
 ////// ::: SALIR ::: //
 /*	- Una de las opciones disponibles en el sistema debe ser salir del mismo
-	X En ese momento se deben de guardar los datos de las estructuras en memoria como:
-		X Árboles binarios
-		X Listas doblemente ligadas
-	X Se deben guardar como archivos binarios.
+	Z En ese momento se deben de guardar los datos de las estructuras en memoria como:
+		Y Árboles binarios
+		Y Listas doblemente ligadas
+	Z Se deben guardar como archivos binarios.
 */
 ////// ::: OPCIONES ADICIONALES ::: // (NO hacerlo a priori)
 /*	Queda a criterio del alumno manejar opciones adicionales para enriquecer el proyecto, como:
