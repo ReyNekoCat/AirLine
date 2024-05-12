@@ -195,10 +195,10 @@ void leerUsuarios();
 //QuickSort
 void swapData(NodoUsuario*, NodoUsuario*);
 NodoUsuario* lastNode(NodoUsuario*);
-NodoUsuario* partition(NodoUsuario*, NodoUsuario*);
-void _quickSort(NodoUsuario*, NodoUsuario*);
-void quickSort(NodoUsuario*);
-void printList(NodoUsuario*);
+NodoUsuario* partitionNick(NodoUsuario*, NodoUsuario*);
+void _quickSortNick(NodoUsuario*, NodoUsuario*);
+void quickSortNick(NodoUsuario*);
+//void printListNick(NodoUsuario*);
 //Arbol
 NodoUsuario* sortedListToBST(NodoUsuario*);
 NodoUsuario* sortedListToBSTRecur(NodoUsuario**, int);
@@ -219,10 +219,10 @@ void reporteVuelos(); //Antes Boletos/Medicos
 //QuickSort
 void swapData(NodoVuelo*, NodoVuelo*);
 NodoVuelo* lastNode(NodoVuelo*);
-NodoVuelo* partition(NodoVuelo*, NodoVuelo*);
-void _quickSort(NodoVuelo*, NodoVuelo*);
-void quickSort(NodoVuelo*);
-void printList(NodoVuelo*);
+NodoVuelo* partitionNum(NodoVuelo*, NodoVuelo*);
+void _quickSortNum(NodoVuelo*, NodoVuelo*);
+void quickSortNum(NodoVuelo*);
+//void printList(NodoVuelo*);
 
 void preOrderList(NodoUsuario*, HWND);
 void inOrderList(NodoUsuario*, HWND);
@@ -236,10 +236,11 @@ void leerBoletos();
 
 void swapData(NodoBoleto*, NodoBoleto*);
 NodoBoleto* lastNode(NodoBoleto*);
-NodoBoleto* partition(NodoBoleto*, NodoBoleto*);
-void _quickSort(NodoBoleto*, NodoBoleto*);
-void quickSort(NodoBoleto*);
-void printList(NodoBoleto*);
+
+NodoBoleto* partitionVuelo(NodoBoleto*, NodoBoleto*);
+void _quickSortAsiento(NodoBoleto*, NodoBoleto*);
+void quickSortAsiento(NodoBoleto*);
+//void printListAsiento(NodoBoleto*);
 #pragma endregion
 
 #pragma region Funciones de Listas Pasajeros (Pacientes)
@@ -3257,6 +3258,7 @@ void leerUsuarios() {
 	NodoUsuario* aux = iniUsuario;
 }
 #pragma region QuickSort
+//Generales
 void swapData(NodoUsuario* a, NodoUsuario* b) {
 	DatoUsuario* temp = a->dato;
 	a->dato = b->dato;
@@ -3268,7 +3270,8 @@ NodoUsuario* lastNode(NodoUsuario* root) //Función para encontrar el último nodo
 		root = root->sig;
 	return root;
 }
-NodoUsuario* partition(NodoUsuario* l, NodoUsuario* h)
+//Específicas
+NodoUsuario* partitionNick(NodoUsuario* l, NodoUsuario* h)
 {
 	//Se toma el último elemento como pivote
 	// x = high (pivote)
@@ -3293,24 +3296,25 @@ NodoUsuario* partition(NodoUsuario* l, NodoUsuario* h)
 	swapData(i, h);
 	return i;
 }
-void _quickSort(NodoUsuario* l, NodoUsuario* h) // Función recursiva
+void _quickSortNick(NodoUsuario* l, NodoUsuario* h) // Función recursiva
 {
 	if (h != NULL && l != h && l != h->sig)
 	{
-		NodoUsuario* p = partition(l, h);
-		_quickSort(l, p->ant);
-		_quickSort(p->sig, h);
+		NodoUsuario* p = partitionNick(l, h);
+		_quickSortNick(l, p->ant);
+		_quickSortNick(p->sig, h);
 	}
 }
-void quickSort(NodoUsuario* head) // Función principal
+void quickSortNick(NodoUsuario* head) // Función principal
 {
 	// Encuentra el último nodo
 	NodoUsuario* h = lastNode(head);
 
 	// Manda a llamar la función de QuickSort recursiva
-	_quickSort(head, h);
+	_quickSortNick(head, h);
 }
-void printList(NodoUsuario* head)
+/*
+* void printListNick(NodoUsuario* head)
 {
 	while (head)
 	{
@@ -3319,6 +3323,7 @@ void printList(NodoUsuario* head)
 	}
 	std::cout << std::endl;
 }
+*/
 #pragma endregion
 #pragma region Arbol
 //Conversiones
@@ -3834,7 +3839,16 @@ void reporteVuelos()
 		}
 	}*/
 }
+void imprimirPasajerosPorVuelo(NodoBoleto* inicioBoletos, int numVuelo) {
+	for (NodoBoleto* nodo = inicioBoletos; nodo != NULL; nodo = nodo->sig) {
+		if (nodo->dato->numVuelo == numVuelo) {
+			// Se encontró un boleto con el número de vuelo proporcionado
+			std::cout << nodo->dato->nombreCompPasajero << std::endl;
+		}
+	}
+}
 #pragma region QuickSort
+//Generales
 void swapData(NodoVuelo* a, NodoVuelo* b) {
 	DatoVuelo* temp = a->dato;
 	a->dato = b->dato;
@@ -3846,7 +3860,8 @@ NodoVuelo* lastNode(NodoVuelo* root) //Función para encontrar el último nodo
 		root = root->sig;
 	return root;
 }
-NodoVuelo* partition(NodoVuelo* l, NodoVuelo* h)
+//Específicas
+NodoVuelo* partitionNum(NodoVuelo* l, NodoVuelo* h)
 {
 	//Se toma el último elemento como pivote
 	// x = high (pivote)
@@ -3870,24 +3885,25 @@ NodoVuelo* partition(NodoVuelo* l, NodoVuelo* h)
 	swapData(i, h);
 	return i;
 }
-void _quickSort(NodoVuelo* l, NodoVuelo* h) // Función recursiva
+void _quickSortNum(NodoVuelo* l, NodoVuelo* h) // Función recursiva
 {
 	if (h != NULL && l != h && l != h->sig)
 	{
-		NodoVuelo* p = partition(l, h);
-		_quickSort(l, p->ant);
-		_quickSort(p->sig, h);
+		NodoVuelo* p = partitionNum(l, h);
+		_quickSortNum(l, p->ant);
+		_quickSortNum(p->sig, h);
 	}
 }
-void quickSort(NodoVuelo* head) // Función principal
+void quickSortNum(NodoVuelo* head) // Función principal
 {
 	// Encuentra el último nodo
 	NodoVuelo* h = lastNode(head);
 
 	// Manda a llamar la función de QuickSort recursiva
-	_quickSort(head, h);
+	_quickSortNum(head, h);
 }
-void printList(NodoVuelo* head)
+/*
+void printListNum(NodoVuelo* head)
 {
 	while (head)
 	{
@@ -3896,6 +3912,7 @@ void printList(NodoVuelo* head)
 	}
 	std::cout << std::endl;
 }
+*/
 #pragma endregion
 #pragma endregion
 
@@ -4358,8 +4375,8 @@ NodoBoleto* binarySearchNombre(NodoBoleto* head, const char* nombrePasajeroComp)
 	// No se encontró ningún boleto con el nombre del pasajero proporcionado
 	return NULL;
 }
-
 #pragma region QuickSort
+//Generales
 void swapData(NodoBoleto* a, NodoBoleto* b) {
 	DatoBoleto* temp = a->dato;
 	a->dato = b->dato;
@@ -4370,7 +4387,8 @@ NodoBoleto* lastNode(NodoBoleto* root) {
 		root = root->sig;
 	return root;
 }
-NodoBoleto* partition(NodoBoleto* l, NodoBoleto* h) {
+//Específicas
+NodoBoleto* partitionAsiento(NodoBoleto* l, NodoBoleto* h) {
 	int x = h->dato->num;
 	NodoBoleto* i = l->ant;
 
@@ -4385,17 +4403,18 @@ NodoBoleto* partition(NodoBoleto* l, NodoBoleto* h) {
 	swapData(i, h);
 	return i;
 }
-void _quickSort(NodoBoleto* l, NodoBoleto* h) {
+void _quickSortAsiento(NodoBoleto* l, NodoBoleto* h) {
 	if (h != NULL && l != h && l != h->sig) {
-		NodoBoleto* p = partition(l, h);
-		_quickSort(l, p->ant);
-		_quickSort(p->sig, h);
+		NodoBoleto* p = partitionAsiento(l, h);
+		_quickSortAsiento(l, p->ant);
+		_quickSortAsiento(p->sig, h);
 	}
 }
-void quickSort(NodoBoleto* head) {
+void quickSortAsiento(NodoBoleto* head) {
 	NodoBoleto* h = lastNode(head);
-	_quickSort(head, h);
+	_quickSortAsiento(head, h);
 }
+/*
 void printList(NodoBoleto* head) {
 	while (head) {
 		std::cout << head->dato->num << "\n";
@@ -4403,6 +4422,7 @@ void printList(NodoBoleto* head) {
 	}
 	std::cout << std::endl;
 }
+*/
 #pragma	endregion
 #pragma endregion
 
