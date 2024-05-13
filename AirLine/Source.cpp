@@ -3852,7 +3852,7 @@ void printVuelosEnRango(HWND hwnd, int List, NodoVuelo* iniVuelos, DATE inicioDa
 		}
 	}
 }
-void generarReportePasajerosVuelo(NodoBoleto* iniBoletos, int numVuelo, const char* nombreArchivo) {
+void generarManifiestoPasajeros(NodoBoleto* iniBoletos, int numVuelo, const char* nombreArchivo) {
 	// Abrir el archivo de texto para escritura
 	FILE* archivo = fopen(nombreArchivo, "w");
 	if (archivo == NULL) {

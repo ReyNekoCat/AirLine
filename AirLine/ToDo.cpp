@@ -108,9 +108,9 @@
 	X En la parte superior del manifiesto deben de venir los datos del vuelo 
 		Y Además de mostrar al lado la lista de pasajeros.
 	- Los datos del manifiesto deben de incluir:
-		X Nombre completo del pasajero
-		X Edad
-		X Nacionalidad.
+		Y Nombre completo del pasajero
+		Y Edad
+		Y Nacionalidad.
 	X Se debe mostrar en pantalla y luego con un botón generar un archivo texto con el reporte.
 */
 ////// ::: REPORTE DE VUELOS ::: //
