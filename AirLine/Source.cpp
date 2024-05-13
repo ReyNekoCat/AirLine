@@ -18,18 +18,6 @@
 
 using namespace std;
 
-struct DatoUsuario;
-struct NodoUsuario;
-
-struct DatoVuelo;
-struct NodoVuelo;
-
-struct DatoBoleto;
-struct NodoBoleto;
-
-struct DatoPasajero;
-struct NodoPasajero;
-
 // Estructuras
 #pragma region Structs
 struct DatoUsuario {
@@ -94,7 +82,7 @@ struct NodoBoleto
 	NodoBoleto* ant;
 	NodoBoleto* sig;
 };
-NodoBoleto* pivote, * iniBoleto, * auxBoleto, * auxBoleto2, * auxBoleto3 = nullptr;
+NodoBoleto* iniBoleto, * auxBoleto, * auxBoleto2, * auxBoleto3 = nullptr;
 
 struct DatoPasajero {
 	char usuarioRegistro[30];
@@ -1290,6 +1278,7 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			if (auxVuelo2/*->sig*/ == nullptr || strcmp(numBuscarC, auxVuelo2->dato->origen) != 0)
 			{
 				NodoVuelo* temp = new NodoVuelo;
+				temp->dato = new DatoVuelo;
 
 				char numAsignadoC[10];
 				GetDlgItemText(hwnd, IDC_EDIT2, numAsignadoC, sizeof(numAsignadoC));
@@ -1317,6 +1306,9 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				GetDlgItemText(hwnd, IDC_EDIT4, temp->dato->destino, sizeof(temp->dato->destino));
 				//GetDlgItemText(hwnd, IDC_EDIT3, temp->claveChar, sizeof(temp->claveChar));
 				strcpy_s(temp->dato->usuarioRegistro, miUsuario->dato->nick);
+
+				temp->sig = nullptr;
+				temp->ant = nullptr;
 				nuevoVuelo(temp);
 
 				SetDlgItemText(hwnd, IDC_EDIT2, "");
@@ -1921,7 +1913,7 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				HWND hDia = GetDlgItem(hwnd, IDC_DATETIMEPICKER1);
 				SYSTEMTIME diaCumple = { 0 }; double dia;
 				DateTime_GetSystemtime(hDia, &diaCumple);
-				SystemTimeToVariantTime(&diaCumple, &dia);
+				SystemTimeToVariantTime(&diaCumple, &dia); 
 
 				temp->dato->nacimiento = dia;
 
@@ -1929,6 +1921,8 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 				temp->dato->registro = 0.0;
 
+				temp->sig = nullptr;
+				temp->ant = nullptr;
 				nuevoPasajero(temp);
 
 				SetDlgItemText(hwnd, IDC_EDIT2, "");
@@ -2695,8 +2689,7 @@ void nuevoUsuarioLista(NodoUsuario* nuevo)
 	if (iniUsuario == nullptr)
 	{ //Si 'inicio->sig es igual a nullptr, o sea, apunta a nada, la lista esta vacia
 		iniUsuario = new NodoUsuario;
-		DatoUsuario* data = new DatoUsuario;
-		iniUsuario->dato = data;
+		iniUsuario->dato = new DatoUsuario;
 
 		strcpy_s(iniUsuario->dato->nick, nuevo->dato->nick);
 		strcpy_s(iniUsuario->dato->nombre, nuevo->dato->nombre);
@@ -2734,9 +2727,7 @@ void nuevoUsuarioLista(NodoUsuario* nuevo)
 		auxUsuario->sig->sig = nullptr;
 		auxUsuario->sig->ant = auxUsuario;
 		auxUsuario = auxUsuario->sig;
-
-		DatoUsuario* data = new DatoUsuario;
-		auxUsuario->dato = data;
+		auxUsuario->dato = new DatoUsuario;
 
 		strcpy_s(auxUsuario->dato->nick, nuevo->dato->nick);
 		strcpy_s(auxUsuario->dato->nombre, nuevo->dato->nombre);
@@ -2867,10 +2858,9 @@ void escribirUsuarios() {
 }
 void leerUsuarios() {
 	ifstream archivo("Usuarios.bin", ios::binary);
-	DatoUsuario* dato;
 
 	while (archivo) {
-		dato = new DatoUsuario;
+		DatoUsuario* dato = new DatoUsuario;
 		archivo.read(reinterpret_cast<char*>(&dato->type), sizeof(dato->type));
 		archivo.read(dato->nick, sizeof(dato->nick));
 		archivo.read(dato->nombre, sizeof(dato->nombre));
@@ -3228,6 +3218,7 @@ void nuevoVuelo(NodoVuelo* nuevoV)
 	if (iniVuelo == nullptr)
 	{ //Si 'inicio->sig es igual a nullptr, o sea, apunta a nada, la lista esta vacia
 		iniVuelo = new NodoVuelo;
+		iniVuelo->dato = new DatoVuelo;
 
 		strcpy_s(iniVuelo->dato->origen, nuevoV->dato->origen);
 		strcpy_s(iniVuelo->dato->destino, nuevoV->dato->destino);
@@ -3262,6 +3253,7 @@ void nuevoVuelo(NodoVuelo* nuevoV)
 		auxVuelo->sig->sig = nullptr;
 		auxVuelo->sig->ant = auxVuelo;
 		auxVuelo = auxVuelo->sig;
+		auxVuelo->dato = new DatoVuelo;
 
 		strcpy_s(auxVuelo->dato->origen, nuevoV->dato->origen);
 		strcpy_s(auxVuelo->dato->destino, nuevoV->dato->destino);
@@ -3380,7 +3372,6 @@ void escribirVuelo()
 		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
 		return;
 	}
-
 	if (escribir.is_open())
 	{
 		while (auxVuelo != nullptr)
@@ -3390,7 +3381,6 @@ void escribirVuelo()
 				MessageBox(NULL, "Ocurrió un error durante la escritura", "Error", MB_OK | MB_ICONERROR);
 				return;
 			}
-
 			escribir.write((char*)auxVuelo->dato, sizeof(DatoVuelo));
 			auxVuelo = auxVuelo->sig;
 		}
@@ -3597,48 +3587,35 @@ void printListNum(NodoVuelo* head)
 
 //Listas de Boletos
 #pragma region Funciones de Listas Boletos
-void nuevoBoleto(NodoBoleto* nuevoBoleto)
+void nuevoBoleto(NodoBoleto* nuevoB)
 {
-	if (pivote == nullptr)
+	if (iniBoleto == nullptr)
 	{ //Si 'inicio->sig es igual a nullptr, o sea, apunta a nada, la lista esta vacia
-		pivote = new NodoBoleto;
+		iniBoleto = new NodoBoleto;
+		iniBoleto->dato = new DatoBoleto;
 
-		strcpy_s(pivote->dato->nombrePasajero, nuevoBoleto->dato->nombrePasajero);
-		strcpy_s(pivote->dato->apellidoPPasajero, nuevoBoleto->dato->apellidoPPasajero);
-		strcpy_s(pivote->dato->apellidoMPasajero, nuevoBoleto->dato->apellidoMPasajero);
+		strcpy_s(iniBoleto->dato->nombrePasajero, nuevoB->dato->nombrePasajero);
+		strcpy_s(iniBoleto->dato->apellidoPPasajero, nuevoB->dato->apellidoPPasajero);
+		strcpy_s(iniBoleto->dato->apellidoMPasajero, nuevoB->dato->apellidoMPasajero);
 
 		// Concatenación
-		strcpy_s(pivote->dato->nombreCompPasajero, nuevoBoleto->dato->nombrePasajero);
-		strcat_s(pivote->dato->nombreCompPasajero, " ");
-		strcat_s(pivote->dato->nombreCompPasajero, pivote->dato->apellidoPPasajero);
-		strcat_s(pivote->dato->nombreCompPasajero, " ");
-		strcat_s(pivote->dato->nombreCompPasajero, pivote->dato->apellidoMPasajero);
+		strcpy_s(iniBoleto->dato->nombreCompPasajero, nuevoB->dato->nombrePasajero);
+		strcat_s(iniBoleto->dato->nombreCompPasajero, " ");
+		strcat_s(iniBoleto->dato->nombreCompPasajero, iniBoleto->dato->apellidoPPasajero);
+		strcat_s(iniBoleto->dato->nombreCompPasajero, " ");
+		strcat_s(iniBoleto->dato->nombreCompPasajero, iniBoleto->dato->apellidoMPasajero);
 
-		//strcpy_s(pivote->cedulaChar, nuevoMed->cedulaChar);
-		//pivote->cedulaNum = atoi(pivote->cedulaChar);
-		//strcpy_s(pivote->numConsultorioChar, nuevoMed->numConsultorioChar);
-		//pivote->clase = atoi(pivote->numConsultorioChar);
-		//strcpy_s(pivote->telefonoChar, nuevoMed->telefonoChar);
-		//pivote->estado = atoi(pivote->telefonoChar);
+		iniBoleto->dato->pase = nuevoB->dato->pase;
+		iniBoleto->dato->numVuelo = nuevoB->dato->numVuelo;
+		strcpy_s(iniBoleto->dato->usuarioRegistro, nuevoB->dato->usuarioRegistro);
 
-		//strcpy_s(pivote->hoararioChar, nuevoMed->hoararioChar);
-		pivote->dato->pase = nuevoBoleto->dato->pase;
-		//strcpy_s(pivote->diasChar, nuevoMed->diasChar);
-		//pivote->diasNum = nuevoMed->diasNum;
+		iniBoleto->sig = nullptr;
+		iniBoleto->ant = nullptr;
 
-		pivote->dato->numVuelo = nuevoBoleto->dato->numVuelo;
-
-		//strcpy_s(pivote->foto, nuevoMed->foto);
-
-		strcpy_s(pivote->dato->usuarioRegistro, nuevoBoleto->dato->usuarioRegistro);
-
-		pivote->sig = nullptr;
-		pivote->ant = nullptr;
-
-		auxBoleto = pivote;
+		auxBoleto = iniBoleto;
 		auxBoleto2 = auxBoleto;
 		auxBoleto3 = auxBoleto;
-		iniBoleto = pivote;
+		iniBoleto = iniBoleto;
 	}
 	else
 	{
@@ -3797,14 +3774,25 @@ void nuevoBoleto(NodoBoleto* nuevoBoleto)
 
 		}
 		*/
+		auxBoleto = iniBoleto;
 
+		while (auxBoleto->sig != nullptr)
+		{
+			auxBoleto = auxBoleto->sig;
+		}
 
-		strcpy_s(auxBoleto->dato->nombrePasajero, nuevoBoleto->dato->nombrePasajero);
-		strcpy_s(auxBoleto->dato->apellidoPPasajero, nuevoBoleto->dato->apellidoPPasajero);
-		strcpy_s(auxBoleto->dato->apellidoMPasajero, nuevoBoleto->dato->apellidoMPasajero);
+		auxBoleto->sig = new NodoBoleto;
+		auxBoleto->sig->sig = nullptr;
+		auxBoleto->sig->ant = auxBoleto;
+		auxBoleto = auxBoleto->sig;
+		auxBoleto->dato = new DatoBoleto;
+
+		strcpy_s(auxBoleto->dato->nombrePasajero, nuevoB->dato->nombrePasajero);
+		strcpy_s(auxBoleto->dato->apellidoPPasajero, nuevoB->dato->apellidoPPasajero);
+		strcpy_s(auxBoleto->dato->apellidoMPasajero, nuevoB->dato->apellidoMPasajero);
 
 		// Concatenación
-		strcpy_s(auxBoleto->dato->nombreCompPasajero, nuevoBoleto->dato->nombrePasajero);
+		strcpy_s(auxBoleto->dato->nombreCompPasajero, nuevoB->dato->nombrePasajero);
 		strcat_s(auxBoleto->dato->nombreCompPasajero, " ");
 		strcat_s(auxBoleto->dato->nombreCompPasajero, auxBoleto->dato->apellidoPPasajero);
 		strcat_s(auxBoleto->dato->nombreCompPasajero, " ");
@@ -3818,15 +3806,15 @@ void nuevoBoleto(NodoBoleto* nuevoBoleto)
 		//auxMed->estado = atoi(auxMed->telefonoChar);
 
 		//strcpy_s(auxMed->hoararioChar, nuevoMed->hoararioChar);
-		auxBoleto->dato->pase = nuevoBoleto->dato->pase;
+		auxBoleto->dato->pase = nuevoB->dato->pase;
 		//strcpy_s(auxMed->diasChar, nuevoMed->diasChar);
 		//auxMed->diasNum = nuevoMed->diasNum;
 
-		auxBoleto->dato->numVuelo = nuevoBoleto->dato->numVuelo;
+		auxBoleto->dato->numVuelo = nuevoB->dato->numVuelo;
 
 		//strcpy_s(auxMed->foto, nuevoMed->foto);
 
-		strcpy_s(auxBoleto->dato->usuarioRegistro, nuevoBoleto->dato->usuarioRegistro);
+		strcpy_s(auxBoleto->dato->usuarioRegistro, nuevoB->dato->usuarioRegistro);
 
 		while (auxBoleto->ant != nullptr)
 		{
@@ -3835,7 +3823,7 @@ void nuevoBoleto(NodoBoleto* nuevoBoleto)
 
 		iniBoleto = auxBoleto;
 
-		auxBoleto = pivote;
+		auxBoleto = iniBoleto;
 		auxBoleto2 = auxBoleto;
 		auxBoleto3 = auxBoleto;
 	}
@@ -3865,19 +3853,19 @@ void eliminarBoleto(char pasajeroNom[60])
 			MessageBox(0, "Medico no encontrado", "AVISO", MB_OK);
 		}
 		
-		if (auxBoleto == pivote)
+		if (auxBoleto == iniBoleto)
 		{
-			if (pivote->ant != nullptr && pivote->sig != nullptr)
+			if (iniBoleto->ant != nullptr && iniBoleto->sig != nullptr)
 			{
-				pivote = pivote->sig;
+				iniBoleto = iniBoleto->sig;
 			}
-			else if (pivote->ant == nullptr)
+			else if (iniBoleto->ant == nullptr)
 			{
-				pivote = pivote->sig;
+				iniBoleto = iniBoleto->sig;
 			}
 			else
 			{
-				pivote = pivote->ant;
+				iniBoleto = iniBoleto->ant;
 			}
 		}
 
@@ -3994,9 +3982,10 @@ void leerBoletos()
 
 	if (leer.is_open())
 	{
-		NodoBoleto* medLeido = new NodoBoleto;
+		NodoBoleto* BolLeido = new NodoBoleto;
+		BolLeido->dato = new DatoBoleto;
 
-		while (!leer.read((char*)medLeido, sizeof(NodoBoleto)).eof())
+		while (!leer.read((char*)BolLeido->dato, sizeof(DatoBoleto)).eof())
 		{
 			while (auxBoleto != nullptr && auxBoleto->sig != nullptr)
 			{
@@ -4004,24 +3993,23 @@ void leerBoletos()
 			}
 			if (auxBoleto == nullptr)
 			{
-				iniBoleto = medLeido;
+				iniBoleto = BolLeido;
 				iniBoleto->sig = nullptr;
 				iniBoleto->ant = nullptr;
 				auxBoleto = iniBoleto;
 			}
 			else
 			{
-				auxBoleto->sig = medLeido;
+				auxBoleto->sig = BolLeido;
 				auxBoleto->sig->ant = auxBoleto;
 				auxBoleto = auxBoleto->sig;
 				auxBoleto->sig = nullptr;
 			}
 
-			medLeido = new NodoBoleto;
+			BolLeido = new NodoBoleto;
 		}
-
 		leer.close();
-		delete medLeido;
+		delete BolLeido;
 	}
 }
 NodoBoleto* binarySearchNombreBoleto(NodoBoleto* head, const char* nombrePasajeroComp) {
@@ -4230,8 +4218,6 @@ void nuevoPasajero(NodoPasajero* nuevoPas)
 		auxPasajero->sig->sig = nullptr;
 		auxPasajero->sig->ant = auxPasajero;
 		auxPasajero = auxPasajero->sig;
-
-
 		auxPasajero->dato = new DatoPasajero;
 
 		strcpy_s(auxPasajero->dato->nombre, nuevoPas->dato->nombre);
@@ -4410,9 +4396,10 @@ void leerPasajeros()
 	if (leer.is_open())
 	{
 		NodoPasajero* pasLeido = new NodoPasajero;
+		pasLeido->dato = new DatoPasajero;
 
-		while (!leer.read((char*)pasLeido, sizeof(NodoPasajero)).eof())
-		{
+		while (!leer.read((char*)pasLeido->dato, sizeof(DatoPasajero)).eof())
+		{		
 			while (auxPasajero != nullptr && auxPasajero->sig != nullptr)
 			{
 				auxPasajero = auxPasajero->sig;
