@@ -1384,13 +1384,13 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 			while (auxVuelo2->sig != nullptr)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST2, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo2->dato->origen);
+				SendDlgItemMessage(hwnd, IDC_LIST2, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo2->dato->num);
 				auxVuelo2 = auxVuelo2->sig;
 			}
 
 			if (auxVuelo2->sig == nullptr/* || auxEsp2->ant == nullptr*/)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST2, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo2->dato->origen);
+				SendDlgItemMessage(hwnd, IDC_LIST2, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo2->dato->num);
 				auxVuelo2 = auxVuelo2->sig;
 			}
 		}
@@ -2588,7 +2588,6 @@ bool cMenu(HWND hwnd, long opcion)
 			DestroyWindow(hwnd);
 			PostQuitMessage(0);
 		}
-
 		default:
 		{
 			break;
