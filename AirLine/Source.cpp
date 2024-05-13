@@ -362,27 +362,27 @@ int WINAPI WinMain(
 
 			if (i == 2)
 			{
-				strcpy_s(ini2->Modelo, "Boeing 737");
-				ini2->asientos = 166;
-				ini2->asientosT = 150;
-				ini2->asientosE = 16;
-				ini2->asientosCT = 1500;
-				ini2->asientosCE = 3000;
-				ini2->asientosN = 17;
-				ini2->asientosA = 124;
-				ini2->asientosM = 25;
+				strcpy_s(aux2->Modelo, "Boeing 737");
+				aux2->asientos = 166;
+				aux2->asientosT = 150;
+				aux2->asientosE = 16;
+				aux2->asientosCT = 1500;
+				aux2->asientosCE = 3000;
+				aux2->asientosN = 17;
+				aux2->asientosA = 124;
+				aux2->asientosM = 25;
 			}
 			else
 			{
-				strcpy_s(ini2->Modelo, "Boeing 777");
-				ini2->asientos = 276;
-				ini2->asientosT = 152;
-				ini2->asientosE = 124;
-				ini2->asientosCT = 1800;
-				ini2->asientosCE = 4200;
-				ini2->asientosN = 28;
-				ini2->asientosA = 207;
-				ini2->asientosM = 41;
+				strcpy_s(aux2->Modelo, "Boeing 777");
+				aux2->asientos = 276;
+				aux2->asientosT = 152;
+				aux2->asientosE = 124;
+				aux2->asientosCT = 1800;
+				aux2->asientosCE = 4200;
+				aux2->asientosN = 28;
+				aux2->asientosA = 207;
+				aux2->asientosM = 41;
 			}
 
 			/*else if (i == 3)
@@ -424,7 +424,7 @@ int WINAPI WinMain(
 
 			if (i == 2)
 			{
-				strcpy_s(ini3->Lugar, "Estados Unidos");
+				strcpy_s(aux3->Lugar, "Estados Unidos");
 			}
 			else if (i == 3)
 			{
@@ -452,7 +452,7 @@ int WINAPI WinMain(
 			}
 			else
 			{
-				strcpy_s(ini3->Lugar, "México - Queretaro");
+				strcpy_s(aux3->Lugar, "México - Queretaro");
 			}
 
 			aux3 = ini3;
@@ -903,16 +903,13 @@ BOOL CALLBACK cDialog3(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					break;
 				}
 			}
-
 			break;
 		}
-
 		default:
 		{
 			break;
 		}
 	}
-
 	return false;  // Un callback siempre retorna falso
 }
 
@@ -1301,10 +1298,6 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				strcpy_s(temp->dato->usuarioRegistro, miUsuario->dato->nick);
 
 				temp->dato->registro = 0.0;
-
-				GetDlgItemText(hwnd, IDC_EDIT2, temp->dato->origen, sizeof(temp->dato->origen));
-				GetDlgItemText(hwnd, IDC_EDIT4, temp->dato->destino, sizeof(temp->dato->destino));
-				//GetDlgItemText(hwnd, IDC_EDIT3, temp->claveChar, sizeof(temp->claveChar));
 				strcpy_s(temp->dato->usuarioRegistro, miUsuario->dato->nick);
 
 				temp->sig = nullptr;
@@ -2243,22 +2236,23 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 				SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 			}
-
-			auxPasajero3 = iniPasajero;
-			if (iniPasajero != nullptr)
+			// Checar
+			if (iniBoleto != nullptr)
 			{
-				while (auxPasajero3->sig != nullptr)
+				auxBoleto3 = iniBoleto;
+				auxBoleto3->dato = new DatoBoleto;
+				auxBoleto3->dato = iniBoleto->dato;
+				while (auxBoleto3->sig != nullptr)
 				{
-					SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxPasajero3->dato->nombreComp/*nombreCompM*/);
-					auxPasajero3 = auxPasajero3->sig;
+					SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto3->dato->nombreCompPasajero/*nombreCompM*/);
+					auxBoleto3 = auxBoleto3->sig;
 				}
-				if (auxBoleto3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
+				if (auxBoleto3 != nullptr || auxBoleto3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
 				{
-					SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxPasajero3->dato->nombreComp/*nombreCompM*/);
-					auxPasajero3 = auxPasajero3->sig;
+					SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto3->dato->nombreCompPasajero/*nombreCompM*/);
+					auxBoleto3 = auxBoleto3->sig;
 				}
 			}
-
 			break;
 		}
 		case WM_COMMAND:
@@ -2601,7 +2595,6 @@ bool cMenu(HWND hwnd, long opcion)
 		}
 
 		}
-
 		break;
 	}
 	default:
@@ -2609,10 +2602,8 @@ bool cMenu(HWND hwnd, long opcion)
 		break;
 	}
 	}
-
 	return true;
 }
-
 
 // Funciones
 #pragma region Funciones
