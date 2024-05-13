@@ -1101,6 +1101,8 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			_itoa_s(aux2->asientos, texto, 10);
 			SetDlgItemText(hwnd, IDC_EDIT20, texto);
 
+			redirection = false;
+
 		}
 		if (miUsuario != nullptr)
 		{
@@ -1374,7 +1376,19 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		case IDC_BUTTON3: // Editar
 		{
+			if (auxVuelo2 == nullptr)
+			{
+				MessageBox(NULL, "No se ha seleccionado un vuelo, seleccione una de la lista con doble click.", "AVISO", MB_OK | MB_ICONERROR);
+			}
+			else
+			{
+				
+				EndDialog(hwnd, 0);
+				HWND hDialog5 = CreateDialog(hInstanceGlobal, MAKEINTRESOURCE(IDD_DIALOG5), 0, cDialog5);
 
+				ShowWindow(hDialog5, SW_SHOW);
+				UpdateWindow(hDialog5); //Opcional
+			}
 
 			break;
 		}
@@ -1542,10 +1556,14 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				{
 				case IDYES:
 				{
-					
-
+					auxVuelo2->dato->status = 2;
+					MessageBox(NULL, "Vuelo cancelado.", "AVISO", MB_OK | MB_ICONINFORMATION);
 					auxVuelo2 = nullptr;
 
+					EndDialog(hwnd, 0);
+					HWND hDialog6 = CreateDialog(hInstanceGlobal, MAKEINTRESOURCE(IDD_DIALOG6), 0, cDialog6);
+					ShowWindow(hDialog6, SW_SHOW);
+					UpdateWindow(hDialog6); //Opcional
 					break;
 				}
 
@@ -1554,9 +1572,10 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					SetDlgItemText(hwnd, IDC_EDIT2, "");
 					SetDlgItemText(hwnd, IDC_EDIT3, "");
 					SetDlgItemText(hwnd, IDC_EDIT4, "");
+					SetDlgItemText(hwnd, IDC_EDIT6, "");
+					SetDlgItemText(hwnd, IDC_EDIT7, "");
 
 					auxVuelo2 = nullptr;
-
 					break;
 				}
 
@@ -1567,7 +1586,6 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 				}
 			}
-
 			break;
 		}
 		
@@ -1576,16 +1594,13 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 		}
-
 		break;
 	}
-
 	default:
 	{
 		break;
 	}
 	}
-
 	return false;  // Un callback siempre retorna falso
 }
 
