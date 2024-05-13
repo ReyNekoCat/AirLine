@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Spanish (Mexico) resources
+// Español (México) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESM)
 LANGUAGE LANG_SPANISH, SUBLANG_SPANISH_MEXICAN
@@ -186,7 +186,6 @@ BEGIN
     EDITTEXT        IDC_EDIT4,56,230,212,20,ES_AUTOHSCROLL | ES_READONLY
     CTEXT           "Fecha:",IDC_STATIC,56,260,212,20,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
     EDITTEXT        IDC_EDIT6,56,290,212,20,ES_AUTOHSCROLL | ES_READONLY
-    PUSHBUTTON      "Confirmar",IDC_BUTTON3,355,356,50,14
     CONTROL         "",IDC_BMP,"Static",SS_BITMAP,490,20,15,13
     CTEXT           "Estado:",IDC_STATIC,56,320,212,20,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
     EDITTEXT        IDC_EDIT7,56,350,212,20,ES_AUTOHSCROLL | ES_READONLY
@@ -233,9 +232,7 @@ BEGIN
     PUSHBUTTON      "Asiento",IDC_BUTTON2,565,50,55,15
     CTEXT           "Asientos disponibles:",IDC_STATIC,56,250,74,15,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
     EDITTEXT        IDC_EDIT20,130,250,55,15,ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER
-    CTEXT           "Total:",IDC_STATIC,206,250,75,15,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
-    EDITTEXT        IDC_EDIT23,281,250,55,15,ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER
-    PUSHBUTTON      "Generar reporte",IDC_BUTTON1,510,250,165,15
+    PUSHBUTTON      "Generar manifiesto",IDC_BUTTON1,510,250,165,15
     CTEXT           "Estado:",IDC_STATIC,369,250,75,15,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
     EDITTEXT        IDC_EDIT27,445,250,55,15,ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER
 END
@@ -1017,12 +1014,12 @@ BEGIN
     END
 END
 
-#endif    // Spanish (Mexico) resources
+#endif    // Español (México) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Spanish (Spain, International Sort) resources
+// Español (España, alfabetización internacional) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESN)
 LANGUAGE LANG_SPANISH, SUBLANG_SPANISH_MODERN
@@ -1053,7 +1050,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // Spanish (Spain, International Sort) resources
+#endif    // Español (España, alfabetización internacional) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
