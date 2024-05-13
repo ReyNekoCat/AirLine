@@ -28,6 +28,7 @@
 #define IDC_LIST1                       1006
 #define IDC_EDIT4                       1007
 #define IDC_LIST4                       1007
+#define IDC_BUTTON11                    1007
 #define IDC_EDIT5                       1008
 #define IDC_LIST2                       1008
 #define IDC_LIST5                       1008
@@ -61,6 +62,7 @@
 #define IDC_EDIT20                      1031
 #define IDC_DATETIMEPICKER1             1032
 #define IDC_EDIT23                      1033
+#define IDC_DATETIMEPICKER2             1033
 #define IDC_EDIT10                      1034
 #define IDC_EDIT11                      1035
 #define IDC_EDIT19                      1036
@@ -109,13 +111,14 @@
 #define ID_BOLETOS_REGISTRO             40032
 #define ID_BOLETOS_ABORDAJE             40033
 #define ID_PASES                        40034
+#define ID_VUELOS_REPOTE                40035
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        133
-#define _APS_NEXT_COMMAND_VALUE         40035
+#define _APS_NEXT_COMMAND_VALUE         40036
 #define _APS_NEXT_CONTROL_VALUE         1059
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

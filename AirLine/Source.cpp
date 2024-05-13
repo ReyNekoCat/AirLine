@@ -221,6 +221,7 @@ void preOrderList(NodoUsuario*, HWND);
 void inOrderList(NodoUsuario*, HWND);
 void reporteVuelos();
 #pragma endregion
+#pragma endregion
 
 #pragma region Funciones de Listas Boletos
 void nuevoBoleto(NodoBoleto*);
@@ -1865,7 +1866,128 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 }
 
 //Reporte de vuelos
+BOOL CALLBACK cDialog9(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+	{
+		if (miUsuario != nullptr)
+		{
+			SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->dato->nombreComp);
+		}
+		if (miUsuario->dato->foto != nullptr)
+		{
+			strcpy_s(zFile, miUsuario->dato->foto); //Inicializar zfile con la dirección de memoria del puntero foto
 
+			HBITMAP bmp; //1
+			bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
+			SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
+		}
+
+		auxVuelo3 = iniVuelo; // Vuelos
+		if (iniVuelo != nullptr)
+		{
+			while (auxVuelo3->sig != nullptr)
+			{
+				SendDlgItemMessage(hwnd, IDC_LIST1, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo3->dato->origen);
+				auxVuelo3 = auxVuelo3->sig;
+			}
+
+			if (auxVuelo3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
+			{
+				SendDlgItemMessage(hwnd, IDC_LIST1, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo3->dato->origen);
+				auxVuelo3 = auxVuelo3->sig;
+			}
+		}
+		else
+		{
+			MessageBox(NULL, "No hay vuelos registrados.", "AVISO", MB_OK | MB_ICONINFORMATION);
+		}
+
+		break;
+	}
+	case WM_COMMAND:
+	{
+		long opcion = LOWORD(wParam);
+		cMenu(hwnd, opcion);
+
+		switch (LOWORD(wParam))
+		{
+		//case IDC_LIST1: // Vuelos
+		//{
+		//	switch (HIWORD(wParam))
+		//	{
+		//	case LBN_DBLCLK: //Al dar doble clic en el ListBox 
+		//	{
+		//		int num;
+		//		int indice = 0;
+		//		indice = SendDlgItemMessage(hwnd, IDC_LIST1, LB_GETCURSEL, 0, 0);
+		//		SendDlgItemMessage(hwnd, IDC_LIST1, LB_GETTEXT, indice, (LPARAM)num);
+		//		auxVuelo3 = iniVuelo;
+		//		while (auxVuelo3->sig != nullptr && auxVuelo3->dato->num == num)
+		//		{
+		//			auxVuelo3 = auxVuelo3->sig;
+		//		}
+		//		break;
+		//	}
+		//	default:
+		//	{
+		//		break;
+		//	}
+		//	}
+		//	break;
+		//}
+		case IDC_BUTTON1: // Más recientes
+		{
+
+
+			break;
+		}
+		case IDC_BUTTON2: // Más antiguos
+		{
+
+
+			break;
+		}
+		case IDC_BUTTON3: // Fechas
+		{
+
+
+			break;
+		}
+		case IDC_BUTTON4: // Reporte
+		{
+			if (iniVuelo == nullptr)
+			{
+				MessageBox(NULL, "No hay vuelos registrados.", "AVISO", MB_OK | MB_ICONERROR);
+			}
+			else
+			{
+				reporteVuelos();
+				MessageBox(NULL, "Reporte fue guardado.", "AVISO", MB_OK | MB_ICONEXCLAMATION);
+			}
+
+			break;
+		}
+
+		default:
+		{
+			break;
+		}
+		}
+
+		break;
+	}
+
+	default:
+	{
+		break;
+	}
+	}
+
+	return false;  // Un callback siempre retorna falso
+}
 
 // Registro Pasajeros
 BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -2568,14 +2690,14 @@ bool cMenu(HWND hwnd, long opcion)
 
 		break;
 	}
-	//case ---: // Lista Medicos
-	//{
-	//	EndDialog(hwnd, 0);
-	//	HWND hDialog8 = CreateDialog(hInstanceGlobal, MAKEINTRESOURCE(IDD_DIALOG8), 0, cDialog8);
-	//	ShowWindow(hDialog8, SW_SHOW);
-	//	UpdateWindow(hDialog8); //Opcional
-	//	break;
-	//}
+	case ID_VUELOS_REPOTE: // Reporte Vuelos
+	{
+		EndDialog(hwnd, 0);
+		HWND hDialog9 = CreateDialog(hInstanceGlobal, MAKEINTRESOURCE(IDD_DIALOG9), 0, cDialog9);
+		ShowWindow(hDialog9, SW_SHOW);
+		UpdateWindow(hDialog9); //Opcional
+		break;
+	}
 	//case ---: // Reporte Medicos
 	//{
 	//	EndDialog(hwnd, 0);
@@ -3451,8 +3573,10 @@ void escribirVuelo()
 			if (escribir.bad())
 			{
 				MessageBox(NULL, "Ocurrió un error durante la escritura", "Error", MB_OK | MB_ICONERROR);
+
 				return;
 			}
+
 			escribir.write((char*)auxVuelo->dato, sizeof(DatoVuelo));
 			auxVuelo = auxVuelo->sig;
 		}
@@ -3512,17 +3636,20 @@ void reporteVuelos()
 		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
 		return;
 	}
-	auxBoleto = iniBoleto;
+	auxVuelo = iniVuelo;
 	if (escribir.is_open())
 	{
-		while (auxBoleto != nullptr)
+		while (auxVuelo != nullptr)
 		{
-			if (escribir.bad()) {
+			if (escribir.bad())
+			{
 				MessageBox(NULL, "Ocurrió un error durante la escritura", "Error", MB_OK | MB_ICONERROR);
+
 				return;
 			}
-			escribir.write((char*)auxBoleto, sizeof(NodoBoleto));
-			auxBoleto = auxBoleto->sig;
+
+			escribir.write((char*)auxVuelo->dato, sizeof(DatoVuelo));
+			auxVuelo = auxVuelo->sig;
 		}
 		escribir.close();
 	}
@@ -4662,6 +4789,4 @@ void printList(NodoVuelo* head) {
 
 #pragma endregion
 #pragma endregion
-#pragma endregion
-
 #pragma endregion
