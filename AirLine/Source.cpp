@@ -88,9 +88,7 @@ struct DatoBoleto {
 	char usuarioRegistro[30];
 	//char diasChar[30];
 };
-boleto* pivote, * iniBoleto, * auxBoleto, * auxBoleto2, * auxBoleto3 = nullptr;
-
-struct pasajero
+struct NodoBoleto
 {
 	DatoBoleto* dato;
 	NodoBoleto* ant;
@@ -213,12 +211,14 @@ NodoUsuario* searchTree(struct NodoUsuario*, DatoUsuario*);
 NodoUsuario* deleteTreeNodeByNick(NodoUsuario*, char*);
 #pragma endregion
 
-#pragma region Funciones de Listas Vuelos (Especialidades)
+#pragma region Funciones de Listas Vuelos
 void nuevoVuelo(NodoVuelo* nueva);
 void eliminarVuelo(char vuelo[30]);
 void escribirVuelo();
 void leerVuelos();
 void reporteVuelos(); //Antes Boletos/Medicos
+void printVuelosEnRango(HWND, int, NodoVuelo*, DATE, DATE);
+void generarManifiestoPasajeros(NodoBoleto*, int, const char*);
 //QuickSort
 void swapData(NodoVuelo*, NodoVuelo*);
 NodoVuelo* lastNode(NodoVuelo*);
@@ -232,19 +232,32 @@ void inOrderList(NodoUsuario*, HWND);
 void reporteVuelos();
 #pragma endregion
 
-#pragma region Funciones de Listas Boletos (Medicos)
-void nuevoBoleto(NodoBoleto* nuevoMed);
-void eliminarBoleto(char medicoNom[60]);
+#pragma region Funciones de Listas Boletos
+void nuevoBoleto(NodoBoleto*);
+//void eliminarBoleto(char);
 void escribirBoletos();
 void leerBoletos();
-
+NodoBoleto* binarySearchNombreBoleto(NodoBoleto*, const char*);
+#pragma region QuickSort
+//Generales
 void swapData(NodoBoleto*, NodoBoleto*);
 NodoBoleto* lastNode(NodoBoleto*);
-
-NodoBoleto* partitionNumVuelo(NodoBoleto*, NodoBoleto*);
+//Específicas
+NodoBoleto* partitionNumAsiento(NodoBoleto*, NodoBoleto*);
 void _quickSortNumAsiento(NodoBoleto*, NodoBoleto*);
 void quickSortNumAsiento(NodoBoleto*);
-//void printListAsiento(NodoBoleto*);
+
+NodoBoleto* partitionNumVuelo(NodoBoleto*, NodoBoleto*);
+void _quickSortNumVuelo(NodoBoleto*, NodoBoleto*);
+void quickSortNumVuelo(NodoBoleto*);
+
+NodoBoleto* partitionNomPasajero(NodoBoleto*, NodoBoleto*);
+void _quickSortNomPasajero(NodoBoleto*, NodoBoleto*);
+void quickSortNomPasajero(NodoBoleto*);
+
+void printBoletosDeVueloList(HWND, int, NodoBoleto*, int);
+void printList(NodoBoleto*);
+#pragma	endregion
 #pragma endregion
 
 #pragma region Funciones de Listas Pasajeros (Pacientes)
@@ -253,6 +266,7 @@ void eliminarPasajero(char NodoPasajero[60]);
 void escribirPasajeros();
 void leerPasajeros();
 void reportePasajeros(); //No es necesario
+NodoPasajero* binarySearchNombrePasajero(NodoPasajero*, const char*);
 
 void swapData(NodoPasajero* a, NodoPasajero* b);
 void heapify(NodoPasajero* head, int n, NodoPasajero* NodoUsuario);
@@ -1244,7 +1258,7 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 				int num;
 				char numC[10];
-				num = auxVuelo3->num + 1;
+				num = auxVuelo3->dato->num + 1;
 
 				_itoa_s(num, numC, 10);
 				SetDlgItemText(hwnd, IDC_EDIT2, numC);
@@ -1267,22 +1281,22 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 			auxVuelo2 = iniVuelo;
 
-			while (auxVuelo2/*->sig*/ != nullptr && strcmp(espBuscar, auxVuelo2->dato->origen) != 0)
+			while (auxVuelo2/*->sig*/ != nullptr && strcmp(numBuscarC, auxVuelo2->dato->origen) != 0)
 			{
 				auxVuelo2 = auxVuelo2->sig;
 			}
 
-			if (auxVuelo2/*->sig*/ == nullptr || strcmp(espBuscar, auxVuelo2->dato->origen) != 0)
+			if (auxVuelo2/*->sig*/ == nullptr || strcmp(numBuscarC, auxVuelo2->dato->origen) != 0)
 			{
 				NodoVuelo* temp = new NodoVuelo;
 
 				char numAsignadoC[10];
 				GetDlgItemText(hwnd, IDC_EDIT2, numAsignadoC, sizeof(numAsignadoC));
-				temp->num = atoi(numAsignadoC);
+				temp->dato->num = atoi(numAsignadoC);
 
-				GetDlgItemText(hwnd, IDC_EDIT3, temp->origen, sizeof(temp->origen));
-				GetDlgItemText(hwnd, IDC_EDIT4, temp->destino, sizeof(temp->destino));
-				GetDlgItemText(hwnd, IDC_EDIT17, temp->modelo, sizeof(temp->modelo));
+				GetDlgItemText(hwnd, IDC_EDIT3, temp->dato->origen, sizeof(temp->dato->origen));
+				GetDlgItemText(hwnd, IDC_EDIT4, temp->dato->destino, sizeof(temp->dato->destino));
+				GetDlgItemText(hwnd, IDC_EDIT17, temp->dato->modelo, sizeof(temp->dato->modelo));
 
 				//Se obtiene la fecha
 				HWND hDia = GetDlgItem(hwnd, IDC_DATETIMEPICKER1);
@@ -1290,13 +1304,13 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				DateTime_GetSystemtime(hDia, &diaCumple);
 				SystemTimeToVariantTime(&diaCumple, &dia);
 
-				temp->status = 0;
+				temp->dato->status = 0;
 
-				temp->fecha = dia;
+				temp->dato->fecha = dia;
 
-				strcpy_s(temp->usuarioRegistro, miUsuario->nick);
+				strcpy_s(temp->dato->usuarioRegistro, miUsuario->dato->nick);
 
-				temp->registro = 0.0;
+				temp->dato->registro = 0.0;
 
 				GetDlgItemText(hwnd, IDC_EDIT2, temp->dato->origen, sizeof(temp->dato->origen));
 				GetDlgItemText(hwnd, IDC_EDIT4, temp->dato->destino, sizeof(temp->dato->destino));
@@ -1416,16 +1430,16 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 				auxVuelo2 = iniVuelo;
 
-				while (auxVuelo2->sig != nullptr && strcmp(auxVuelo2->origen, vueloO) != 0)
+				while (auxVuelo2->sig != nullptr && strcmp(auxVuelo2->dato->origen, vueloO) != 0)
 				{
 					auxVuelo2 = auxVuelo2->sig;
 				}
 
-				SetDlgItemText(hwnd, IDC_EDIT2, auxVuelo2->num);
-				SetDlgItemText(hwnd, IDC_EDIT3, auxVuelo2->origen);
-				SetDlgItemText(hwnd, IDC_EDIT4, auxVuelo2->destino);
-				SetDlgItemText(hwnd, IDC_EDIT6, auxVuelo2->fecha);
-				SetDlgItemText(hwnd, IDC_EDIT7, auxVuelo2->status);
+				SetDlgItemInt(hwnd, IDC_EDIT2, auxVuelo2->dato->num, NULL);
+				SetDlgItemText(hwnd, IDC_EDIT3, auxVuelo2->dato->origen);
+				SetDlgItemText(hwnd, IDC_EDIT4, auxVuelo2->dato->destino);
+				SetDlgItemInt(hwnd, IDC_EDIT6, auxVuelo2->dato->fecha, NULL);
+				SetDlgItemInt(hwnd, IDC_EDIT7, auxVuelo2->dato->status, NULL);
 
 				break;
 			}
@@ -1683,12 +1697,12 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 				while (auxBoleto3->sig != nullptr)
 				{
-					SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto3->nombreCompPasajero/*nombreCompM*/);
+					SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto3->dato->nombreCompPasajero/*nombreCompM*/);
 					auxBoleto3 = auxBoleto3->sig;
 				}
 				if (auxBoleto3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
 				{
-					SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto3->nombreCompPasajero/*nombreCompM*/);
+					SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto3->dato->nombreCompPasajero/*nombreCompM*/);
 					auxBoleto3 = auxBoleto3->sig;
 				}
 			}
@@ -1735,18 +1749,18 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 					auxBoleto3 = iniBoleto;
 
-					while (auxBoleto3->sig != nullptr && strcmp(auxBoleto3->nombreCompPasajero, num) != 0)
+					while (auxBoleto3->sig != nullptr && strcmp(auxBoleto3->dato->nombreCompPasajero, num) != 0)
 					{
 						auxBoleto3 = auxBoleto3->sig;
 
 					}
 
-					SetDlgItemText(hwnd, IDC_EDIT2, auxBoleto3->nombrePasajero);
-					SetDlgItemText(hwnd, IDC_EDIT3, auxBoleto3->apellidoPPasajero);
-					SetDlgItemText(hwnd, IDC_EDIT4, auxBoleto3->apellidoMPasajero);
+					SetDlgItemText(hwnd, IDC_EDIT2, auxBoleto3->dato->nombrePasajero);
+					SetDlgItemText(hwnd, IDC_EDIT3, auxBoleto3->dato->apellidoPPasajero);
+					SetDlgItemText(hwnd, IDC_EDIT4, auxBoleto3->dato->apellidoMPasajero);
 
 					//SetDlgItemText(hwnd, IDC_EDIT5, auxBoleto3->cedulaChar);
-					SetDlgItemText(hwnd, IDC_EDIT18, auxBoleto3->vuelo);
+					SetDlgItemInt(hwnd, IDC_EDIT18, auxBoleto3->dato->numVuelo, NULL);
 
 					//SetDlgItemText(hwnd, IDC_EDIT8, auxBoleto3->telefonoChar);
 
@@ -1832,14 +1846,14 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		if (miUsuario != nullptr)
 		{
-			SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->nombreComp);
+			SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->dato->nombreComp);
 		}
-		if (miUsuario->foto != nullptr)
+		if (miUsuario->dato->foto != nullptr)
 		{
-			strcpy_s(zFile, miUsuario->foto); //Inicializar zfile con la dirección de memoria del puntero foto
+			strcpy_s(zFile, miUsuario->dato->foto); //Inicializar zfile con la dirección de memoria del puntero foto
 
 			HBITMAP bmp; //1
-			bmp = (HBITMAP)LoadImage(NULL, miUsuario->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
+			bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 			SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 		}
 
@@ -1915,28 +1929,29 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 			auxPasajero2 = iniPasajero;
 
-			while (auxPasajero2/*->sig*/ != nullptr && strcmp(pasajeroBuscar, auxPasajero2->nombreComp) != 0)
+			while (auxPasajero2/*->sig*/ != nullptr && strcmp(pasajeroBuscar, auxPasajero2->dato->nombreComp) != 0)
 			{
 				auxPasajero2 = auxPasajero2->sig;
 			}
 
-			if (auxPasajero2/*->sig*/ == nullptr || strcmp(pasajeroBuscar, auxPasajero2->nombreComp) != 0)
+			if (auxPasajero2/*->sig*/ == nullptr || strcmp(pasajeroBuscar, auxPasajero2->dato->nombreComp) != 0)
 			{
-				pasajero* temp = new pasajero;
+				NodoPasajero* temp = new NodoPasajero;
+				temp->dato = new DatoPasajero;
 
-				GetDlgItemText(hwnd, IDC_EDIT2, temp->nombre, sizeof(temp->nombre));
-				GetDlgItemText(hwnd, IDC_EDIT3, temp->apellidoP, sizeof(temp->apellidoP));
-				GetDlgItemText(hwnd, IDC_EDIT4, temp->apellidoM, sizeof(temp->apellidoM));
-				GetDlgItemText(hwnd, IDC_EDIT6, temp->nacionalidad, sizeof(temp->nacionalidad));
+				GetDlgItemText(hwnd, IDC_EDIT2, temp->dato->nombre, sizeof(temp->dato->nombre));
+				GetDlgItemText(hwnd, IDC_EDIT3, temp->dato->apellidoP, sizeof(temp->dato->apellidoP));
+				GetDlgItemText(hwnd, IDC_EDIT4, temp->dato->apellidoM, sizeof(temp->dato->apellidoM));
+				GetDlgItemText(hwnd, IDC_EDIT6, temp->dato->nacionalidad, sizeof(temp->dato->nacionalidad));
 
 				//Genero
 				if (IDC_RADIO1 == BST_CHECKED)
 				{
-					temp->genero = 1;
+					temp->dato->genero = 1;
 				}
 				else
 				{
-					temp->genero = 0;
+					temp->dato->genero = 0;
 				}
 
 				//Se obtiene la fecha de nacimiento
@@ -1945,11 +1960,11 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				DateTime_GetSystemtime(hDia, &diaCumple);
 				SystemTimeToVariantTime(&diaCumple, &dia);
 
-				temp->nacimiento = dia;
+				temp->dato->nacimiento = dia;
 
-				strcpy_s(temp->usuarioRegistro, miUsuario->nick);
+				strcpy_s(temp->dato->usuarioRegistro, miUsuario->dato->nick);
 
-				temp->registro = 0.0;
+				temp->dato->registro = 0.0;
 
 				nuevoPasajero(temp);
 
@@ -2070,19 +2085,19 @@ BOOL CALLBACK cDialog11(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					GetDlgItemText(hwnd, IDC_EDIT2, pasajeroBuscar, sizeof(pasajeroBuscar));
 					
 					auxPasajero3 = iniPasajero;
-					while (auxPasajero3->sig != nullptr && strcmp(pasajeroBuscar, auxPasajero3->nombreComp) != 0)
+					while (auxPasajero3->sig != nullptr && strcmp(pasajeroBuscar, auxPasajero3->dato->nombreComp) != 0)
 					{
 						auxPasajero3 = auxPasajero3->sig;
 					}
 
-					if (strcmp(pasajeroBuscar, auxPasajero3->nombreComp) == 0)
+					if (strcmp(pasajeroBuscar, auxPasajero3->dato->nombreComp) == 0)
 					{
-						SetDlgItemText(hwnd, IDC_EDIT3, auxPasajero3->nombre);
-						SetDlgItemText(hwnd, IDC_EDIT4, auxPasajero3->apellidoP);
-						SetDlgItemText(hwnd, IDC_EDIT5, auxPasajero3->apellidoM);
+						SetDlgItemText(hwnd, IDC_EDIT3, auxPasajero3->dato->nombre);
+						SetDlgItemText(hwnd, IDC_EDIT4, auxPasajero3->dato->apellidoP);
+						SetDlgItemText(hwnd, IDC_EDIT5, auxPasajero3->dato->apellidoM);
 
 						//Genero
-						if (auxPasajero3->genero == 1)
+						if (auxPasajero3->dato->genero == 1)
 						{
 							SetDlgItemText(hwnd, IDC_EDIT9, "Masculino");
 						}
@@ -2093,12 +2108,12 @@ BOOL CALLBACK cDialog11(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 						//Edad/Nacimiento
 						char cadenaNacimiento[100];
-						sprintf_s(cadenaNacimiento, "%f", auxPasajero3->nacimiento);
+						sprintf_s(cadenaNacimiento, "%f", auxPasajero3->dato->nacimiento);
 						SetDlgItemText(hwnd, IDC_EDIT10, cadenaNacimiento);
-						sprintf_s(cadenaNacimiento, "%f", auxPasajero3->nacimiento);
+						sprintf_s(cadenaNacimiento, "%f", auxPasajero3->dato->nacimiento);
 						SetDlgItemText(hwnd, IDC_EDIT11, cadenaNacimiento);
 
-						SetDlgItemText(hwnd, IDC_EDIT16, auxPasajero3->nacionalidad);
+						SetDlgItemText(hwnd, IDC_EDIT16, auxPasajero3->dato->nacionalidad);
 					}
 					else
 					{
@@ -2111,26 +2126,26 @@ BOOL CALLBACK cDialog11(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				}
 				case IDC_BUTTON2: // Editar
 				{
-					GetDlgItemText(hwnd, IDC_EDIT3, auxPasajero3->nombre, sizeof(auxPasajero3->nombre));
-					GetDlgItemText(hwnd, IDC_EDIT4, auxPasajero3->apellidoP, sizeof(auxPasajero3->apellidoP));
-					GetDlgItemText(hwnd, IDC_EDIT5, auxPasajero3->apellidoM, sizeof(auxPasajero3->apellidoM));
-					GetDlgItemText(hwnd, IDC_EDIT16, auxPasajero3->nacionalidad, sizeof(auxPasajero3->nacionalidad));
+					GetDlgItemText(hwnd, IDC_EDIT3, auxPasajero3->dato->nombre, sizeof(auxPasajero3->dato->nombre));
+					GetDlgItemText(hwnd, IDC_EDIT4, auxPasajero3->dato->apellidoP, sizeof(auxPasajero3->dato->apellidoP));
+					GetDlgItemText(hwnd, IDC_EDIT5, auxPasajero3->dato->apellidoM, sizeof(auxPasajero3->dato->apellidoM));
+					GetDlgItemText(hwnd, IDC_EDIT16, auxPasajero3->dato->nacionalidad, sizeof(auxPasajero3->dato->nacionalidad));
 
 					// Concatenación
-					strcpy_s(auxPasajero3->nombreComp, auxPasajero3->nombre);
-					strcat_s(auxPasajero3->nombreComp, " ");
-					strcat_s(auxPasajero3->nombreComp, auxPasajero3->apellidoP);
-					strcat_s(auxPasajero3->nombreComp, " ");
-					strcat_s(auxPasajero3->nombreComp, auxPasajero3->apellidoM);
+					strcpy_s(auxPasajero3->dato->nombreComp, auxPasajero3->dato->nombre);
+					strcat_s(auxPasajero3->dato->nombreComp, " ");
+					strcat_s(auxPasajero3->dato->nombreComp, auxPasajero3->dato->apellidoP);
+					strcat_s(auxPasajero3->dato->nombreComp, " ");
+					strcat_s(auxPasajero3->dato->nombreComp, auxPasajero3->dato->apellidoM);
 
 					//Genero
 					if (IDC_RADIO1 == BST_CHECKED)
 					{
-						auxPasajero3->genero = 1;
+						auxPasajero3->dato->genero = 1;
 					}
 					else
 					{
-						auxPasajero3->genero = 0;
+						auxPasajero3->dato->genero = 0;
 					}
 
 					//Se obtiene la fecha de nacimiento
@@ -2139,11 +2154,11 @@ BOOL CALLBACK cDialog11(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					DateTime_GetSystemtime(hDia, &diaCumple);
 					SystemTimeToVariantTime(&diaCumple, &dia);
 
-					auxPasajero3->nacimiento = dia;
+					auxPasajero3->dato->nacimiento = dia;
 
-					strcpy_s(auxPasajero3->usuarioRegistro, miUsuario->nick);
+					strcpy_s(auxPasajero3->dato->usuarioRegistro, miUsuario->dato->nick);
 
-					auxPasajero3->registro = 0.0;
+					auxPasajero3->dato->registro = 0.0;
 
 					MessageBox(NULL, "Cambios guardados.", "AVISO", MB_OK | MB_ICONINFORMATION);
 
@@ -2177,11 +2192,11 @@ BOOL CALLBACK cDialog11(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						GetDlgItemText(hwnd, IDC_EDIT2, pasajero, sizeof(pasajero));
 
 						auxPasajero3 = iniPasajero;
-						while (auxPasajero3->sig != nullptr && strcmp(pasajero, auxPasajero3->nombreComp) != 0)
+						while (auxPasajero3->sig != nullptr && strcmp(pasajero, auxPasajero3->dato->nombreComp) != 0)
 						{
 							auxPasajero3 = auxPasajero3->sig;
 						}
-						if (/*auxPasajero3->sig == nullptr && */strcmp(pasajero, auxPasajero3->nombreComp) != 0)
+						if (/*auxPasajero3->sig == nullptr && */strcmp(pasajero, auxPasajero3->dato->nombreComp) != 0)
 						{
 							MessageBox(NULL, "No se encontró al pasajero.", "AVISO", MB_OK | MB_ICONINFORMATION);
 
@@ -2195,7 +2210,7 @@ BOOL CALLBACK cDialog11(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						}
 						else
 						{
-							eliminarPasajero(auxPasajero3->nombreComp);
+							eliminarPasajero(auxPasajero3->dato->nombreComp);
 
 							SetDlgItemText(hwnd, IDC_EDIT3, "");
 							SetDlgItemText(hwnd, IDC_EDIT4, "");
@@ -2270,12 +2285,12 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 				while (auxPasajero3->sig != nullptr)
 				{
-					SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxPasajero3->nombreComp/*nombreCompM*/);
+					SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxPasajero3->dato->nombreComp/*nombreCompM*/);
 					auxPasajero3 = auxPasajero3->sig;
 				}
 				if (auxBoleto3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
 				{
-					SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxPasajero3->nombreComp/*nombreCompM*/);
+					SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxPasajero3->dato->nombreComp/*nombreCompM*/);
 					auxPasajero3 = auxPasajero3->sig;
 				}
 			}
@@ -3236,27 +3251,26 @@ void printList(NodoUsuario* node)
 
 //Listas de Vuelos (Especialidades)
 #pragma region Funciones de Listas Vuelos (Especialidades)
-void nuevoVuelo(NodoVuelo* nueva)
 //Listas de Vuelos
 #pragma region Funciones de Listas Vuelos
-void nuevoVuelo(Vuelo* nuevoV)
+void nuevoVuelo(NodoVuelo* nuevoV)
 {
 	if (iniVuelo == nullptr)
 	{ //Si 'inicio->sig es igual a nullptr, o sea, apunta a nada, la lista esta vacia
 		iniVuelo = new NodoVuelo;
 
-		strcpy_s(iniVuelo->dato->origen, nueva->dato->origen);
-		strcpy_s(iniVuelo->dato->destino, nueva->dato->destino);
-		strcpy_s(iniVuelo->origen, nuevoV->origen);
-		strcpy_s(iniVuelo->destino, nuevoV->destino);
-		strcpy_s(iniVuelo->modelo, nuevoV->modelo);
+		strcpy_s(iniVuelo->dato->origen, nuevoV->dato->origen);
+		strcpy_s(iniVuelo->dato->destino, nuevoV->dato->destino);
+		strcpy_s(iniVuelo->dato->origen, nuevoV->dato->origen);
+		strcpy_s(iniVuelo->dato->destino, nuevoV->dato->destino);
+		strcpy_s(iniVuelo->dato->modelo, nuevoV->dato->modelo);
 
-		iniVuelo->num = nuevoV->num;
-		iniVuelo->fecha = nuevoV->fecha;
-		iniVuelo->status = nuevoV->status;
-		iniVuelo->registro = nuevoV->registro;
+		iniVuelo->dato->num = nuevoV->dato->num;
+		iniVuelo->dato->fecha = nuevoV->dato->fecha;
+		iniVuelo->dato->status = nuevoV->dato->status;
+		iniVuelo->dato->registro = nuevoV->dato->registro;
 
-		strcpy_s(iniVuelo->usuarioRegistro, nuevoV->usuarioRegistro);
+		strcpy_s(iniVuelo->dato->usuarioRegistro, nuevoV->dato->usuarioRegistro);
 
 		iniVuelo->sig = nullptr;
 		iniVuelo->ant = nullptr;
@@ -3279,16 +3293,16 @@ void nuevoVuelo(Vuelo* nuevoV)
 		auxVuelo->sig->ant = auxVuelo;
 		auxVuelo = auxVuelo->sig;
 
-		strcpy_s(auxVuelo->origen, nuevoV->origen);
-		strcpy_s(auxVuelo->destino, nuevoV->destino);
-		strcpy_s(auxVuelo->modelo, nuevoV->modelo);
+		strcpy_s(auxVuelo->dato->origen, nuevoV->dato->origen);
+		strcpy_s(auxVuelo->dato->destino, nuevoV->dato->destino);
+		strcpy_s(auxVuelo->dato->modelo, nuevoV->dato->modelo);
 
-		auxVuelo->num = nuevoV->num;
-		auxVuelo->fecha = nuevoV->fecha;
-		auxVuelo->status = nuevoV->status;
-		auxVuelo->registro = nuevoV->registro;
+		auxVuelo->dato->num = nuevoV->dato->num;
+		auxVuelo->dato->fecha = nuevoV->dato->fecha;
+		auxVuelo->dato->status = nuevoV->dato->status;
+		auxVuelo->dato->registro = nuevoV->dato->registro;
 
-		strcpy_s(auxVuelo->usuarioRegistro, nuevoV->usuarioRegistro);
+		strcpy_s(auxVuelo->dato->usuarioRegistro, nuevoV->dato->usuarioRegistro);
 
 		auxVuelo2 = auxVuelo;
 		auxVuelo3 = auxVuelo;
@@ -3509,7 +3523,7 @@ void printVuelosEnRango(HWND hwnd, int List, NodoVuelo* iniVuelos, DATE inicioDa
 		if (nodo->dato->fecha >= inicioDate && nodo->dato->fecha <= finDate) {
 			// Convertir el número de vuelo a una cadena
 			char numVueloStr[10];
-			sprintf(numVueloStr, "%d", nodo->dato->num);
+			sprintf_s(numVueloStr, sizeof(numVueloStr), "%d", nodo->dato->num);
 
 			// Agregar el número de vuelo al ListBox
 			SendDlgItemMessage(hwnd, List, LB_ADDSTRING, 0, (LPARAM)numVueloStr);
@@ -3518,8 +3532,9 @@ void printVuelosEnRango(HWND hwnd, int List, NodoVuelo* iniVuelos, DATE inicioDa
 }
 void generarManifiestoPasajeros(NodoBoleto* iniBoletos, int numVuelo, const char* nombreArchivo) {
 	// Abrir el archivo de texto para escritura
-	FILE* archivo = fopen(nombreArchivo, "w");
-	if (archivo == NULL) {
+	FILE* archivo;
+	errno_t err = fopen_s(&archivo, nombreArchivo, "w");
+	if (err != 0) {
 		printf("No se pudo abrir el archivo %s\n", nombreArchivo);
 		return;
 	}
@@ -3531,7 +3546,7 @@ void generarManifiestoPasajeros(NodoBoleto* iniBoletos, int numVuelo, const char
 				// Escribir los datos del pasajero en el archivo			
 				int edad = formatoEdad(pasajero->dato->nacimiento);
 				char edadStr[4];
-				sprintf(edadStr, "%d", edad);
+				sprintf_s(edadStr, sizeof(edadStr), "%d", edad);
 				fprintf(archivo, "Nombre: %s, Edad: %s, Nacionalidad: %s\n",
 					pasajero->dato->nombreComp, edadStr, pasajero->dato->nacionalidad);
 			}
@@ -4204,11 +4219,11 @@ void nuevoPasajero(NodoPasajero* nuevoPas)
 		strcat_s(iniPasajero->dato->nombreComp, " ");
 		strcat_s(iniPasajero->dato->nombreComp, iniPasajero->dato->apellidoM);
 
-		strcpy_s(iniPasajero->nacionalidad, nuevoPas->nacionalidad);
+		strcpy_s(iniPasajero->dato->nacionalidad, nuevoPas->dato->nacionalidad);
 
-		iniPasajero->genero = nuevoPas->genero;
-		iniPasajero->nacimiento = nuevoPas->nacimiento;
-		iniPasajero->registro = nuevoPas->registro;
+		iniPasajero->dato->genero = nuevoPas->dato->genero;
+		iniPasajero->dato->nacimiento = nuevoPas->dato->nacimiento;
+		iniPasajero->dato->registro = nuevoPas->dato->registro;
 		
 		// ::: CAMBIO DE TIPO ::: //
 		//strcpy_s(iniPas->fecha, nuevoPas->fecha);
@@ -4239,7 +4254,7 @@ void nuevoPasajero(NodoPasajero* nuevoPas)
 			auxPasajero = auxPasajero->sig;
 		}
 
-		auxPasajero->sig = new pasajero;
+		auxPasajero->sig = new NodoPasajero;
 		auxPasajero->sig->sig = nullptr;
 		auxPasajero->sig->ant = auxPasajero;
 		auxPasajero = auxPasajero->sig;
@@ -4249,17 +4264,17 @@ void nuevoPasajero(NodoPasajero* nuevoPas)
 		strcpy_s(auxPasajero->dato->apellidoM, nuevoPas->dato->apellidoM);
 
 		// Concatenación
-		strcpy_s(auxPasajero->nombreComp, nuevoPas->nombre);
-		strcat_s(auxPasajero->nombreComp, " ");
-		strcat_s(auxPasajero->nombreComp, auxPasajero->apellidoP);
-		strcat_s(auxPasajero->nombreComp, " ");
-		strcat_s(auxPasajero->nombreComp, auxPasajero->apellidoM);
+		strcpy_s(auxPasajero->dato->nombreComp, nuevoPas->dato->nombre);
+		strcat_s(auxPasajero->dato->nombreComp, " ");
+		strcat_s(auxPasajero->dato->nombreComp, auxPasajero->dato->apellidoP);
+		strcat_s(auxPasajero->dato->nombreComp, " ");
+		strcat_s(auxPasajero->dato->nombreComp, auxPasajero->dato->apellidoM);
 
-		strcpy_s(auxPasajero->nacionalidad, nuevoPas->nacionalidad);
+		strcpy_s(auxPasajero->dato->nacionalidad, nuevoPas->dato->nacionalidad);
 
-		auxPasajero->genero = nuevoPas->genero;
-		auxPasajero->nacimiento = nuevoPas->nacimiento;
-		auxPasajero->registro = nuevoPas->registro;
+		auxPasajero->dato->genero = nuevoPas->dato->genero;
+		auxPasajero->dato->nacimiento = nuevoPas->dato->nacimiento;
+		auxPasajero->dato->registro = nuevoPas->dato->registro;
 
 		strcpy_s(auxPasajero->dato->usuarioRegistro, nuevoPas->dato->usuarioRegistro);
 
@@ -4271,7 +4286,6 @@ void nuevoPasajero(NodoPasajero* nuevoPas)
 	MessageBox(NULL, "Se ha registrado al pasajero con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
 	/*int opc = MessageBox(hwnd, (LPCWSTR)L"¿Seguro que desea eliminar este usuario?", (LPCWSTR)L"AVISO", MB_YESNO | MB_ICONQUESTION);*/
 }
-
 void eliminarPasajero(char pasajeroNom[60])
 {
 	NodoPasajero* start;
@@ -4283,13 +4297,13 @@ void eliminarPasajero(char pasajeroNom[60])
 	}
 	else
 	{
-		while (auxPasajero->sig != nullptr && strcmp(auxPasajero->nombreComp, pasajeroNom) != 0)
+		while (auxPasajero->sig != nullptr && strcmp(auxPasajero->dato->nombreComp, pasajeroNom) != 0)
 		{ //Nos movemos en el arreglo para buscar el usuario
 
 			auxPasajero = auxPasajero->sig;
 		}
 
-		if (/*auxPasajero->sig == nullptr || */strcmp(auxPasajero->nombreComp, pasajeroNom) != 0)
+		if (/*auxPasajero->sig == nullptr || */strcmp(auxPasajero->dato->nombreComp, pasajeroNom) != 0)
 		{
 			MessageBox(0, "Pasajero no encontrado", "AVISO", MB_OK);
 		}
@@ -4378,10 +4392,15 @@ void eliminarPasajero(char pasajeroNom[60])
 }
 void escribirPasajeros()
 {
+	if (iniPasajero == nullptr) {
+		MessageBox(NULL, "La lista de pasajeros está vacía", "Advertencia", MB_OK | MB_ICONWARNING);
+		return;
+	}
+
 	auxPasajero = iniPasajero;
 
 	ofstream escribir("Pasajeros.bin", ios::binary | ios::out | ios::trunc);
-	
+
 	if (!escribir.is_open())
 	{
 		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
@@ -4402,6 +4421,7 @@ void escribirPasajeros()
 
 	escribir.close();
 }
+
 void leerPasajeros()
 {
 	auxPasajero = iniPasajero;
@@ -4520,7 +4540,6 @@ NodoPasajero* binarySearchNombrePasajero(NodoPasajero* head, const char* nombreP
 	// No se encontró ningún pasajero con el nombre proporcionado
 	return NULL;
 }
-
 #pragma region HeapSort
 void swapData(NodoPasajero* a, NodoPasajero* b) {
 	DatoPasajero* temp = a->dato;
@@ -4588,4 +4607,6 @@ void printList(NodoVuelo* head) {
 
 #pragma endregion
 #pragma endregion
+#pragma endregion
+
 #pragma endregion
