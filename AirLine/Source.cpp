@@ -221,7 +221,6 @@ void preOrderList(NodoUsuario*, HWND);
 void inOrderList(NodoUsuario*, HWND);
 void reporteVuelos();
 #pragma endregion
-#pragma endregion
 
 #pragma region Funciones de Listas Boletos
 void nuevoBoleto(NodoBoleto*);
@@ -263,6 +262,7 @@ void swapData(NodoPasajero* a, NodoPasajero* b);
 void heapify(NodoPasajero* head, int n, NodoPasajero* NodoUsuario);
 void heapSort(NodoPasajero* head);
 #pragma endregion
+#pragma endregion
 
 // Puntero - Handler
 int WINAPI WinMain(
@@ -281,7 +281,6 @@ int WINAPI WinMain(
 
 	// Asignacion de valores fijos
 	#pragma region Valores fijos
-
 	// Nacionalidades
 	for (i = 1; i < 5; i++)
 	{
@@ -1065,7 +1064,8 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_INITDIALOG:
 	{
-		if (redirection) {
+		if (redirection)
+		{
 			SetDlgItemInt(hwnd, IDC_EDIT2, auxVuelo2->dato->num, false);
 			SetDlgItemText(hwnd, IDC_EDIT3, auxVuelo2->dato->origen);
 			SetDlgItemText(hwnd, IDC_EDIT4, auxVuelo2->dato->destino);
@@ -1105,6 +1105,7 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			redirection = false;
 
 		}
+
 		if (miUsuario != nullptr)
 		{
 			SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->dato->nombreComp);
@@ -1379,20 +1380,66 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			if (auxVuelo2 == nullptr)
 			{
-				MessageBox(NULL, "No se ha seleccionado un vuelo, seleccione una de la lista con doble click.", "AVISO", MB_OK | MB_ICONERROR);
+				MessageBox(NULL, "No se ha seleccionado un vuelo, seleccione uno de la lista con doble click.", "AVISO", MB_OK | MB_ICONERROR);
 			}
 			else
 			{
-				
-				EndDialog(hwnd, 0);
-				HWND hDialog5 = CreateDialog(hInstanceGlobal, MAKEINTRESOURCE(IDD_DIALOG5), 0, cDialog5);
+				//Se guarda el vuelo en un auxiliar
+				/*NodoVuelo* temp = new NodoVuelo;
+				temp->dato = new DatoVuelo;*/
 
-				ShowWindow(hDialog5, SW_SHOW);
-				UpdateWindow(hDialog5); //Opcional
+				char numAsignadoC[10];
+				GetDlgItemText(hwnd, IDC_EDIT2, numAsignadoC, sizeof(numAsignadoC));
+				auxVuelo2->dato->num = atoi(numAsignadoC);
+
+				GetDlgItemText(hwnd, IDC_EDIT3, auxVuelo2->dato->origen, sizeof(auxVuelo2->dato->origen));
+				GetDlgItemText(hwnd, IDC_EDIT4, auxVuelo2->dato->destino, sizeof(auxVuelo2->dato->destino));
+				GetDlgItemText(hwnd, IDC_EDIT17, auxVuelo2->dato->modelo, sizeof(auxVuelo2->dato->modelo));
+
+				//Se obtiene la fecha
+				HWND hDia = GetDlgItem(hwnd, IDC_DATETIMEPICKER1);
+				SYSTEMTIME diaCumple = { 0 }; double dia;
+				DateTime_GetSystemtime(hDia, &diaCumple);
+				SystemTimeToVariantTime(&diaCumple, &dia);
+
+				/*auxVuelo2->dato->status = 0;*/
+
+				auxVuelo2->dato->fecha = dia;
+
+				strcpy_s(auxVuelo2->dato->usuarioRegistro, miUsuario->dato->nick);
+
+				auxVuelo2->dato->registro = 0.0;
+				strcpy_s(auxVuelo2->dato->usuarioRegistro, miUsuario->dato->nick);
+
+				MessageBox(NULL, "Cambios guardados.", "AVISO", MB_OK | MB_ICONINFORMATION);
+
+				/*auxVuelo2 = nullptr;*/
+
+				SetDlgItemText(hwnd, IDC_EDIT2, "");
+				SetDlgItemText(hwnd, IDC_EDIT3, "");
+				SetDlgItemText(hwnd, IDC_EDIT4, "");
+				SetDlgItemText(hwnd, IDC_EDIT17, "");
+				SetDlgItemText(hwnd, IDC_EDIT6, "");
+				SetDlgItemText(hwnd, IDC_EDIT7, "");
+				SetDlgItemText(hwnd, IDC_EDIT8, "");
+				SetDlgItemText(hwnd, IDC_EDIT9, "");
+				SetDlgItemText(hwnd, IDC_EDIT10, "");
+				SetDlgItemText(hwnd, IDC_EDIT11, "");
+				SetDlgItemText(hwnd, IDC_EDIT19, "");
+				SetDlgItemText(hwnd, IDC_EDIT20, "");
+				SetDlgItemText(hwnd, IDC_EDIT23, "");
+
+				//Recarga la pestaña
+				EndDialog(hwnd, 0);
+				HWND hDialog6 = CreateDialog(hInstanceGlobal, MAKEINTRESOURCE(IDD_DIALOG6), 0, cDialog6);
+
+				ShowWindow(hDialog6, SW_SHOW);
+				UpdateWindow(hDialog6); //Opcional
 			}
 
 			break;
 		}
+
 		default:
 		{
 			break;
@@ -1429,6 +1476,39 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			HBITMAP bmp; //1
 			bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 			SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
+		}
+
+		if (auxVuelo2 != nullptr)
+		{
+			SetDlgItemInt(hwnd, IDC_EDIT2, auxVuelo2->dato->num, NULL);
+			SetDlgItemText(hwnd, IDC_EDIT3, auxVuelo2->dato->origen);
+			SetDlgItemText(hwnd, IDC_EDIT4, auxVuelo2->dato->destino);
+
+			char cadenaFecha[100];
+			SYSTEMTIME fecha = { 0 };
+			VariantTimeToSystemTime(auxVuelo2->dato->fecha, &fecha);
+			formatoFecha(&fecha, cadenaFecha);
+			//sprintf_s(cadenaNacimiento, "%f", miUsuario->dato->nacimiento);
+			SetDlgItemText(hwnd, IDC_EDIT6, cadenaFecha);
+
+			switch (auxVuelo2->dato->status)
+			{
+			case 0:
+			{
+				SetDlgItemText(hwnd, IDC_EDIT7, "En espera");
+				break;
+			}
+			case 1:
+			{
+				SetDlgItemText(hwnd, IDC_EDIT7, "Efectuado");
+				break;
+			}
+			case 2:
+			{
+				SetDlgItemText(hwnd, IDC_EDIT7, "Cancelado");
+				break;
+			}
+			}
 		}
 
 		auxVuelo2 = iniVuelo;
@@ -1514,6 +1594,7 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						break;
 					}
 				}
+
 				break;
 			}
 
@@ -1625,19 +1706,28 @@ BOOL CALLBACK cDialog7(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 		}
 
-		auxVuelo3 = iniVuelo; // Vuelos
+		auxVuelo2 = iniVuelo;
 		if (iniVuelo != nullptr)
 		{
-			while (auxVuelo3->sig != nullptr)
+			// Ordenamiento QueckSort Vuelos
+			quickSortNum(iniVuelo);
+
+			while (auxVuelo2->sig != nullptr)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST9, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo3->dato->origen);
-				auxVuelo3 = auxVuelo3->sig;
+				if (auxVuelo2->dato->status = 1)
+				{
+					SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo2->dato->origen);
+				}
+				auxVuelo2 = auxVuelo2->sig;
 			}
 
-			if (auxVuelo3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
+			if (auxVuelo2->sig == nullptr/* || auxEsp2->ant == nullptr*/)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST9, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo3->dato->origen);
-				auxVuelo3 = auxVuelo3->sig;
+				if (auxVuelo2->dato->status = 1)
+				{
+					SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo2->dato->origen);
+				}
+				auxVuelo2 = auxVuelo2->sig;
 			}
 		}
 		else
@@ -1654,21 +1744,43 @@ BOOL CALLBACK cDialog7(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		switch (LOWORD(wParam))
 		{
-		case IDC_BUTTON1: // Nombre
+		case IDC_LIST3: //Vuelos
 		{
-			
+			switch (HIWORD(wParam))
+			{
+			case LBN_DBLCLK: //Al dar doble clic en el ListBox 
+			{
+				char vueloO[30];
+				int indice2 = 0;
+				indice2 = SendDlgItemMessage(hwnd, IDC_LIST2, LB_GETCURSEL, 0, 0);
+				SendDlgItemMessage(hwnd, IDC_LIST2, LB_GETTEXT, indice2, (LPARAM)vueloO);
 
-			break;
-		}
-		case IDC_BUTTON2: // Asiento
-		{
-			
+				auxVuelo2 = iniVuelo;
+
+				while (auxVuelo2->sig != nullptr && strcmp(auxVuelo2->dato->origen, vueloO) != 0)
+				{
+					auxVuelo2 = auxVuelo2->sig;
+				}
+
+				SetDlgItemText(hwnd, IDC_EDIT2, auxVuelo2->dato->origen);
+
+				// Pasajero de este Vuelo
+				
+
+				break;
+			}
+
+			default:
+			{
+				break;
+			}
+			}
 
 			break;
 		}
 		case IDC_BUTTON3: // Seleccionar
 		{
-			if (auxVuelo3 == nullptr)
+			if (auxVuelo2 == nullptr)
 			{
 				MessageBox(NULL, "No se ha seleccionado un vuelo, seleccione uno de la lista con doble click.", "AVISO", MB_OK | MB_ICONERROR);
 			}
@@ -1723,39 +1835,45 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 			}
 
-			auxBoleto3 = iniBoleto; // Boletos
-			if (iniBoleto != nullptr)
+			if (auxVuelo2 != nullptr)
 			{
-				while (auxBoleto3->sig != nullptr)
-				{
-					SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto3->dato->nombreCompPasajero/*nombreCompM*/);
-					auxBoleto3 = auxBoleto3->sig;
-				}
-				if (auxBoleto3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
-				{
-					SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto3->dato->nombreCompPasajero/*nombreCompM*/);
-					auxBoleto3 = auxBoleto3->sig;
-				}
-			}
+				SetDlgItemInt(hwnd, IDC_EDIT2, auxVuelo2->dato->num, false);
+				SetDlgItemText(hwnd, IDC_EDIT3, auxVuelo2->dato->origen);
+				SetDlgItemText(hwnd, IDC_EDIT4, auxVuelo2->dato->destino);
+				SetDlgItemText(hwnd, IDC_EDIT21, auxVuelo2->dato->modelo);
 
-			auxVuelo3 = iniVuelo; // Vuelos
-			if (iniVuelo != nullptr)
-			{
-				while (auxVuelo3->sig != nullptr)
+				char cadenaFecha[100];
+				SYSTEMTIME fecha = { 0 };
+				VariantTimeToSystemTime(auxVuelo2->dato->fecha, &fecha);
+
+				DateTime_SetSystemtime(GetDlgItem(hwnd, IDC_DATETIMEPICKER1), GDT_VALID, &fecha);
+
+				aux2 = ini2;
+				while (aux2->sig != nullptr && strcmp(aux2->Modelo, auxVuelo2->dato->modelo) != 0)
 				{
-					SendDlgItemMessage(hwnd, IDC_LIST10, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo3->dato->origen);
-					auxVuelo3 = auxVuelo3->sig;
+					aux2 = aux2->sig;
 				}
 
-				if (auxVuelo3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
-				{
-					SendDlgItemMessage(hwnd, IDC_LIST10, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo3->dato->origen);
-					auxVuelo3 = auxVuelo3->sig;
-				}
-			}
-			else
-			{
-				MessageBox(NULL, "No hay vuelos registrados.", "AVISO", MB_OK | MB_ICONINFORMATION);
+				char texto[10];
+				_itoa_s(aux2->asientosT, texto, 10);
+				SetDlgItemText(hwnd, IDC_EDIT6, texto);
+				_itoa_s(aux2->asientosCT, texto, 10);
+				SetDlgItemText(hwnd, IDC_EDIT7, texto);
+				_itoa_s(aux2->asientosE, texto, 10);
+				SetDlgItemText(hwnd, IDC_EDIT8, texto);
+				_itoa_s(aux2->asientosCE, texto, 10);
+				SetDlgItemText(hwnd, IDC_EDIT9, texto);
+
+				_itoa_s(aux2->asientosN, texto, 10);
+				SetDlgItemText(hwnd, IDC_EDIT10, texto);
+				_itoa_s(aux2->asientosA, texto, 10);
+				SetDlgItemText(hwnd, IDC_EDIT11, texto);
+				_itoa_s(aux2->asientosM, texto, 10);
+				SetDlgItemText(hwnd, IDC_EDIT19, texto);
+				_itoa_s(aux2->asientos, texto, 10);
+				SetDlgItemText(hwnd, IDC_EDIT20, texto);
+				_itoa_s(auxVuelo2->dato->status, texto, 10);
+				SetDlgItemText(hwnd, IDC_EDIT27, texto);
 			}
 
 			break;
@@ -1767,55 +1885,8 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 			switch (LOWORD(wParam))
 			{
-			case IDC_LIST3: // Boletos
-			{
-				switch (HIWORD(wParam))
-				{
-				case LBN_DBLCLK: //Al dar doble clic en el ListBox 
-				{
-					char num[60] = { 0 };
-					int indice = 0;
-					indice = SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETCURSEL, 0, 0);
-					SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETTEXT, indice, (LPARAM)num);
-
-					auxBoleto3 = iniBoleto;
-
-					while (auxBoleto3->sig != nullptr && strcmp(auxBoleto3->dato->nombreCompPasajero, num) != 0)
-					{
-						auxBoleto3 = auxBoleto3->sig;
-
-					}
-
-					SetDlgItemText(hwnd, IDC_EDIT2, auxBoleto3->dato->nombrePasajero);
-					SetDlgItemText(hwnd, IDC_EDIT3, auxBoleto3->dato->apellidoPPasajero);
-					SetDlgItemText(hwnd, IDC_EDIT4, auxBoleto3->dato->apellidoMPasajero);
-
-					//SetDlgItemText(hwnd, IDC_EDIT5, auxBoleto3->cedulaChar);
-					SetDlgItemInt(hwnd, IDC_EDIT18, auxBoleto3->dato->numVuelo, NULL);
-
-					//SetDlgItemText(hwnd, IDC_EDIT8, auxBoleto3->telefonoChar);
-
-					//SetDlgItemText(hwnd, IDC_EDIT17, auxBoleto3->numConsultorioChar);
-					//SetDlgItemText(hwnd, IDC_EDIT15, auxBoleto3->hoararioChar);
-					//SetDlgItemText(hwnd, IDC_EDIT16, auxBoleto3->diasChar);
-
-					//strcpy_s(zFile, auxBoleto3->foto); //Inicializar zfile con la dirección de memoria del puntero foto
-
-					HBITMAP bmp; //1
-					//bmp = (HBITMAP)LoadImage(NULL, auxBoleto3->foto, IMAGE_BITMAP, 120, 120, LR_LOADFROMFILE); //2
-					//SendDlgItemMessage(hwnd, IDC_BMP2, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3 
-
-					break;
-				}
-				default:
-				{
-					break;
-				}
-				}
-
-				break;
-			}
-			case IDC_BUTTON1: // Numero
+			
+			case IDC_BUTTON1: // Reporte
 			{
 				
 
@@ -1833,20 +1904,7 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 				break;
 			}
-			case IDC_BUTTON4: // Reporte
-			{
-				if (iniPasajero == nullptr)
-				{
-					MessageBox(NULL, "No hay pacientes registrados.", "AVISO", MB_OK | MB_ICONERROR);
-				}
-				else
-				{
-					reportePasajeros();
-					MessageBox(NULL, "Reporte fue guardado en C:-Users-hp-Documents-UANL-Universidad 7-ED-Proyecto_Clinica-Proyecto_Clinica.", "AVISO", MB_OK | MB_ICONEXCLAMATION);
-				}
-
-				break;
-			}
+			
 			default:
 			{
 				break;
