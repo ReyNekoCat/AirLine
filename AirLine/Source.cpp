@@ -2479,9 +2479,18 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		case WM_INITDIALOG:
 		{
-			if (miUsuario != nullptr)
-				SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->dato->nombreComp);
+			if (redirection)
+			{
+				
 
+				redirection = false;
+
+			}
+
+			if (miUsuario != nullptr)
+			{
+				SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->dato->nombreComp);
+			}
 			if (miUsuario->dato->foto != nullptr)
 			{
 				strcpy_s(zFile, miUsuario->dato->foto); //Inicializar zfile con la dirección de memoria del puntero foto
@@ -2490,23 +2499,38 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 				SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 			}
-			// Checar
-			if (iniBoleto != nullptr)
+			
+			auxVuelo2 = iniVuelo; //Vuelos
+			if (iniVuelo != nullptr)
 			{
-				auxBoleto3 = iniBoleto;
-				auxBoleto3->dato = new DatoBoleto;
-				auxBoleto3->dato = iniBoleto->dato;
-				while (auxBoleto3->sig != nullptr)
+				// Ordenamiento QueckSort Vuelos
+				quickSortNum(iniVuelo);
+
+				while (auxVuelo2->sig != nullptr)
 				{
-					SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto3->dato->nombreCompPasajero/*nombreCompM*/);
-					auxBoleto3 = auxBoleto3->sig;
+					char numStr[10];
+					sprintf_s(numStr, sizeof(numStr), "%d", auxVuelo2->dato->num);
+					SendDlgItemMessageA(hwnd, IDC_LIST3, LB_ADDSTRING, 0, (LPARAM)numStr);
+					auxVuelo2 = auxVuelo2->sig;
 				}
-				if (auxBoleto3 != nullptr || auxBoleto3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
+
+				if (auxVuelo2->sig == nullptr/* || auxEsp2->ant == nullptr*/)
 				{
-					SendDlgItemMessage(hwnd, IDC_LIST3, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto3->dato->nombreCompPasajero/*nombreCompM*/);
-					auxBoleto3 = auxBoleto3->sig;
+					char numStr[10];
+					sprintf_s(numStr, sizeof(numStr), "%d", auxVuelo2->dato->num);
+					SendDlgItemMessageA(hwnd, IDC_LIST3, LB_ADDSTRING, 0, (LPARAM)numStr);
+					auxVuelo2 = auxVuelo2->sig;
 				}
 			}
+			else
+			{
+				MessageBox(NULL, "No hay vuelos registrados.", "AVISO", MB_OK | MB_ICONINFORMATION);
+			}
+
+			//// Clases
+			//SendDlgItemMessage(hwnd, IDC_LIST7, LB_ADDSTRING, (WPARAM)0, (LPARAM)"Turista");
+			//SendDlgItemMessage(hwnd, IDC_LIST7, LB_ADDSTRING, (WPARAM)0, (LPARAM)"Ejecutiva");
+
 			break;
 		}
 		case WM_COMMAND:
@@ -2516,9 +2540,130 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 			switch (LOWORD(wParam))
 			{
-				case IDC_BUTTON1:
+			//case IDC_LIST7: // Clase
+			//{
+			//	switch (HIWORD(wParam))
+			//	{
+			//	case LBN_DBLCLK: //Al dar doble clic en el ListBox 
+			//	{
+			//		char clase[30] = { 0 };
+			//		int indice = 0;
+			//		indice = SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETCURSEL, 0, 0);
+			//		SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETTEXT, indice, (LPARAM)clase);
+			//		if (strcmp(clase, "Ejecutiva") != 0)
+			//		{
+			//			SetDlgItemText(hwnd, IDC_EDIT10, "Ejecutiva");
+			//		}
+			//		else
+			//		{
+			//			SetDlgItemText(hwnd, IDC_EDIT10, "Turista");
+			//		}
+			//		
+			//		break;
+			//	}
+			//	default:
+			//	{
+			//		break;
+			//	}
+			//	}
+			//	break;
+			//}
+			case IDC_LIST3: //Vuelos
+			{
+				switch (HIWORD(wParam))
+				{
+				case LBN_DBLCLK: //Al dar doble clic en el ListBox 
+				{
+					char vueloO[30] = { 0 };
+					int indice2 = 0;
+					indice2 = SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETCURSEL, 0, 0);
+					SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETTEXT, indice2, (LPARAM)vueloO);
+
+					int numVuelo;
+					numVuelo = atoi(vueloO);
+					auxVuelo2 = iniVuelo;
+
+					while (auxVuelo2->sig != nullptr && auxVuelo2->dato->num != numVuelo)
+					{
+						auxVuelo2 = auxVuelo2->sig;
+					}
+
+					SetDlgItemInt(hwnd, IDC_EDIT2, auxVuelo2->dato->num, NULL);
+					SetDlgItemText(hwnd, IDC_EDIT3, auxVuelo2->dato->origen);
+					SetDlgItemText(hwnd, IDC_EDIT4, auxVuelo2->dato->destino);
+
+					char cadenaFecha[100];
+					SYSTEMTIME fecha = { 0 };
+					VariantTimeToSystemTime(auxVuelo2->dato->fecha, &fecha);
+					formatoFecha(&fecha, cadenaFecha);
+					//sprintf_s(cadenaNacimiento, "%f", miUsuario->dato->nacimiento);
+					SetDlgItemText(hwnd, IDC_EDIT5, cadenaFecha);
+
+					break;
+				}
+
+				default:
+				{
+					break;
+				}
+				}
+
+				break;
+			}
+				case IDC_BUTTON1: //Buscar
+				{
+					char pasaBuscar[30];
+					GetDlgItemText(hwnd, IDC_EDIT6, pasaBuscar, sizeof(pasaBuscar));
+
+					auxPasajero3 = binarySearchNombrePasajero(iniPasajero, pasaBuscar);
+
+					if (auxPasajero3 != NULL) // (strcmp(pasajeroBuscar, auxPasajero3->dato->nombreComp) == 0)
+					{
+						SetDlgItemText(hwnd, IDC_EDIT7, auxPasajero3->dato->nombreComp);
+
+						//Edad/Nacimiento
+						char cadenaNacimiento[100];
+						SYSTEMTIME cumple = { 0 };
+						VariantTimeToSystemTime(auxPasajero3->dato->nacimiento, &cumple);
+						formatoFecha(&cumple, cadenaNacimiento);
+						/*SetDlgItemText(hwnd, IDC_EDIT6, cadenaNacimiento);*/
+
+						SetDlgItemInt(hwnd, IDC_EDIT8, formatoEdad(auxPasajero3->dato->nacimiento), false);
+					}
+					else
+					{
+						MessageBox(NULL, "No se ha encontradó a este pasajero.", "AVISO", MB_OK | MB_ICONINFORMATION);
+					}
+
+					break;
+				}
+				case IDC_BUTTON2: //Número
 				{
 					
+
+					break;
+				}
+				case IDC_BUTTON3: //Ejecutiva
+				{
+					SetDlgItemText(hwnd, IDC_EDIT10, "Ejecutiva");
+
+					break;
+				}
+				case IDC_BUTTON4: //Turista
+				{
+					SetDlgItemText(hwnd, IDC_EDIT10, "Turista");
+
+					break;
+				}
+				case IDC_BUTTON5: //Guardar
+				{
+
+
+					break;
+				}
+				case IDC_BUTTON6: //Editar
+				{
+
 
 					break;
 				}
@@ -2564,15 +2709,51 @@ BOOL CALLBACK cDialog13(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		switch (LOWORD(wParam))
 		{
+		case IDC_BUTTON1: // Buscar
+		{
+			char pasBolBuscar[30];
+			GetDlgItemText(hwnd, IDC_EDIT21, pasBolBuscar, sizeof(pasBolBuscar));
+
+			//auxBoleto3->dato->nombreCompPasajero = binarySearchNombreBoleto(iniBoleto, pasBolBuscar);
+
+			//if (auxBoleto3 != NULL) // (strcmp(pasajeroBuscar, auxPasajero3->dato->nombreComp) == 0)
+			//{
+			//	
+			//}
+			//else
+			//{
+			//	MessageBox(NULL, "No se ha encontradó a este pasajero.", "AVISO", MB_OK | MB_ICONINFORMATION);
+			//}
+
+			break;
+		}
+		case IDC_BUTTON2: //
+		{
+
+
+			break;
+		}
 		case IDC_BUTTON3: //
 		{
 
 
 			break;
 		}
-		case IDC_BUTTON4: //
+		case IDC_BUTTON4: // Editar
 		{
+			if (auxVuelo2 == nullptr)
+			{
+				MessageBox(NULL, "No se ha seleccionado un pasajero, seleccione una de la lista con doble click.", "AVISO", MB_OK | MB_ICONERROR);
+			}
+			else
+			{
+				redirection = true;
+				EndDialog(hwnd, 0);
+				HWND hDialog12 = CreateDialog(hInstanceGlobal, MAKEINTRESOURCE(IDD_DIALOG12), 0, cDialog12);
 
+				ShowWindow(hDialog12, SW_SHOW);
+				UpdateWindow(hDialog12); //Opcional
+			}
 
 			break;
 		}
@@ -2625,30 +2806,13 @@ BOOL CALLBACK cDialog14(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		switch (LOWORD(wParam))
 		{
-		case IDC_BUTTON6: // Buscar
+		case IDC_BUTTON1: // Buscar
 		{
 
 
 			break;
 		}
-		case IDC_BUTTON3: // Generar hora
-		{
 
-
-			break;
-		}
-		case IDC_BUTTON4: // Editar
-		{
-
-
-			break;
-		}
-		case IDC_BUTTON5: // Elimiar
-		{
-
-
-			break;
-		}
 		default:
 		{
 			break;
@@ -2658,6 +2822,7 @@ BOOL CALLBACK cDialog14(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		break;
 	}
+
 	default:
 	{
 		break;
