@@ -49,6 +49,7 @@ struct DatoVuelo {
 	char destino[30];
 	char modelo[30];
 	int num;
+	int asientos;
 	int status;
 	double fecha;
 	double registro;
@@ -666,7 +667,7 @@ BOOL CALLBACK cDialog2(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					GetDlgItemText(hwnd, IDC_EDIT6, temp->dato->password, sizeof(temp->dato->password));
 						
 					//Genero
-					if (IDC_RADIO1 == BST_CHECKED)
+					if ((IsDlgButtonChecked(hwnd, IDC_RADIO1) == BST_CHECKED))
 					{
 						temp->dato->genero = 1;
 					}
@@ -854,7 +855,7 @@ BOOL CALLBACK cDialog3(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					strcat_s(miUsuario->dato->nombreComp, miUsuario->dato->apellidoM);
 
 					//Genero
-					if (IDC_RADIO1 == BST_CHECKED)
+					if ((IsDlgButtonChecked(hwnd, IDC_RADIO1) == BST_CHECKED))
 					{
 						miUsuario->dato->genero = 1;
 					}
@@ -1335,6 +1336,7 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				GetDlgItemText(hwnd, IDC_EDIT3, temp->dato->origen, sizeof(temp->dato->origen));
 				GetDlgItemText(hwnd, IDC_EDIT4, temp->dato->destino, sizeof(temp->dato->destino));
 				GetDlgItemText(hwnd, IDC_EDIT17, temp->dato->modelo, sizeof(temp->dato->modelo));
+				temp->dato->asientos = aux2->asientos;
 
 				//Se obtiene la fecha
 				HWND hDia = GetDlgItem(hwnd, IDC_DATETIMEPICKER1);
@@ -1402,6 +1404,7 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				GetDlgItemText(hwnd, IDC_EDIT3, auxVuelo2->dato->origen, sizeof(auxVuelo2->dato->origen));
 				GetDlgItemText(hwnd, IDC_EDIT4, auxVuelo2->dato->destino, sizeof(auxVuelo2->dato->destino));
 				GetDlgItemText(hwnd, IDC_EDIT17, auxVuelo2->dato->modelo, sizeof(auxVuelo2->dato->modelo));
+				auxVuelo2->dato->asientos = aux2->asientos;
 
 				//Se obtiene la fecha
 				HWND hDia = GetDlgItem(hwnd, IDC_DATETIMEPICKER1);
@@ -2147,7 +2150,7 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				GetDlgItemText(hwnd, IDC_EDIT6, temp->dato->nacionalidad, sizeof(temp->dato->nacionalidad));
 
 				//Genero
-				if (IDC_RADIO1 == BST_CHECKED)
+				if ((IsDlgButtonChecked(hwnd, IDC_RADIO1) == BST_CHECKED))
 				{
 					temp->dato->genero = 1;
 				}
@@ -2350,7 +2353,7 @@ BOOL CALLBACK cDialog11(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					strcat_s(auxPasajero3->dato->nombreComp, auxPasajero3->dato->apellidoM);
 
 					//Genero
-					if (IDC_RADIO1 == BST_CHECKED)
+					if ((IsDlgButtonChecked(hwnd, IDC_RADIO1) == BST_CHECKED))
 					{
 						auxPasajero3->dato->genero = 1;
 					}
@@ -3635,10 +3638,12 @@ void nuevoVuelo(NodoVuelo* nuevoV)
 		strcpy_s(iniVuelo->dato->destino, nuevoV->dato->destino);
 		strcpy_s(iniVuelo->dato->modelo, nuevoV->dato->modelo);
 
+
 		iniVuelo->dato->num = nuevoV->dato->num;
 		iniVuelo->dato->fecha = nuevoV->dato->fecha;
 		iniVuelo->dato->status = nuevoV->dato->status;
 		iniVuelo->dato->registro = nuevoV->dato->registro;
+		iniVuelo->dato->asientos = nuevoV->dato->asientos;
 
 		strcpy_s(iniVuelo->dato->usuarioRegistro, nuevoV->dato->usuarioRegistro);
 
@@ -3672,6 +3677,7 @@ void nuevoVuelo(NodoVuelo* nuevoV)
 		auxVuelo->dato->fecha = nuevoV->dato->fecha;
 		auxVuelo->dato->status = nuevoV->dato->status;
 		auxVuelo->dato->registro = nuevoV->dato->registro;
+		auxVuelo->dato->asientos = nuevoV->dato->asientos;
 
 		strcpy_s(auxVuelo->dato->usuarioRegistro, nuevoV->dato->usuarioRegistro);
 
@@ -3679,7 +3685,6 @@ void nuevoVuelo(NodoVuelo* nuevoV)
 		auxVuelo3 = auxVuelo;
 		auxVuelo = iniVuelo;
 	}
-
 	MessageBox(NULL, "Se ha registrado el vuelo con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
 	/*int opc = MessageBox(hwnd, (LPCWSTR)L"¿Seguro que desea eliminar este usuario?", (LPCWSTR)L"AVISO", MB_YESNO | MB_ICONQUESTION);*/
 }
