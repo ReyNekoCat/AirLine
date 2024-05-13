@@ -641,6 +641,38 @@ BOOL CALLBACK cDialog2(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				}
 				case IDC_BUTTON2: // Registrarse
 				{
+					//Condicional para comprobar que no haya controles vacíos
+					char nick[30];
+					GetDlgItemText(hwnd, IDC_EDIT1, nick, sizeof(nick));
+					char nombre[30];
+					GetDlgItemText(hwnd, IDC_EDIT2, nombre, sizeof(nombre));
+					char apellidoP[30];
+					GetDlgItemText(hwnd, IDC_EDIT3, apellidoP, sizeof(apellidoP));
+					char apellidoM[30];
+					GetDlgItemText(hwnd, IDC_EDIT4, apellidoM, sizeof(apellidoM));
+					char email[100];
+					GetDlgItemText(hwnd, IDC_EDIT5, email, sizeof(email));
+					char password[30];
+					GetDlgItemText(hwnd, IDC_EDIT6, password, sizeof(password));
+
+					// Verificar si los controles están vacíos
+					if (strlen(nick) == 0 || strlen(nombre) == 0 || strlen(apellidoP) == 0 || strlen(apellidoM) == 0 || strlen(email) == 0 || strlen(password) == 0)
+					{
+						MessageBox(NULL, "Por favor, rellene todos los campos.", "AVISO", MB_OK | MB_ICONINFORMATION);
+						break;
+					}
+					//Se verifica la edad
+					HWND hDia = GetDlgItem(hwnd, IDC_DATETIMEPICKER1);
+					SYSTEMTIME diaCumple = { 0 }; double dia;
+					DateTime_GetSystemtime(hDia, &diaCumple);
+					SystemTimeToVariantTime(&diaCumple, &dia);
+					int edad = formatoEdad(dia);
+					if (edad < 18 || edad > 120)
+					{
+						MessageBox(NULL, "No se pueden registrar menores de edad.", "AVISO", MB_OK | MB_ICONINFORMATION);
+						break;
+					}
+					
 					char usuBuscar[30];
 					GetDlgItemText(hwnd, IDC_EDIT1, usuBuscar, sizeof(usuBuscar));
 
@@ -675,14 +707,7 @@ BOOL CALLBACK cDialog2(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					{
 						temp->dato->genero = 0;
 					}
-
-					//Se obtiene la fecha de nacimiento
-					HWND hDia = GetDlgItem(hwnd, IDC_DATETIMEPICKER1);
-					SYSTEMTIME diaCumple = { 0 }; double dia;			
-					DateTime_GetSystemtime(hDia, &diaCumple);
-					SystemTimeToVariantTime(&diaCumple, &dia);
 					temp->dato->nacimiento = dia;
-
 					strcpy_s(temp->dato->foto, "");
 
 					temp->sig = nullptr;
@@ -798,11 +823,7 @@ BOOL CALLBACK cDialog3(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				SYSTEMTIME cumple = { 0 };
 				VariantTimeToSystemTime(miUsuario->dato->nacimiento, &cumple);
 				formatoFecha(&cumple, cadenaNacimiento);
-				//sprintf_s(cadenaNacimiento, "%f", miUsuario->dato->nacimiento);
 				SetDlgItemText(hwnd, IDC_EDIT6, cadenaNacimiento);
-				
-				//sprintf_s(cadenaNacimiento, "%f", miUsuario->dato->nacimiento);
-				//SetDlgItemText(hwnd, IDC_EDIT7, cadenaNacimiento);
 				SetDlgItemInt(hwnd, IDC_EDIT7, formatoEdad(miUsuario->dato->nacimiento), false);
 			}
 
@@ -1306,10 +1327,42 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			}
 
 			break;
-			
+
 		}
 		case IDC_BUTTON2: // Guardar
 		{
+			//Condicional para asegurar ningun control esté vacío
+			char numAsignadoC[10];
+			GetDlgItemText(hwnd, IDC_EDIT2, numAsignadoC, sizeof(numAsignadoC));
+			char origen[30];
+			GetDlgItemText(hwnd, IDC_EDIT3, origen, sizeof(origen));
+			char destino[30];
+			GetDlgItemText(hwnd, IDC_EDIT4, destino, sizeof(destino));
+			char modelo[30];
+			GetDlgItemText(hwnd, IDC_EDIT17, modelo, sizeof(modelo));
+
+			// Verificar si los controles están vacíos
+			if (strlen(numAsignadoC) == 0 || strlen(origen) == 0 || strlen(destino) == 0 || strlen(modelo) == 0)
+			{
+				MessageBox(NULL, "Por favor, rellene todos los campos.", "AVISO", MB_OK | MB_ICONINFORMATION);
+				break;
+			}
+			//Condicional para que el vuelo no se haga el mismo día que se creó
+			SYSTEMTIME fechaSeleccionada;
+			DateTime_GetSystemtime(GetDlgItem(hwnd, IDC_DATETIMEPICKER1), &fechaSeleccionada);
+			SYSTEMTIME fechaActual;
+			GetSystemTime(&fechaActual);
+			DATE dateSeleccionada, dateActual;
+			SystemTimeToVariantTime(&fechaSeleccionada, &dateSeleccionada);
+			SystemTimeToVariantTime(&fechaActual, &dateActual);
+
+			// Verificar si la fecha seleccionada es la misma que la fecha actual
+			if (dateSeleccionada <= dateActual)
+			{
+				MessageBox(NULL, "La fecha del vuelo no puede ser el día de hoy o anterior.", "AVISO", MB_OK | MB_ICONINFORMATION);
+				break;
+			}
+
 			int numBuscar;
 			char numBuscarC[10];
 
@@ -1393,11 +1446,45 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			}
 			else
 			{
-				//Se guarda el vuelo en un auxiliar
-				/*NodoVuelo* temp = new NodoVuelo;
-				temp->dato = new DatoVuelo;*/
-
+				//Condicional para asegurar ningun control esté vacío
 				char numAsignadoC[10];
+				GetDlgItemText(hwnd, IDC_EDIT2, numAsignadoC, sizeof(numAsignadoC));
+				char origen[30];
+				GetDlgItemText(hwnd, IDC_EDIT3, origen, sizeof(origen));
+				char destino[30];
+				GetDlgItemText(hwnd, IDC_EDIT4, destino, sizeof(destino));
+				char modelo[30];
+				GetDlgItemText(hwnd, IDC_EDIT17, modelo, sizeof(modelo));
+
+				if (strlen(numAsignadoC) == 0 || strlen(origen) == 0 || strlen(destino) == 0 || strlen(modelo) == 0)
+				{
+					MessageBox(NULL, "Por favor, rellene todos los campos.", "AVISO", MB_OK | MB_ICONINFORMATION);
+					break;
+				}
+
+				//Condicional para que el vuelo no se haga el mismo día que se creó
+				SYSTEMTIME fechaSeleccionada;
+				DateTime_GetSystemtime(GetDlgItem(hwnd, IDC_DATETIMEPICKER1), &fechaSeleccionada);
+				SYSTEMTIME fechaActual;
+				GetSystemTime(&fechaActual);
+				DATE dateSeleccionada, dateActual;
+				SystemTimeToVariantTime(&fechaSeleccionada, &dateSeleccionada);
+				SystemTimeToVariantTime(&fechaActual, &dateActual);
+
+				// Verificar si la fecha seleccionada es la misma que la fecha actual
+				if (dateSeleccionada <= dateActual)
+				{
+					MessageBox(NULL, "La fecha del vuelo no puede ser el día de hoy o anterior.", "AVISO", MB_OK | MB_ICONINFORMATION);
+					break;
+				}
+
+				//Se obtiene la fecha
+				HWND hDia = GetDlgItem(hwnd, IDC_DATETIMEPICKER1);
+				SYSTEMTIME diaCumple = { 0 }; double dia;
+				DateTime_GetSystemtime(hDia, &diaCumple);
+				SystemTimeToVariantTime(&diaCumple, &dia);
+				int edad = formatoEdad(dia);
+
 				GetDlgItemText(hwnd, IDC_EDIT2, numAsignadoC, sizeof(numAsignadoC));
 				auxVuelo2->dato->num = atoi(numAsignadoC);
 
@@ -1405,12 +1492,6 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				GetDlgItemText(hwnd, IDC_EDIT4, auxVuelo2->dato->destino, sizeof(auxVuelo2->dato->destino));
 				GetDlgItemText(hwnd, IDC_EDIT17, auxVuelo2->dato->modelo, sizeof(auxVuelo2->dato->modelo));
 				auxVuelo2->dato->asientos = aux2->asientos;
-
-				//Se obtiene la fecha
-				HWND hDia = GetDlgItem(hwnd, IDC_DATETIMEPICKER1);
-				SYSTEMTIME diaCumple = { 0 }; double dia;
-				DateTime_GetSystemtime(hDia, &diaCumple);
-				SystemTimeToVariantTime(&diaCumple, &dia);
 
 				/*auxVuelo2->dato->status = 0;*/
 
@@ -1455,7 +1536,6 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 		}
-
 		break;
 	}
 
@@ -2322,10 +2402,11 @@ BOOL CALLBACK cDialog11(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 						//Edad/Nacimiento
 						char cadenaNacimiento[100];
-						sprintf_s(cadenaNacimiento, "%f", auxPasajero3->dato->nacimiento);
+						SYSTEMTIME cumple = { 0 };
+						VariantTimeToSystemTime(auxPasajero->dato->nacimiento, &cumple);
+						formatoFecha(&cumple, cadenaNacimiento);
 						SetDlgItemText(hwnd, IDC_EDIT10, cadenaNacimiento);
-						sprintf_s(cadenaNacimiento, "%f", auxPasajero3->dato->nacimiento);
-						SetDlgItemText(hwnd, IDC_EDIT11, cadenaNacimiento);
+						SetDlgItemInt(hwnd, IDC_EDIT11, formatoEdad(auxPasajero->dato->nacimiento), false);
 
 						SetDlgItemText(hwnd, IDC_EDIT16, auxPasajero3->dato->nacionalidad);
 					}
@@ -3073,8 +3154,13 @@ char* formatoFecha(LPSYSTEMTIME Sys, char* buff) {
 }
 int formatoEdad(double cumple) {
 	SYSTEMTIME SysNow = { 0 };
+	SYSTEMTIME Cumple = { 0 };
 	double now = 0;
 	GetSystemTime(&SysNow);
+	VariantTimeToSystemTime(cumple, &Cumple);
+	if (SysNow.wYear <= Cumple.wYear) {
+		return 0;
+	}
 	SystemTimeToVariantTime(&SysNow, &now);
 	VariantTimeToSystemTime(now - cumple, &SysNow);
 
