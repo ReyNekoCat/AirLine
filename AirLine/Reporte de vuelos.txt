@@ -1,1 +1,3 @@
-Número de vuelo: 1, Fecha: 2024-05-16 09:18:03, Origen: México - Ciudad de México, Destino: Argentina
+Número de vuelo: 1, Fecha: 2024-05-15 11:40:27, Origen: Argentina, Destino: 
+Número de vuelo: 2, Fecha: 2024-05-16 11:40:43, Origen: México, Destino: Estados Unidos
+Número de vuelo: 3, Fecha: 2024-05-18 11:41:01, Origen: México - Sonora, Destino: México - Ciudad de México
