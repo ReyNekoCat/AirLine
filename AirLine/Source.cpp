@@ -198,6 +198,9 @@ NodoUsuario* newNode(DatoUsuario*);
 void insertTree(NodoUsuario*&, NodoUsuario*);
 NodoUsuario* searchTree(struct NodoUsuario*, DatoUsuario*);
 NodoUsuario* deleteTreeNodeByNick(NodoUsuario*, char*);
+
+void preOrderList(NodoUsuario*, HWND);
+void inOrderList(NodoUsuario*, HWND);
 #pragma endregion
 
 #pragma region Funciones de Listas Vuelos
@@ -205,21 +208,25 @@ void nuevoVuelo(NodoVuelo* nueva);
 void eliminarVuelo(char vuelo[30]);
 void escribirVuelo();
 void leerVuelos();
-void reporteVuelos(); //Antes Boletos/Medicos
+void reporteVuelos(HWND, int);
 void printVuelosEnRango(HWND, int, NodoVuelo*, DATE, DATE);
 void generarManifiestoPasajeros(NodoBoleto*, int, const char*);
 NodoVuelo* binarySearchNumVuelo(NodoVuelo*, int);
+void SetRegistroVuelos(HWND, int, int, int);
 //QuickSort
 void swapData(NodoVuelo*, NodoVuelo*);
 NodoVuelo* lastNode(NodoVuelo*);
 NodoVuelo* partitionNum(NodoVuelo*, NodoVuelo*);
 void _quickSortNum(NodoVuelo*, NodoVuelo*);
 void quickSortNum(NodoVuelo*);
-//void printList(NodoVuelo*);
 
-void preOrderList(NodoUsuario*, HWND);
-void inOrderList(NodoUsuario*, HWND);
-void reporteVuelos();
+NodoVuelo* partitionFechaOldToNew(NodoVuelo*, NodoVuelo*);
+void _quickSortFechaOldToNew(NodoVuelo*, NodoVuelo*);
+void quickSortFechaOldToNew(NodoVuelo*);
+
+NodoVuelo* partitionFechaNewToOld(NodoVuelo*, NodoVuelo*);
+void _quickSortFechaNewToOld(NodoVuelo*, NodoVuelo*);
+void quickSortFechaNewToOld(NodoVuelo*);
 #pragma endregion
 #pragma endregion
 
@@ -1473,14 +1480,16 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 			case LBN_DBLCLK: //Al dar doble clic en el ListBox 
 			{
-				char vueloO[30];
+				char vueloO[30] = { 0 };
 				int indice2 = 0;
 				indice2 = SendDlgItemMessage(hwnd, IDC_LIST2, LB_GETCURSEL, 0, 0);
 				SendDlgItemMessage(hwnd, IDC_LIST2, LB_GETTEXT, indice2, (LPARAM)vueloO);
-
+				
+				int numVuelo;
+				numVuelo = atoi(vueloO);
 				auxVuelo2 = iniVuelo;
 
-				while (auxVuelo2->sig != nullptr && strcmp(auxVuelo2->dato->origen, vueloO) != 0)
+				while (auxVuelo2->sig != nullptr && auxVuelo2->dato->num != numVuelo)
 				{
 					auxVuelo2 = auxVuelo2->sig;
 				}
@@ -1884,27 +1893,6 @@ BOOL CALLBACK cDialog9(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 			SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 		}
-
-		auxVuelo3 = iniVuelo; // Vuelos
-		if (iniVuelo != nullptr)
-		{
-			while (auxVuelo3->sig != nullptr)
-			{
-				SendDlgItemMessage(hwnd, IDC_LIST1, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo3->dato->origen);
-				auxVuelo3 = auxVuelo3->sig;
-			}
-
-			if (auxVuelo3->sig == nullptr/* || auxUsu2->ant == nullptr*/)
-			{
-				SendDlgItemMessage(hwnd, IDC_LIST1, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo3->dato->origen);
-				auxVuelo3 = auxVuelo3->sig;
-			}
-		}
-		else
-		{
-			MessageBox(NULL, "No hay vuelos registrados.", "AVISO", MB_OK | MB_ICONINFORMATION);
-		}
-
 		break;
 	}
 	case WM_COMMAND:
@@ -1940,20 +1928,24 @@ BOOL CALLBACK cDialog9(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		//}
 		case IDC_BUTTON1: // Más recientes
 		{
+			quickSortFechaNewToOld(iniVuelo);
 
-
+			SendMessage(GetDlgItem(hwnd, IDC_LIST1), LB_RESETCONTENT, 0, 0);
+			SetRegistroVuelos(hwnd, IDC_LIST1, IDC_DATETIMEPICKER1, IDC_DATETIMEPICKER2);
 			break;
 		}
 		case IDC_BUTTON2: // Más antiguos
 		{
+			quickSortFechaOldToNew(iniVuelo);
 
-
+			SendMessage(GetDlgItem(hwnd, IDC_LIST1), LB_RESETCONTENT, 0, 0);
+			SetRegistroVuelos(hwnd, IDC_LIST1, IDC_DATETIMEPICKER1, IDC_DATETIMEPICKER2);
 			break;
 		}
 		case IDC_BUTTON3: // Fechas
 		{
-
-
+			SendMessage(GetDlgItem(hwnd, IDC_LIST1), LB_RESETCONTENT, 0, 0);
+			SetRegistroVuelos(hwnd, IDC_LIST1, IDC_DATETIMEPICKER1, IDC_DATETIMEPICKER2);
 			break;
 		}
 		case IDC_BUTTON4: // Reporte
@@ -1964,7 +1956,7 @@ BOOL CALLBACK cDialog9(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			}
 			else
 			{
-				reporteVuelos();
+				reporteVuelos(hwnd, IDC_LIST1);
 				MessageBox(NULL, "Reporte fue guardado.", "AVISO", MB_OK | MB_ICONEXCLAMATION);
 			}
 
@@ -3629,52 +3621,28 @@ void leerVuelos()
 		leer.close();
 	}
 }
-void reporteVuelos()
+void reporteVuelos(HWND hwnd, int listBoxId)
 {
 	ofstream escribir("Reporte de vuelos.txt", ios::out | ios::trunc);
 	if (!escribir.is_open()) {
 		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
 		return;
 	}
-	auxVuelo = iniVuelo;
-	if (escribir.is_open())
-	{
-		while (auxVuelo != nullptr)
-		{
-			if (escribir.bad())
-			{
-				MessageBox(NULL, "Ocurrió un error durante la escritura", "Error", MB_OK | MB_ICONERROR);
 
-				return;
-			}
-
-			escribir.write((char*)auxVuelo->dato, sizeof(DatoVuelo));
-			auxVuelo = auxVuelo->sig;
-		}
-		escribir.close();
+	// Obtener el número de elementos en el ListBox
+	int count = SendMessage(GetDlgItem(hwnd, listBoxId), LB_GETCOUNT, 0, 0);
+	if (count == 0) {
+		MessageBox(NULL, "No hay vuelos para reportar", "Error", MB_OK | MB_ICONERROR);
+		return;
 	}
-	/*auxMed = iniMed;
-
-	if (auxMed == nullptr)
-	{
-		MessageBox(0, "La lista esta vacia.", "AVISO", MB_OK);
+	for (int i = 0; i < count; i++) {
+		char text[256];
+		// Obtener el texto del elemento
+		SendMessage(GetDlgItem(hwnd, listBoxId), LB_GETTEXT, i, (LPARAM)text);
+		// Escribir el texto en el archivo
+		escribir << text << endl;
 	}
-	else
-	{
-		ofstream escribir;
-		escribir.open("C:\\Users\\hp\\Documents\\UANL\\Universidad 5\\ProgAv\\Proyecto Final\\Segundo Avance\\Segundo Avance\\Segundo Avance\\Usuarios.bin", ios::out | ios::binary | ios::trunc);
-
-		if (escribir.is_open())
-		{
-			while (auxMed != nullptr)
-			{
-				escribir.write((char*)auxMed, sizeof(usuario));
-				auxMed = auxMed->sig;
-			}
-
-			escribir.close();
-		}
-	}*/
+	escribir.close();
 }
 void printVuelosEnRango(HWND hwnd, int List, NodoVuelo* iniVuelos, DATE inicioDate, DATE finDate) {
 	for (NodoVuelo* nodo = iniVuelos; nodo != NULL; nodo = nodo->sig) {
@@ -3735,6 +3703,55 @@ NodoVuelo* binarySearchNumVuelo(NodoVuelo* iniVuelos, int numVuelo) {
 	}
 	return NULL;
 }
+void SetRegistroVuelos(HWND hwnd, int ListBoxID, int DTP1, int DTP2) {
+	auxVuelo3 = iniVuelo; // Vuelos
+	SYSTEMTIME fecha1 = { 0 }; double fecha1D;
+	SYSTEMTIME fecha2 = { 0 }; double fecha2D;
+	DateTime_GetSystemtime(GetDlgItem(hwnd, DTP1), &fecha1);
+	DateTime_GetSystemtime(GetDlgItem(hwnd, DTP2), &fecha2);
+	SystemTimeToVariantTime(&fecha1, &fecha1D);
+	SystemTimeToVariantTime(&fecha2, &fecha2D);
+
+	if (iniVuelo != nullptr)
+	{
+		while (auxVuelo3->sig != nullptr)
+		{
+			if (auxVuelo3->dato->fecha >= fecha1D && auxVuelo3->dato->fecha <= fecha2D) {
+				char cadenaFecha[100];
+				SYSTEMTIME fecha = { 0 };
+				VariantTimeToSystemTime(auxVuelo3->dato->fecha, &fecha);
+				formatoFecha(&fecha, cadenaFecha);
+
+				char vueloInfo[200];
+				sprintf_s(vueloInfo, sizeof(vueloInfo), "Número de vuelo: %d, Fecha: %s, Origen: %s, Destino: %s",
+					auxVuelo3->dato->num, cadenaFecha, auxVuelo3->dato->origen, auxVuelo3->dato->destino);
+
+				SendDlgItemMessage(hwnd, ListBoxID, LB_ADDSTRING, (WPARAM)0, (LPARAM)vueloInfo);
+			}
+			auxVuelo3 = auxVuelo3->sig;
+		}
+
+		if (auxVuelo3->sig == nullptr && auxVuelo3->dato->fecha >= fecha1D && auxVuelo3->dato->fecha <= fecha2D)
+		{
+			char cadenaFecha[100];
+			SYSTEMTIME fecha = { 0 };
+			VariantTimeToSystemTime(auxVuelo3->dato->fecha, &fecha);
+			formatoFecha(&fecha, cadenaFecha);
+
+			char vueloInfo[200];
+			sprintf_s(vueloInfo, sizeof(vueloInfo), "Número de vuelo: %d, Fecha: %s, Origen: %s, Destino: %s",
+				auxVuelo3->dato->num, cadenaFecha, auxVuelo3->dato->origen, auxVuelo3->dato->destino);
+
+			SendDlgItemMessage(hwnd, ListBoxID, LB_ADDSTRING, (WPARAM)0, (LPARAM)vueloInfo);
+		}
+		auxVuelo3 = auxVuelo3->sig;
+	}
+	else
+	{
+		MessageBox(NULL, "No hay vuelos registrados.", "AVISO", MB_OK | MB_ICONINFORMATION);
+	}
+}
+
 #pragma region QuickSort
 //Generales
 void swapData(NodoVuelo* a, NodoVuelo* b) {
@@ -3790,6 +3807,71 @@ void quickSortNum(NodoVuelo* head) // Función principal
 	// Manda a llamar la función de QuickSort recursiva
 	_quickSortNum(head, h);
 }
+
+NodoVuelo* partitionFechaOldToNew(NodoVuelo* l, NodoVuelo* h)
+{
+	double x = h->dato->fecha;
+	NodoVuelo* i = l->ant;
+
+	for (NodoVuelo* j = l; j != h; j = j->sig)
+	{
+		if (j->dato->fecha <= x)
+		{
+			i = (i == NULL) ? l : i->sig;
+			swapData(i, j);
+		}
+	}
+	i = (i == NULL) ? l : i->sig;
+	swapData(i, h);
+	return i;
+}
+void _quickSortFechaOldToNew(NodoVuelo* l, NodoVuelo* h)
+{
+	if (h != NULL && l != h && l != h->sig)
+	{
+		NodoVuelo* p = partitionFechaOldToNew(l, h);
+		_quickSortFechaOldToNew(l, p->ant);
+		_quickSortFechaOldToNew(p->sig, h);
+	}
+}
+void quickSortFechaOldToNew(NodoVuelo* head)
+{
+	NodoVuelo* h = lastNode(head);
+	_quickSortFechaOldToNew(head, h);
+}
+
+NodoVuelo* partitionFechaNewToOld(NodoVuelo* l, NodoVuelo* h)
+{
+	double x = h->dato->fecha;
+	NodoVuelo* i = l->ant;
+
+	for (NodoVuelo* j = l; j != h; j = j->sig)
+	{
+		if (j->dato->fecha >= x)
+		{
+			i = (i == NULL) ? l : i->sig;
+			swapData(i, j);
+		}
+	}
+	i = (i == NULL) ? l : i->sig;
+	swapData(i, h);
+	return i;
+}
+void _quickSortFechaNewToOld(NodoVuelo* l, NodoVuelo* h)
+{
+	if (h != NULL && l != h && l != h->sig)
+	{
+		NodoVuelo* p = partitionFechaNewToOld(l, h);
+		_quickSortFechaNewToOld(l, p->ant);
+		_quickSortFechaNewToOld(p->sig, h);
+	}
+}
+void quickSortFechaNewToOld(NodoVuelo* head)
+{
+	NodoVuelo* h = lastNode(head);
+	_quickSortFechaNewToOld(head, h);
+}
+
 /*
 void printListNum(NodoVuelo* head)
 {
