@@ -17,6 +17,7 @@
 //#include <winuser.h>
 
 using namespace std;
+bool redirection = false;
 
 // Estructuras
 #pragma region Structs
@@ -207,6 +208,7 @@ void leerVuelos();
 void reporteVuelos(); //Antes Boletos/Medicos
 void printVuelosEnRango(HWND, int, NodoVuelo*, DATE, DATE);
 void generarManifiestoPasajeros(NodoBoleto*, int, const char*);
+NodoVuelo* binarySearchNumVuelo(NodoVuelo*, int);
 //QuickSort
 void swapData(NodoVuelo*, NodoVuelo*);
 NodoVuelo* lastNode(NodoVuelo*);
@@ -1062,6 +1064,44 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_INITDIALOG:
 	{
+		if (redirection) {
+			SetDlgItemInt(hwnd, IDC_EDIT2, auxVuelo2->dato->num, false);
+			SetDlgItemText(hwnd, IDC_EDIT3, auxVuelo2->dato->origen);
+			SetDlgItemText(hwnd, IDC_EDIT4, auxVuelo2->dato->destino);
+			SetDlgItemText(hwnd, IDC_EDIT17, auxVuelo2->dato->modelo);
+
+			char cadenaFecha[100];
+			SYSTEMTIME fecha = { 0 };
+			VariantTimeToSystemTime(auxVuelo2->dato->fecha, &fecha);
+
+			DateTime_SetSystemtime(GetDlgItem(hwnd, IDC_DATETIMEPICKER1), GDT_VALID, &fecha);
+
+			aux2 = ini2;
+			while (aux2->sig != nullptr && strcmp(aux2->Modelo, auxVuelo2->dato->modelo) != 0)
+			{
+				aux2 = aux2->sig;
+			}
+
+			char texto[10];
+			_itoa_s(aux2->asientosT, texto, 10);
+			SetDlgItemText(hwnd, IDC_EDIT6, texto);
+			_itoa_s(aux2->asientosCT, texto, 10);
+			SetDlgItemText(hwnd, IDC_EDIT7, texto);
+			_itoa_s(aux2->asientosE, texto, 10);
+			SetDlgItemText(hwnd, IDC_EDIT8, texto);
+			_itoa_s(aux2->asientosCE, texto, 10);
+			SetDlgItemText(hwnd, IDC_EDIT9, texto);
+
+			_itoa_s(aux2->asientosN, texto, 10);
+			SetDlgItemText(hwnd, IDC_EDIT10, texto);
+			_itoa_s(aux2->asientosA, texto, 10);
+			SetDlgItemText(hwnd, IDC_EDIT11, texto);
+			_itoa_s(aux2->asientosM, texto, 10);
+			SetDlgItemText(hwnd, IDC_EDIT19, texto);
+			_itoa_s(aux2->asientos, texto, 10);
+			SetDlgItemText(hwnd, IDC_EDIT20, texto);
+
+		}
 		if (miUsuario != nullptr)
 		{
 			SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->dato->nombreComp);
@@ -1384,13 +1424,17 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 			while (auxVuelo2->sig != nullptr)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST2, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo2->dato->num);
+				char numStr[10];
+				sprintf_s(numStr, sizeof(numStr), "%d", auxVuelo2->dato->num);
+				SendDlgItemMessageA(hwnd, IDC_LIST2, LB_ADDSTRING, 0, (LPARAM)numStr);
 				auxVuelo2 = auxVuelo2->sig;
 			}
 
 			if (auxVuelo2->sig == nullptr/* || auxEsp2->ant == nullptr*/)
 			{
-				SendDlgItemMessage(hwnd, IDC_LIST2, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxVuelo2->dato->num);
+				char numStr[10];
+				sprintf_s(numStr, sizeof(numStr), "%d", auxVuelo2->dato->num);
+				SendDlgItemMessageA(hwnd, IDC_LIST2, LB_ADDSTRING, 0, (LPARAM)numStr);
 				auxVuelo2 = auxVuelo2->sig;
 			}
 		}
@@ -1429,9 +1473,32 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				SetDlgItemInt(hwnd, IDC_EDIT2, auxVuelo2->dato->num, NULL);
 				SetDlgItemText(hwnd, IDC_EDIT3, auxVuelo2->dato->origen);
 				SetDlgItemText(hwnd, IDC_EDIT4, auxVuelo2->dato->destino);
-				SetDlgItemInt(hwnd, IDC_EDIT6, auxVuelo2->dato->fecha, NULL);
-				SetDlgItemInt(hwnd, IDC_EDIT7, auxVuelo2->dato->status, NULL);
 
+				char cadenaFecha[100];
+				SYSTEMTIME fecha = { 0 };
+				VariantTimeToSystemTime(auxVuelo2->dato->fecha, &fecha);
+				formatoFecha(&fecha, cadenaFecha);
+				//sprintf_s(cadenaNacimiento, "%f", miUsuario->dato->nacimiento);
+				SetDlgItemText(hwnd, IDC_EDIT6, cadenaFecha);
+
+				switch (auxVuelo2->dato->status)
+				{
+					case 0:
+					{
+						SetDlgItemText(hwnd, IDC_EDIT7, "En espera");
+						break;
+					}
+					case 1:
+					{
+						SetDlgItemText(hwnd, IDC_EDIT7, "Efectuado");
+						break;
+					}
+					case 2:
+					{
+						SetDlgItemText(hwnd, IDC_EDIT7, "Cancelado");
+						break;
+					}
+				}
 				break;
 			}
 
@@ -1447,12 +1514,12 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			if (auxVuelo2 == nullptr)
 			{
-				MessageBox(NULL, "No se ha seleccionado una especialidad, seleccione una de la lista con doble click.", "AVISO", MB_OK | MB_ICONERROR);
+				MessageBox(NULL, "No se ha seleccionado un vuelo, seleccione una de la lista con doble click.", "AVISO", MB_OK | MB_ICONERROR);
 			}
 			else
 			{
+				redirection = true;
 				EndDialog(hwnd, 0);
-
 				HWND hDialog5 = CreateDialog(hInstanceGlobal, MAKEINTRESOURCE(IDD_DIALOG5), 0, cDialog5);
 
 				ShowWindow(hDialog5, SW_SHOW);
@@ -3505,7 +3572,27 @@ void generarManifiestoPasajeros(NodoBoleto* iniBoletos, int numVuelo, const char
 	// Cerrar el archivo
 	fclose(archivo);
 }
-
+//Función de búsqueda en la lista por numero de vuelo
+NodoVuelo* binarySearchNumVuelo(NodoVuelo* iniVuelos, int numVuelo) {
+	NodoVuelo* inicio = iniVuelos;
+	NodoVuelo* fin = NULL;
+	while (inicio != fin) {
+		NodoVuelo* mitad = inicio;
+		for (int i = 0; i < numVuelo / 2; i++) {
+			mitad = mitad->sig;
+		}
+		if (mitad->dato->num == numVuelo) {
+			return mitad;
+		}
+		else if (mitad->dato->num < numVuelo) {
+			inicio = mitad->sig;
+		}
+		else {
+			fin = mitad;
+		}
+	}
+	return NULL;
+}
 #pragma region QuickSort
 //Generales
 void swapData(NodoVuelo* a, NodoVuelo* b) {
