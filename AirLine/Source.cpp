@@ -48,6 +48,8 @@ struct DatoVuelo {
 	char origen[30];
 	char destino[30];
 	char modelo[30];
+	int asientos;
+	int asientosOcupados;
 	int num;
 	int asientos;
 	int status;
@@ -1388,6 +1390,7 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				GetDlgItemText(hwnd, IDC_EDIT4, temp->dato->destino, sizeof(temp->dato->destino));
 				GetDlgItemText(hwnd, IDC_EDIT17, temp->dato->modelo, sizeof(temp->dato->modelo));
 				temp->dato->asientos = aux2->asientos;
+				temp->dato->asientosOcupados = 0;
 
 				//Se obtiene la fecha
 				HWND hDia = GetDlgItem(hwnd, IDC_DATETIMEPICKER1);
@@ -1477,6 +1480,27 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				{
 					MessageBox(NULL, "La fecha del vuelo no puede ser el día de hoy o anterior.", "AVISO", MB_OK | MB_ICONINFORMATION);
 					break;
+				}
+
+				GetDlgItemText(hwnd, IDC_EDIT3, auxVuelo2->dato->origen, sizeof(auxVuelo2->dato->origen));
+				GetDlgItemText(hwnd, IDC_EDIT4, auxVuelo2->dato->destino, sizeof(auxVuelo2->dato->destino));
+				GetDlgItemText(hwnd, IDC_EDIT17, auxVuelo2->dato->modelo, sizeof(auxVuelo2->dato->modelo));
+				
+				if (auxVuelo2->dato->asientos != 76)
+				{
+					if (auxVuelo2->dato->asientos != 166)
+					{
+						if (auxVuelo2->dato->asientos != 276)
+						{
+							auxVuelo2->dato->asientos = aux2->asientos;
+							auxVuelo2->dato->asientos = aux2->asientos - auxVuelo2->dato->asientosOcupados;
+						}
+					}
+				}
+				else
+				{
+					auxVuelo2->dato->asientos = aux2->asientos;
+					auxVuelo2->dato->asientosOcupados = 0;
 				}
 
 				//Se obtiene la fecha
@@ -1611,7 +1635,7 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 			while (auxVuelo2->sig != nullptr)
 			{
-				char numStr[10];
+				char numStr[200];
 				sprintf_s(numStr, sizeof(numStr), "%d", auxVuelo2->dato->num);
 				SendDlgItemMessageA(hwnd, IDC_LIST2, LB_ADDSTRING, 0, (LPARAM)numStr);
 				auxVuelo2 = auxVuelo2->sig;
@@ -1619,7 +1643,7 @@ BOOL CALLBACK cDialog6(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 			if (auxVuelo2->sig == nullptr/* || auxEsp2->ant == nullptr*/)
 			{
-				char numStr[10];
+				char numStr[200];
 				sprintf_s(numStr, sizeof(numStr), "%d", auxVuelo2->dato->num);
 				SendDlgItemMessageA(hwnd, IDC_LIST2, LB_ADDSTRING, 0, (LPARAM)numStr);
 				auxVuelo2 = auxVuelo2->sig;
@@ -2598,7 +2622,7 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 				while (auxVuelo2->sig != nullptr)
 				{
-					char numStr[10];
+					char numStr[200];
 					sprintf_s(numStr, sizeof(numStr), "%d", auxVuelo2->dato->num);
 					SendDlgItemMessageA(hwnd, IDC_LIST3, LB_ADDSTRING, 0, (LPARAM)numStr);
 					auxVuelo2 = auxVuelo2->sig;
@@ -2606,7 +2630,7 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 				if (auxVuelo2->sig == nullptr/* || auxEsp2->ant == nullptr*/)
 				{
-					char numStr[10];
+					char numStr[200];
 					sprintf_s(numStr, sizeof(numStr), "%d", auxVuelo2->dato->num);
 					SendDlgItemMessageA(hwnd, IDC_LIST3, LB_ADDSTRING, 0, (LPARAM)numStr);
 					auxVuelo2 = auxVuelo2->sig;
@@ -2617,10 +2641,6 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				MessageBox(NULL, "No hay vuelos registrados.", "AVISO", MB_OK | MB_ICONINFORMATION);
 			}
 
-			//// Clases
-			//SendDlgItemMessage(hwnd, IDC_LIST7, LB_ADDSTRING, (WPARAM)0, (LPARAM)"Turista");
-			//SendDlgItemMessage(hwnd, IDC_LIST7, LB_ADDSTRING, (WPARAM)0, (LPARAM)"Ejecutiva");
-
 			break;
 		}
 		case WM_COMMAND:
@@ -2630,34 +2650,6 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 			switch (LOWORD(wParam))
 			{
-			//case IDC_LIST7: // Clase
-			//{
-			//	switch (HIWORD(wParam))
-			//	{
-			//	case LBN_DBLCLK: //Al dar doble clic en el ListBox 
-			//	{
-			//		char clase[30] = { 0 };
-			//		int indice = 0;
-			//		indice = SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETCURSEL, 0, 0);
-			//		SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETTEXT, indice, (LPARAM)clase);
-			//		if (strcmp(clase, "Ejecutiva") != 0)
-			//		{
-			//			SetDlgItemText(hwnd, IDC_EDIT10, "Ejecutiva");
-			//		}
-			//		else
-			//		{
-			//			SetDlgItemText(hwnd, IDC_EDIT10, "Turista");
-			//		}
-			//		
-			//		break;
-			//	}
-			//	default:
-			//	{
-			//		break;
-			//	}
-			//	}
-			//	break;
-			//}
 			case IDC_LIST3: //Vuelos
 			{
 				switch (HIWORD(wParam))
@@ -2729,8 +2721,160 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				}
 				case IDC_BUTTON2: //Número
 				{
-					
+					char clase[30];
+					GetDlgItemText(hwnd, IDC_EDIT10, clase, sizeof(clase));
+					if (strcmp(clase, "Ejecutiva") == 0 || strcmp(clase, "Turista") == 0)
+					{
+						if (auxVuelo2 != nullptr)
+						{
+							if (strcmp(auxVuelo2->dato->modelo, "Bombardier CRJ-900") == 0)
+							{
+								if (auxVuelo2->dato->asientos == 76)
+								{
+									auxVuelo2->dato->asientosOcupados = 1;
+									SetDlgItemText(hwnd, IDC_EDIT9, "1");
+									char clase[30];
+									GetDlgItemText(hwnd, IDC_EDIT10, clase, sizeof(clase));
+									if (strcmp(clase, "Ejecutiva") != 0)
+									{
+										SetDlgItemText(hwnd, IDC_EDIT11, "2100");
+									}
+									else
+									{
+										SetDlgItemText(hwnd, IDC_EDIT11, "1200");
+									}
+								}
+								else
+								{
+									auxVuelo2->dato->asientos -= 1;
 
+									if (auxVuelo2->dato->asientos != 0)
+									{
+										auxVuelo2->dato->asientosOcupados = auxVuelo2->dato->asientosOcupados + 1;
+
+										char numC[30];
+										_itoa_s(auxVuelo2->dato->asientosOcupados, numC, 10);
+										SetDlgItemText(hwnd, IDC_EDIT9, numC);
+										char clase[30];
+										GetDlgItemText(hwnd, IDC_EDIT10, clase, sizeof(clase));
+										if (strcmp(clase, "Ejecutiva") != 0)
+										{
+											SetDlgItemText(hwnd, IDC_EDIT11, "2100");
+										}
+										else
+										{
+											SetDlgItemText(hwnd, IDC_EDIT11, "1200");
+										}
+									}
+									else
+									{
+										MessageBox(NULL, "Ya no hay asientos disponibles.", "AVISO", MB_OK | MB_ICONINFORMATION);
+									}
+
+								}
+							}
+							else if (strcmp(auxVuelo2->dato->modelo, "Boeing 737") == 0)
+							{
+								if (auxVuelo2->dato->asientos == 166)
+								{
+									auxVuelo2->dato->asientosOcupados = 1;
+									SetDlgItemText(hwnd, IDC_EDIT9, "1");
+									char clase[30];
+									GetDlgItemText(hwnd, IDC_EDIT10, clase, sizeof(clase));
+									if (strcmp(clase, "Ejecutiva") != 0)
+									{
+										SetDlgItemText(hwnd, IDC_EDIT1, "3000");
+									}
+									else
+									{
+										SetDlgItemText(hwnd, IDC_EDIT1, "1500");
+									}
+								}
+								else
+								{
+									auxVuelo2->dato->asientos -= 1;
+
+									if (auxVuelo2->dato->asientos != 0)
+									{
+										auxVuelo2->dato->asientosOcupados = auxVuelo2->dato->asientosOcupados + 1;
+
+										char numC[30];
+										_itoa_s(auxVuelo2->dato->asientosOcupados, numC, 10);
+										SetDlgItemText(hwnd, IDC_EDIT9, numC);
+										char clase[30];
+										GetDlgItemText(hwnd, IDC_EDIT10, clase, sizeof(clase));
+										if (strcmp(clase, "Ejecutiva") != 0)
+										{
+											SetDlgItemText(hwnd, IDC_EDIT1, "3000");
+										}
+										else
+										{
+											SetDlgItemText(hwnd, IDC_EDIT1, "1500");
+										}
+									}
+									else
+									{
+										MessageBox(NULL, "Ya no hay asientos disponibles.", "AVISO", MB_OK | MB_ICONINFORMATION);
+									}
+
+								}
+							}
+							else
+							{
+								if (auxVuelo2->dato->asientos == 276)
+								{
+									auxVuelo2->dato->asientosOcupados = 1;
+									SetDlgItemText(hwnd, IDC_EDIT9, "1");
+									char clase[30];
+									GetDlgItemText(hwnd, IDC_EDIT10, clase, sizeof(clase));
+									if (strcmp(clase, "Ejecutiva") != 0)
+									{
+										SetDlgItemText(hwnd, IDC_EDIT11, "4200");
+									}
+									else
+									{
+										SetDlgItemText(hwnd, IDC_EDIT11, "1800");
+									}
+								}
+								else
+								{
+									auxVuelo2->dato->asientos -= 1;
+
+									if (auxVuelo2->dato->asientos != 0)
+									{
+										auxVuelo2->dato->asientosOcupados = auxVuelo2->dato->asientosOcupados + 1;
+
+										char numC[30];
+										_itoa_s(auxVuelo2->dato->asientosOcupados, numC, 10);
+										SetDlgItemText(hwnd, IDC_EDIT9, numC);
+										char clase[30];
+										GetDlgItemText(hwnd, IDC_EDIT10, clase, sizeof(clase));
+										if (strcmp(clase, "Ejecutiva") != 0)
+										{
+											SetDlgItemText(hwnd, IDC_EDIT11, "4200");
+										}
+										else
+										{
+											SetDlgItemText(hwnd, IDC_EDIT11, "1800");
+										}
+									}
+									else
+									{
+										MessageBox(NULL, "Ya no hay asientos disponibles.", "AVISO", MB_OK | MB_ICONINFORMATION);
+									}
+
+								}
+							}
+						}
+						else
+						{
+							MessageBox(NULL, "No se ha seleccionado un vuelo.", "AVISO", MB_OK | MB_ICONINFORMATION);
+						}
+					}
+					else
+					{
+						MessageBox(NULL, "No se ha seleccionado una clase.", "AVISO", MB_OK | MB_ICONINFORMATION);
+					}
 					break;
 				}
 				case IDC_BUTTON3: //Ejecutiva
@@ -2751,12 +2895,12 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 					break;
 				}
-				case IDC_BUTTON6: //Editar
-				{
+				//case IDC_BUTTON6: //Editar
+				//{
 
 
-					break;
-				}
+				//	break;
+				//}
 
 				default: break;
 			}
@@ -3736,6 +3880,7 @@ void nuevoVuelo(NodoVuelo* nuevoV)
 		iniVuelo->dato->status = nuevoV->dato->status;
 		iniVuelo->dato->registro = nuevoV->dato->registro;
 		iniVuelo->dato->asientos = nuevoV->dato->asientos;
+		iniVuelo->dato->asientosOcupados = nuevoV->dato->asientosOcupados;
 
 		strcpy_s(iniVuelo->dato->usuarioRegistro, nuevoV->dato->usuarioRegistro);
 
@@ -3770,6 +3915,7 @@ void nuevoVuelo(NodoVuelo* nuevoV)
 		auxVuelo->dato->status = nuevoV->dato->status;
 		auxVuelo->dato->registro = nuevoV->dato->registro;
 		auxVuelo->dato->asientos = nuevoV->dato->asientos;
+		auxVuelo->dato->asientosOcupados = nuevoV->dato->asientosOcupados;
 
 		strcpy_s(auxVuelo->dato->usuarioRegistro, nuevoV->dato->usuarioRegistro);
 
@@ -5025,3 +5171,100 @@ void printList(NodoVuelo* head) {
 #pragma endregion
 #pragma endregion
 #pragma endregion
+
+
+//Opcional
+//char clase[30];
+//GetDlgItemText(hwnd, IDC_EDIT10, clase, sizeof(clase));
+//if (strcmp(clase, "Ejecutiva") != 0 || strcmp(clase, "Turista") != 0)
+//{
+//	if (auxVuelo2 != nullptr)
+//	{
+//		if (auxVuelo2->dato->modelo == "Bombardier CRJ-900")
+//		{
+//			if (auxVuelo2->dato->asientos == 76)
+//			{
+//				auxVuelo2->dato->asientosOcupados = 1;
+//				SetDlgItemText(hwnd, IDC_EDIT9, "1");
+//			}
+//			else
+//			{
+//				auxVuelo2->dato->asientos -= 1;
+//
+//				if (auxVuelo2->dato->asientos != 0)
+//				{
+//					auxVuelo2->dato->asientosOcupados = auxVuelo2->dato->asientosOcupados + 1;
+//
+//					char numC[30];
+//					_itoa_s(auxVuelo2->dato->asientosOcupados, numC, 10);
+//					SetDlgItemText(hwnd, IDC_EDIT9, numC);
+//				}
+//				else
+//				{
+//					MessageBox(NULL, "Ya no hay asientos disponibles.", "AVISO", MB_OK | MB_ICONINFORMATION);
+//				}
+//
+//			}
+//		}
+//		else if (auxVuelo2->dato->modelo == "Boeing 737")
+//		{
+//			if (auxVuelo2->dato->asientos == 166)
+//			{
+//				auxVuelo2->dato->asientosOcupados = 1;
+//				SetDlgItemText(hwnd, IDC_EDIT9, "1");
+//			}
+//			else
+//			{
+//				auxVuelo2->dato->asientos -= 1;
+//
+//				if (auxVuelo2->dato->asientos != 0)
+//				{
+//					auxVuelo2->dato->asientosOcupados = auxVuelo2->dato->asientosOcupados + 1;
+//
+//					char numC[30];
+//					_itoa_s(auxVuelo2->dato->asientosOcupados, numC, 10);
+//					SetDlgItemText(hwnd, IDC_EDIT9, numC);
+//				}
+//				else
+//				{
+//					MessageBox(NULL, "Ya no hay asientos disponibles.", "AVISO", MB_OK | MB_ICONINFORMATION);
+//				}
+//
+//			}
+//		}
+//		else
+//		{
+//			if (auxVuelo2->dato->asientos == 276)
+//			{
+//				auxVuelo2->dato->asientosOcupados = 1;
+//				SetDlgItemText(hwnd, IDC_EDIT9, "1");
+//			}
+//			else
+//			{
+//				auxVuelo2->dato->asientos -= 1;
+//
+//				if (auxVuelo2->dato->asientos != 0)
+//				{
+//					auxVuelo2->dato->asientosOcupados = auxVuelo2->dato->asientosOcupados + 1;
+//
+//					char numC[30];
+//					_itoa_s(auxVuelo2->dato->asientosOcupados, numC, 10);
+//					SetDlgItemText(hwnd, IDC_EDIT9, numC);
+//				}
+//				else
+//				{
+//					MessageBox(NULL, "Ya no hay asientos disponibles.", "AVISO", MB_OK | MB_ICONINFORMATION);
+//				}
+//
+//			}
+//		}
+//	}
+//	else
+//	{
+//		MessageBox(NULL, "No se ha seleccionado un vuelo.", "AVISO", MB_OK | MB_ICONINFORMATION);
+//	}
+//}
+//else
+//{
+//	MessageBox(NULL, "No se ha seleccionado una clase.", "AVISO", MB_OK | MB_ICONINFORMATION);
+//}
