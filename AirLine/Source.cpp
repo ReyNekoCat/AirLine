@@ -1132,9 +1132,7 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			SetDlgItemText(hwnd, IDC_EDIT20, texto);
 
 			redirection = false;
-
 		}
-
 		if (miUsuario != nullptr)
 		{
 			SetDlgItemText(hwnd, IDC_EDIT1, miUsuario->dato->nombreComp);
@@ -1403,7 +1401,10 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 				strcpy_s(temp->dato->usuarioRegistro, miUsuario->dato->nick);
 
-				temp->dato->registro = 0.0;
+				SYSTEMTIME fecha = { 0 };
+				GetLocalTime(&fecha);
+				SystemTimeToVariantTime(&fecha, &temp->dato->registro);
+
 				strcpy_s(temp->dato->usuarioRegistro, miUsuario->dato->nick);
 
 				temp->sig = nullptr;
@@ -1499,7 +1500,10 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 				strcpy_s(auxVuelo2->dato->usuarioRegistro, miUsuario->dato->nick);
 
-				auxVuelo2->dato->registro = 0.0;
+				SYSTEMTIME fecha = { 0 };
+				GetLocalTime(&fecha);
+				SystemTimeToVariantTime(&fecha, &auxVuelo2->dato->registro);
+
 				strcpy_s(auxVuelo2->dato->usuarioRegistro, miUsuario->dato->nick);
 
 				MessageBox(NULL, "Cambios guardados.", "AVISO", MB_OK | MB_ICONINFORMATION);
@@ -1527,22 +1531,20 @@ BOOL CALLBACK cDialog5(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				ShowWindow(hDialog6, SW_SHOW);
 				UpdateWindow(hDialog6); //Opcional
 			}
-
 			break;
 		}
-
 		default:
-		{
-			break;
-		}
+			{
+				break;
+			}
 		}
 		break;
 	}
 
 	default:
-	{
-		break;
-	}
+		{
+			break;
+		}
 	}
 
 	return false;  // Un callback siempre retorna falso
@@ -2249,7 +2251,9 @@ BOOL CALLBACK cDialog10(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 				strcpy_s(temp->dato->usuarioRegistro, miUsuario->dato->nick);
 
-				temp->dato->registro = 0.0;
+				SYSTEMTIME fecha = { 0 };
+				GetLocalTime(&fecha);
+				SystemTimeToVariantTime(&fecha, &temp->dato->registro);
 
 				temp->sig = nullptr;
 				temp->ant = nullptr;
@@ -2453,7 +2457,9 @@ BOOL CALLBACK cDialog11(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 					strcpy_s(auxPasajero3->dato->usuarioRegistro, miUsuario->dato->nick);
 
-					auxPasajero3->dato->registro = 0.0;
+					SYSTEMTIME fecha = { 0 };
+					GetLocalTime(&fecha);
+					SystemTimeToVariantTime(&fecha, &auxPasajero3->dato->registro);
 
 					MessageBox(NULL, "Cambios guardados.", "AVISO", MB_OK | MB_ICONINFORMATION);
 
@@ -4019,6 +4025,7 @@ NodoVuelo* binarySearchNumVuelo(NodoVuelo* iniVuelos, int numVuelo) {
 }
 void SetRegistroVuelos(HWND hwnd, int ListBoxID, int DTP1, int DTP2) {
 	auxVuelo3 = iniVuelo; // Vuelos
+	auxVuelo3->dato = iniVuelo->dato;
 	SYSTEMTIME fecha1 = { 0 }; double fecha1D;
 	SYSTEMTIME fecha2 = { 0 }; double fecha2D;
 	DateTime_GetSystemtime(GetDlgItem(hwnd, DTP1), &fecha1);
@@ -4234,161 +4241,6 @@ void nuevoBoleto(NodoBoleto* nuevoB)
 	}
 	else
 	{
-		// ::: ANTERIOR ::: //
-		/*
-		 		auxMed = pivote;	
-		nuevoMed->cedulaNum = atoi(nuevoMed->cedulaChar);
-
-		//if (nuevoMed->cedulaNum == auxMed->cedulaNum)
-		//{
-		//	auxBoleto2 = auxMed->ant;
-		//	auxMed->ant = new medico;
-		//	auxMed->ant->ant = auxBoleto2;
-		//	auxMed->ant->sig = auxMed;
-		//	auxMed = auxMed->ant;
-		//	auxBoleto2->sig = auxMed;
-		//}
-		//else 
-		if (nuevoMed->cedulaNum > auxMed->cedulaNum)
-		{
-			while (auxMed->sig != nullptr && nuevoMed->cedulaNum > auxMed->cedulaNum)
-			{
-				auxMed = auxMed->sig;
-			}
-
-			if (auxMed->ant != nullptr && auxMed->sig != nullptr)
-			{
-
-				//if (nuevoMed->cedulaNum == auxMed->cedulaNum)
-				//{
-				//	auxBoleto2 = auxMed->ant;
-				//	auxMed->ant = new medico;
-				//	auxMed->ant->ant = auxBoleto2;
-				//	auxMed->ant->sig = auxMed;
-				//	auxMed = auxMed->ant;
-				//	auxBoleto2->sig = auxMed;
-				//}
-				//else
-				if (nuevoMed->cedulaNum > auxMed->cedulaNum)
-				{
-					auxBoleto2 = auxMed->sig;
-					auxMed->sig = new boleto;
-					auxMed->sig->sig = auxBoleto2;
-					auxMed->sig->ant = auxMed;
-					auxMed = auxMed->sig;
-					auxBoleto2->ant = auxMed;
-				}
-				else
-				{
-					auxBoleto2 = auxMed->ant;
-					auxMed->ant = new boleto;
-					auxMed->ant->ant = auxBoleto2;
-					auxMed->ant->sig = auxMed;
-					auxMed = auxMed->ant;
-					auxBoleto2->sig = auxMed;
-				}
-			}
-			else
-			{
-				//if (nuevoMed->cedulaNum == auxMed->cedulaNum)
-				//{
-				//	auxBoleto2 = auxMed->ant;
-				//	auxMed->ant = new medico;
-				//	auxMed->ant->ant = auxBoleto2;
-				//	auxMed->ant->sig = auxMed;
-				//	auxMed = auxMed->ant;
-				//	auxBoleto2->sig = auxMed;
-				//}
-				//else
-				if (nuevoMed->cedulaNum > auxMed->cedulaNum)
-				{
-					auxMed->sig = new boleto;
-					auxMed->sig->sig = nullptr;
-					auxMed->sig->ant = auxMed;
-					auxMed = auxMed->sig;
-				}
-				else
-				{
-					auxBoleto2 = auxMed->ant;
-					auxMed->ant = new boleto;
-					auxMed->ant->ant = auxBoleto2;
-					auxMed->ant->sig = auxMed;
-					auxMed = auxMed->ant;
-					auxBoleto2->sig = auxMed;
-				}
-			}
-		}
-		else
-		{
-			while (auxMed->ant != nullptr && nuevoMed->cedulaNum < auxMed->cedulaNum)
-			{
-				auxMed = auxMed->ant;
-			}
-
-			if (auxMed->ant != nullptr && auxMed->sig != nullptr)
-			{
-
-				//if (nuevoMed->cedulaNum == auxMed->cedulaNum)
-				//{
-				//	auxBoleto2 = auxMed->ant;
-				//	auxMed->ant = new medico;
-				//	auxMed->ant->ant = auxBoleto2;
-				//	auxMed->ant->sig = auxMed;
-				//	auxMed = auxMed->ant;
-				//	auxBoleto2->sig = auxMed;
-				//}
-				//else 
-				if (nuevoMed->cedulaNum < auxMed->cedulaNum)
-				{
-					auxBoleto2 = auxMed->ant;
-					auxMed->ant = new boleto;
-					auxMed->ant->ant = auxBoleto2;
-					auxMed->ant->sig = auxMed;
-					auxMed = auxMed->ant;
-					auxBoleto2->sig = auxMed;
-				}
-				else
-				{
-					auxBoleto2 = auxMed->sig;
-					auxMed->sig = new boleto;
-					auxMed->sig->sig = auxBoleto2;
-					auxMed->sig->ant = auxMed;
-					auxMed = auxMed->sig;
-					auxBoleto2->ant = auxMed;
-				}
-			}
-			else
-			{
-				//if (nuevoMed->cedulaNum == auxMed->cedulaNum)
-				//{
-				//	auxBoleto2 = auxMed->ant;
-				//	auxMed->ant = new medico;
-				//	auxMed->ant->ant = auxBoleto2;
-				//	auxMed->ant->sig = auxMed;
-				//	auxMed = auxMed->ant;
-				//	auxBoleto2->sig = auxMed;
-				//}
-				//else 
-				if (nuevoMed->cedulaNum < auxMed->cedulaNum)
-				{
-					auxMed->ant = new boleto;
-					auxMed->ant->ant = nullptr;
-					auxMed->ant->sig = auxMed;
-					auxMed = auxMed->ant;
-				}
-				else
-				{
-					auxBoleto2 = auxMed->sig;
-					auxMed->sig = new boleto;
-					auxMed->sig->sig = auxBoleto2;
-					auxMed->sig->ant = auxMed;
-					auxMed = auxMed->sig;
-					auxBoleto2->ant = auxMed;
-				}
-			}
-
-		}
-		*/
 		auxBoleto = iniBoleto;
 
 		while (auxBoleto->sig != nullptr)
@@ -4413,21 +4265,8 @@ void nuevoBoleto(NodoBoleto* nuevoB)
 		strcat_s(auxBoleto->dato->nombreCompPasajero, " ");
 		strcat_s(auxBoleto->dato->nombreCompPasajero, auxBoleto->dato->apellidoMPasajero);
 
-		//strcpy_s(auxMed->cedulaChar, nuevoMed->cedulaChar);
-		//auxMed->cedulaNum = atoi(auxMed->cedulaChar);
-		//strcpy_s(auxMed->numConsultorioChar, nuevoMed->numConsultorioChar);
-		//auxMed->clase = atoi(auxMed->numConsultorioChar);
-		//strcpy_s(auxMed->telefonoChar, nuevoMed->telefonoChar);
-		//auxMed->estado = atoi(auxMed->telefonoChar);
-
-		//strcpy_s(auxMed->hoararioChar, nuevoMed->hoararioChar);
 		auxBoleto->dato->pase = nuevoB->dato->pase;
-		//strcpy_s(auxMed->diasChar, nuevoMed->diasChar);
-		//auxMed->diasNum = nuevoMed->diasNum;
-
 		auxBoleto->dato->numVuelo = nuevoB->dato->numVuelo;
-
-		//strcpy_s(auxMed->foto, nuevoMed->foto);
 
 		strcpy_s(auxBoleto->dato->usuarioRegistro, nuevoB->dato->usuarioRegistro);
 

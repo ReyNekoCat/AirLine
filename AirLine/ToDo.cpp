@@ -22,7 +22,7 @@
    Y	Sí		10		Registro de Pasajeros
    X	Sí		10		Compra de boletos
    X	Sí		5		Pases de abordar
-   X 	Sí		10		Cancelación/Confirmación de Vuelos
+   Y 	Sí		10		Cancelación/Confirmación de Vuelos
    X	No		10		Cancelación de boletos comprados
    Y	Sí		10		Manifiesto
    Y	No		10		Reporte de Vuelos

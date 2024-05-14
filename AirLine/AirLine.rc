@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Español (México) resources
+// Spanish (Mexico) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESM)
 LANGUAGE LANG_SPANISH, SUBLANG_SPANISH_MEXICAN
@@ -219,7 +219,7 @@ BEGIN
     EDITTEXT        IDC_EDIT19,450,225,50,15,ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER
     CTEXT           "Acientos (60+):",IDC_STATIC,376,225,65,15,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
     EDITTEXT        IDC_EDIT21,161,148,339,15,ES_AUTOHSCROLL | ES_READONLY
-    LISTBOX         IDC_LIST9,510,70,165,170,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP,WS_EX_CLIENTEDGE
+    LISTBOX         IDC_LIST9,510,70,165,170,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP,WS_EX_CLIENTEDGE
     CTEXT           "Pasajeros:",IDC_STATIC,510,20,165,20,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
     CTEXT           "Ordenar por:",IDC_STATIC,510,50,55,15,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
     CONTROL         "",IDC_BMP,"Static",SS_BITMAP,685,20,15,13
@@ -242,7 +242,7 @@ BEGIN
     CTEXT           "Sesión:",IDC_STATIC,56,20,64,20,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
     EDITTEXT        IDC_EDIT1,130,20,370,20,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY,WS_EX_CLIENTEDGE
     CONTROL         "",IDC_BMP,"Static",SS_BITMAP,510,20,15,13
-    LISTBOX         IDC_LIST1,56,80,444,160,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LISTBOX         IDC_LIST1,56,80,444,160,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     CTEXT           "Vuelos:",IDC_STATIC,56,50,294,20,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
     PUSHBUTTON      "Más reciente",IDC_BUTTON1,359,50,69,20
     PUSHBUTTON      "Más Antiguo",IDC_BUTTON2,431,50,69,20
@@ -716,7 +716,7 @@ BEGIN
         VERTGUIDE, 500
         VERTGUIDE, 510
         VERTGUIDE, 565
-        VERTGUIDE, 585
+        VERTGUIDE, 584
         TOPMARGIN, 7
         BOTTOMMARGIN, 293
         HORZGUIDE, 20
@@ -1052,12 +1052,12 @@ BEGIN
     END
 END
 
-#endif    // Español (México) resources
+#endif    // Spanish (Mexico) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Español (España, alfabetización internacional) resources
+// Spanish (Spain, International Sort) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESN)
 LANGUAGE LANG_SPANISH, SUBLANG_SPANISH_MODERN
@@ -1088,7 +1088,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // Español (España, alfabetización internacional) resources
+#endif    // Spanish (Spain, International Sort) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
