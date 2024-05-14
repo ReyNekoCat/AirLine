@@ -51,7 +51,6 @@ struct DatoVuelo {
 	int asientos;
 	int asientosOcupados;
 	int num;
-	int asientos;
 	int status;
 	double fecha;
 	double registro;
