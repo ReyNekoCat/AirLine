@@ -1869,8 +1869,8 @@ BOOL CALLBACK cDialog7(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 				char vueloO[30];
 				int indice2 = 0;
-				indice2 = SendDlgItemMessage(hwnd, IDC_LIST2, LB_GETCURSEL, 0, 0);
-				SendDlgItemMessage(hwnd, IDC_LIST2, LB_GETTEXT, indice2, (LPARAM)vueloO);
+				indice2 = SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETCURSEL, 0, 0);
+				SendDlgItemMessage(hwnd, IDC_LIST3, LB_GETTEXT, indice2, (LPARAM)vueloO);
 
 				auxVuelo2 = iniVuelo;
 
@@ -1880,9 +1880,6 @@ BOOL CALLBACK cDialog7(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				}
 
 				SetDlgItemText(hwnd, IDC_EDIT2, auxVuelo2->dato->origen);
-
-				// Pasajero de este Vuelo
-				
 
 				break;
 			}
@@ -1951,7 +1948,34 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 				SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 			}
+			auxBoleto2 = iniBoleto;
+			if (iniBoleto != nullptr)
+			{
+				// Ordenamiento QueckSort Boleto
+				//quickSortNum(iniBoleto);
 
+				while (auxBoleto2->sig != nullptr)
+				{
+					if (auxBoleto2->dato->numVuelo = auxVuelo2->dato->num)
+					{
+						SendDlgItemMessage(hwnd, IDC_LIST9, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto2->dato->nombreCompPasajero);
+					}
+					auxBoleto2 = auxBoleto2->sig;
+				}
+
+				if (auxBoleto2->sig == nullptr/* || auxEsp2->ant == nullptr*/)
+				{
+					if (auxBoleto2->dato->numVuelo = auxVuelo2->dato->num)
+					{
+						SendDlgItemMessage(hwnd, IDC_LIST9, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto2->dato->nombreCompPasajero);
+					}
+					auxBoleto2 = auxBoleto2->sig;
+				}
+			}
+			else
+			{
+				MessageBox(NULL, "No hay boletos registrados.", "AVISO", MB_OK | MB_ICONINFORMATION);
+			}
 			if (auxVuelo2 != nullptr)
 			{
 				SetDlgItemInt(hwnd, IDC_EDIT2, auxVuelo2->dato->num, false);
@@ -2592,13 +2616,6 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		case WM_INITDIALOG:
 		{
-			if (redirection)
-			{
-				
-
-				redirection = false;
-
-			}
 
 			if (miUsuario != nullptr)
 			{
@@ -2696,9 +2713,12 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					char pasaBuscar[30];
 					GetDlgItemText(hwnd, IDC_EDIT6, pasaBuscar, sizeof(pasaBuscar));
 
-					auxPasajero3 = binarySearchNombrePasajero(iniPasajero, pasaBuscar);
-
-					if (auxPasajero3 != NULL) // (strcmp(pasajeroBuscar, auxPasajero3->dato->nombreComp) == 0)
+					auxPasajero3 = iniPasajero;
+					while (auxPasajero3->sig != nullptr && strcmp(auxPasajero3->dato->nombreComp, pasaBuscar) != 0)
+					{
+						auxPasajero3 = auxPasajero3->sig;
+					}
+					if (auxPasajero3 != nullptr && (strcmp(pasaBuscar, auxPasajero3->dato->nombreComp) == 0))
 					{
 						SetDlgItemText(hwnd, IDC_EDIT7, auxPasajero3->dato->nombreComp);
 
@@ -2890,7 +2910,81 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				}
 				case IDC_BUTTON5: //Guardar
 				{
+					int numBuscar;
+					char numBuscarC[10];
 
+					GetDlgItemText(hwnd, IDC_EDIT2, numBuscarC, sizeof(numBuscarC));
+
+					numBuscar = atoi(numBuscarC);
+
+					auxBoleto2 = iniBoleto;
+
+					while (auxBoleto2/*->sig*/ != nullptr && numBuscar != auxBoleto2->dato->num)
+					{
+						auxBoleto2 = auxBoleto2->sig;
+					}
+
+					if (auxBoleto2/*->sig*/ == nullptr || numBuscar != auxBoleto2->dato->num)
+					{
+						NodoBoleto* temp = new NodoBoleto;
+						temp->dato = new DatoBoleto;
+
+						char numAsignadoC[10];
+						GetDlgItemText(hwnd, IDC_EDIT2, numAsignadoC, sizeof(numAsignadoC));
+						temp->dato->num = atoi(numAsignadoC);
+
+						GetDlgItemText(hwnd, IDC_EDIT7, temp->dato->nombreCompPasajero, sizeof(temp->dato->nombreCompPasajero));
+						temp->dato->numVuelo = GetDlgItemInt(hwnd, IDC_EDIT12, NULL, NULL);
+						temp->dato->num = GetDlgItemInt(hwnd, IDC_EDIT9, NULL, NULL);
+						char clase[20];
+						GetDlgItemText(hwnd, IDC_EDIT7, clase, sizeof(clase));
+						if (strcmp(clase, "Turista")) {
+							temp->dato->clase = 1;
+						}
+						else {
+							temp->dato->clase = 0;
+						}
+						temp->dato->registroBoleto = 0;
+						temp->dato->registroPase = 0;
+						strcpy_s(temp->dato->usuarioRegistro, miUsuario->dato->nick);
+
+						//Se obtiene la fecha
+						HWND hDia = GetDlgItem(hwnd, IDC_DATETIMEPICKER1);
+						SYSTEMTIME diaCumple = { 0 }; double dia;
+						DateTime_GetSystemtime(hDia, &diaCumple);
+						SystemTimeToVariantTime(&diaCumple, &dia);
+
+						temp->dato->status = 0;
+						strcpy_s(temp->dato->usuarioRegistro, miUsuario->dato->nick);
+						strcpy_s(temp->dato->nombrePasajero, "");
+						strcpy_s(temp->dato->apellidoMPasajero, "");
+						strcpy_s(temp->dato->apellidoPPasajero, "");
+
+						temp->sig = nullptr;
+						temp->ant = nullptr;
+						nuevoBoleto(temp);
+
+						SetDlgItemText(hwnd, IDC_EDIT2, "");
+						SetDlgItemText(hwnd, IDC_EDIT3, "");
+						SetDlgItemText(hwnd, IDC_EDIT4, "");
+						SetDlgItemText(hwnd, IDC_EDIT5, "");
+						SetDlgItemText(hwnd, IDC_EDIT6, "");
+						SetDlgItemText(hwnd, IDC_EDIT7, "");
+						SetDlgItemText(hwnd, IDC_EDIT8, "");
+						SetDlgItemText(hwnd, IDC_EDIT9, "");
+						SetDlgItemText(hwnd, IDC_EDIT10, "");
+						SetDlgItemText(hwnd, IDC_EDIT11, "");
+						EndDialog(hwnd, 0);
+
+						HWND hDialog10 = CreateDialog(hInstanceGlobal, MAKEINTRESOURCE(IDD_DIALOG10), 0, cDialog10);
+
+						ShowWindow(hDialog10, SW_SHOW);
+						UpdateWindow(hDialog10);
+					}
+					else
+					{
+						MessageBox(NULL, "El boleto ya esta registrado.", "AVISO", MB_OK | MB_ICONINFORMATION);
+					}
 
 					break;
 				}
@@ -4366,12 +4460,13 @@ void nuevoBoleto(NodoBoleto* nuevoB)
 		strcpy_s(iniBoleto->dato->apellidoMPasajero, nuevoB->dato->apellidoMPasajero);
 
 		// Concatenación
-		strcpy_s(iniBoleto->dato->nombreCompPasajero, nuevoB->dato->nombrePasajero);
+		/*
 		strcat_s(iniBoleto->dato->nombreCompPasajero, " ");
 		strcat_s(iniBoleto->dato->nombreCompPasajero, iniBoleto->dato->apellidoPPasajero);
 		strcat_s(iniBoleto->dato->nombreCompPasajero, " ");
 		strcat_s(iniBoleto->dato->nombreCompPasajero, iniBoleto->dato->apellidoMPasajero);
-
+		*/strcpy_s(iniBoleto->dato->nombreCompPasajero, nuevoB->dato->nombrePasajero);
+		iniBoleto->dato->num = nuevoB->dato->num;
 		iniBoleto->dato->pase = nuevoB->dato->pase;
 		iniBoleto->dato->numVuelo = nuevoB->dato->numVuelo;
 		strcpy_s(iniBoleto->dato->usuarioRegistro, nuevoB->dato->usuarioRegistro);
@@ -4405,11 +4500,13 @@ void nuevoBoleto(NodoBoleto* nuevoB)
 
 		// Concatenación
 		strcpy_s(auxBoleto->dato->nombreCompPasajero, nuevoB->dato->nombrePasajero);
+		/*
 		strcat_s(auxBoleto->dato->nombreCompPasajero, " ");
 		strcat_s(auxBoleto->dato->nombreCompPasajero, auxBoleto->dato->apellidoPPasajero);
 		strcat_s(auxBoleto->dato->nombreCompPasajero, " ");
 		strcat_s(auxBoleto->dato->nombreCompPasajero, auxBoleto->dato->apellidoMPasajero);
-
+		*/
+		auxBoleto->dato->num = nuevoB->dato->num;
 		auxBoleto->dato->pase = nuevoB->dato->pase;
 		auxBoleto->dato->numVuelo = nuevoB->dato->numVuelo;
 
@@ -4427,7 +4524,7 @@ void nuevoBoleto(NodoBoleto* nuevoB)
 		auxBoleto3 = auxBoleto;
 	}
 
-	MessageBox(NULL, "Se ha registrado al medico con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
+	MessageBox(NULL, "Se ha registrado el boleto con éxito.", "AVISO", MB_OK | MB_ICONINFORMATION);
 	/*int opc = MessageBox(hwnd, (LPCWSTR)L"¿Seguro que desea eliminar este usuario?", (LPCWSTR)L"AVISO", MB_YESNO | MB_ICONQUESTION);*/
 }
 void eliminarBoleto(char pasajeroNom[60])
@@ -4606,6 +4703,7 @@ void leerBoletos()
 			}
 
 			BolLeido = new NodoBoleto;
+			BolLeido->dato = new DatoBoleto;
 		}
 		leer.close();
 		delete BolLeido;
@@ -5019,6 +5117,7 @@ void leerPasajeros()
 			}
 
 			pasLeido = new NodoPasajero;
+			pasLeido->dato = new DatoPasajero;
 		}
 
 		leer.close();
@@ -5095,9 +5194,12 @@ NodoPasajero* binarySearchNombrePasajero(NodoPasajero* head, const char* nombreP
 		}
 		// Si el nombre del pasajero en el punto medio es menor que el nombre proporcionado, busca en la segunda mitad
 		else {
-			start = slow->sig;
+			if (slow->sig != NULL)
+				start = slow->sig;
+			else
+				break;
 		}
-	} while (end == NULL || end != start);
+	} while (end == NULL || end != start || start != NULL);
 	// No se encontró ningún pasajero con el nombre proporcionado
 	return NULL;
 }  // Revisar Star
