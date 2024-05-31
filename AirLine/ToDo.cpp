@@ -18,16 +18,16 @@
 /*	 /	Req. / Puntos / Info. /
    Z	Sí		5       Ingreso al sistema por usuario y contraseña, *recordar usuario.
    Z	No		5		Registro de Usuarios
-   Y	Sí		10		Registro de Vuelos
-   Y	Sí		10		Registro de Pasajeros
-   X	Sí		10		Compra de boletos
+   Z	Sí		10		Registro de Vuelos
+   Z	Sí		10		Registro de Pasajeros
+   Z	Sí		10		Compra de boletos
    X	Sí		5		Pases de abordar
-   Y 	Sí		10		Cancelación/Confirmación de Vuelos
+   Z 	Sí		10		Cancelación/Confirmación de Vuelos
    X	No		10		Cancelación de boletos comprados
    Y	Sí		10		Manifiesto
-   Y	No		10		Reporte de Vuelos
-   Y	Sí		10		Uso apropiado de métodos de ordenamiento y búsqueda binaria en listas ligadas.
-   Y	Sí		5		Guardado de información en archivos binarios.
+   Z	No		10		Reporte de Vuelos
+   Z	Sí		10		Uso apropiado de métodos de ordenamiento y búsqueda binaria en listas ligadas.
+   Z	Sí		5		Guardado de información en archivos binarios.
 */	
 				/// :::: DESCRIPCIONES DEL PROYECTO :::: ///
 
