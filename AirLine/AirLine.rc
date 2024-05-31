@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Spanish (Mexico) resources
+// Español (México) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESM)
 LANGUAGE LANG_SPANISH, SUBLANG_SPANISH_MEXICAN
@@ -1049,12 +1049,12 @@ BEGIN
     END
 END
 
-#endif    // Spanish (Mexico) resources
+#endif    // Español (México) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Spanish (Spain, International Sort) resources
+// Español (España, alfabetización internacional) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESN)
 LANGUAGE LANG_SPANISH, SUBLANG_SPANISH_MODERN
@@ -1085,7 +1085,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // Spanish (Spain, International Sort) resources
+#endif    // Español (España, alfabetización internacional) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
