@@ -2712,12 +2712,16 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				{
 					char pasaBuscar[30];
 					GetDlgItemText(hwnd, IDC_EDIT6, pasaBuscar, sizeof(pasaBuscar));
-
+				
+					auxPasajero3 = binarySearchNombrePasajero(iniPasajero, pasaBuscar);
+					/*
 					auxPasajero3 = iniPasajero;
 					while (auxPasajero3->sig != nullptr && strcmp(auxPasajero3->dato->nombreComp, pasaBuscar) != 0)
 					{
 						auxPasajero3 = auxPasajero3->sig;
 					}
+					*/
+
 					if (auxPasajero3 != nullptr && (strcmp(pasaBuscar, auxPasajero3->dato->nombreComp) == 0))
 					{
 						SetDlgItemText(hwnd, IDC_EDIT7, auxPasajero3->dato->nombreComp);
@@ -5173,6 +5177,15 @@ void reportePasajeros()
 NodoPasajero* binarySearchNombrePasajero(NodoPasajero* head, const char* nombrePasajeroComp) {
 	NodoPasajero* start = head;
 	NodoPasajero* end = NULL;
+	if (head == nullptr) {
+		MessageBox(NULL, "La lista de pasajeros está vacía", "Advertencia", MB_OK | MB_ICONWARNING);
+		return NULL;
+	}
+	// Comprueba si el nombre del pasajero en el primer nodo coincide con el nombre proporcionado
+	if (strcmp(head->dato->nombreComp, nombrePasajeroComp) == 0) {
+		return head;
+	}
+
 	do {
 		// Encuentra el punto medio
 		NodoPasajero* slow = start;
