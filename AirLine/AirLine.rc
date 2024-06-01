@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Español (México) resources
+// Spanish (Mexico) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESM)
 LANGUAGE LANG_SPANISH, SUBLANG_SPANISH_MEXICAN
@@ -316,7 +316,7 @@ BEGIN
     LISTBOX         IDC_LIST3,355,246,125,34,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
 END
 
-IDD_DIALOG12 DIALOGEX 0, 0, 591, 372
+IDD_DIALOG12 DIALOGEX 0, 0, 591, 426
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION
 CAPTION "Aerolínea UANL || Boletos"
 MENU IDR_MENU1
@@ -334,24 +334,25 @@ BEGIN
     CTEXT           "Destino:",IDC_STATIC,56,145,95,16,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
     EDITTEXT        IDC_EDIT4,161,148,320,15,ES_AUTOHSCROLL | ES_READONLY
     CTEXT           "Fecha:",IDC_STATIC,56,173,95,14,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
-    CTEXT           "Número de asiento:",IDC_STATIC,56,268,95,14,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
-    EDITTEXT        IDC_EDIT9,161,268,239,15,ES_AUTOHSCROLL | ES_NUMBER
+    CTEXT           "Número de asiento:",IDC_STATIC,56,317,95,14,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
+    EDITTEXT        IDC_EDIT9,161,317,320,15,ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_EDIT5,161,173,320,15,ES_AUTOHSCROLL | ES_READONLY
     CTEXT           "Pasajero:",IDC_STATIC,56,196,95,14,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
     EDITTEXT        IDC_EDIT6,161,196,239,15,ES_AUTOHSCROLL
-    PUSHBUTTON      "Ejecutiva",IDC_BUTTON3,330,293,71,14
+    PUSHBUTTON      "Ejecutiva",IDC_BUTTON3,329,293,71,14
     CTEXT           "Nombre:",IDC_STATIC,56,220,95,14,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
     EDITTEXT        IDC_EDIT7,161,220,320,15,ES_AUTOHSCROLL | ES_READONLY
     PUSHBUTTON      "Buscar",IDC_BUTTON1,410,196,71,15
     CTEXT           "Clase:",IDC_STATIC,56,293,95,14,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
     CTEXT           "Edad:",IDC_STATIC,56,245,95,14,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
     EDITTEXT        IDC_EDIT8,161,245,320,15,ES_AUTOHSCROLL | ES_READONLY
-    CTEXT           "Costo:",IDC_STATIC,56,318,95,14,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
+    CTEXT           "Costo:",IDC_STATIC,56,344,95,14,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
     EDITTEXT        IDC_EDIT10,161,292,107,15,ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER
-    PUSHBUTTON      "Generar número",IDC_BUTTON2,410,268,71,15
     PUSHBUTTON      "Turista",IDC_BUTTON4,410,293,71,14
-    EDITTEXT        IDC_EDIT11,161,318,107,15,ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER
-    PUSHBUTTON      "Guardar",IDC_BUTTON5,410,318,71,14
+    EDITTEXT        IDC_EDIT11,161,344,107,15,ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER
+    PUSHBUTTON      "Guardar",IDC_BUTTON5,410,344,71,14
+    CTEXT           "Rango de edad:",IDC_STATIC,56,268,95,14,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
+    EDITTEXT        IDC_EDIT19,161,268,320,15,ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER
 END
 
 IDD_DIALOG13 DIALOGEX 0, 0, 593, 360
@@ -805,13 +806,14 @@ BEGIN
         VERTGUIDE, 56
         VERTGUIDE, 161
         VERTGUIDE, 268
+        VERTGUIDE, 330
         VERTGUIDE, 400
         VERTGUIDE, 410
         VERTGUIDE, 481
         VERTGUIDE, 490
         VERTGUIDE, 561
         TOPMARGIN, 7
-        BOTTOMMARGIN, 365
+        BOTTOMMARGIN, 419
         HORZGUIDE, 20
         HORZGUIDE, 40
         HORZGUIDE, 50
@@ -832,6 +834,8 @@ BEGIN
         HORZGUIDE, 307
         HORZGUIDE, 318
         HORZGUIDE, 332
+        HORZGUIDE, 344
+        HORZGUIDE, 358
     END
 
     IDD_DIALOG13, DIALOG
@@ -877,6 +881,7 @@ BEGIN
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 584
+        VERTGUIDE, 1
         VERTGUIDE, 56
         VERTGUIDE, 96
         VERTGUIDE, 106
@@ -1049,12 +1054,12 @@ BEGIN
     END
 END
 
-#endif    // Español (México) resources
+#endif    // Spanish (Mexico) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Español (España, alfabetización internacional) resources
+// Spanish (Spain, International Sort) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESN)
 LANGUAGE LANG_SPANISH, SUBLANG_SPANISH_MODERN
@@ -1085,7 +1090,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // Español (España, alfabetización internacional) resources
+#endif    // Spanish (Spain, International Sort) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

@@ -2700,7 +2700,6 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 					break;
 				}
-
 				default:
 				{
 					break;
@@ -2709,128 +2708,208 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 				break;
 			}
-				case IDC_BUTTON1: //Buscar
-				{
-					char pasaBuscar[30];
-					GetDlgItemText(hwnd, IDC_EDIT6, pasaBuscar, sizeof(pasaBuscar));
+			case IDC_BUTTON1: //Buscar
+			{
+				char pasaBuscar[30];
+				GetDlgItemText(hwnd, IDC_EDIT6, pasaBuscar, sizeof(pasaBuscar));
 				
-					auxPasajero3 = loopSearchNombrePasajero(iniPasajero, pasaBuscar);
-					/*
-					auxPasajero3 = iniPasajero;
-					while (auxPasajero3->sig != nullptr && strcmp(auxPasajero3->dato->nombreComp, pasaBuscar) != 0)
-					{
-						auxPasajero3 = auxPasajero3->sig;
-					}
-					*/
+				auxPasajero3 = loopSearchNombrePasajero(iniPasajero, pasaBuscar);
 
-					if (auxPasajero3 != nullptr && (strcmp(pasaBuscar, auxPasajero3->dato->nombreComp) == 0))
-					{
+				//Edad/Nacimiento
+				char cadenaNacimiento[100];
+				SYSTEMTIME cumple = { 0 };
+				VariantTimeToSystemTime(auxPasajero3->dato->nacimiento, &cumple);
+				formatoFecha(&cumple, cadenaNacimiento);
+				int edad = formatoEdad(auxPasajero3->dato->nacimiento);
+
+			
+				if (auxPasajero3 != nullptr && (strcmp(pasaBuscar, auxPasajero3->dato->nombreComp) == 0))
+				{
+					if (edad <= 12 && auxVuelo2->dato->asientosN == 0) {
+						MessageBox(NULL, "Todos los asientos para niños están ocupados.", "AVISO", MB_OK | MB_ICONINFORMATION);
+						break;
+					}
+					if (edad <= 60 && auxVuelo2->dato->asientosA == 0) {
+						MessageBox(NULL, "Todos los asientos para adultos están ocupados.", "AVISO", MB_OK | MB_ICONINFORMATION);
+						break;
+					}
+					if (edad > 60 && auxVuelo2->dato->asientosM == 0) {
+						MessageBox(NULL, "Todos los asientos para mayores están ocupados.", "AVISO", MB_OK | MB_ICONINFORMATION);
+						break;
+					}
+					else {
 						SetDlgItemText(hwnd, IDC_EDIT7, auxPasajero3->dato->nombreComp);
-
 						//Edad/Nacimiento
-						char cadenaNacimiento[100];
-						SYSTEMTIME cumple = { 0 };
-						VariantTimeToSystemTime(auxPasajero3->dato->nacimiento, &cumple);
-						formatoFecha(&cumple, cadenaNacimiento);
-						/*SetDlgItemText(hwnd, IDC_EDIT6, cadenaNacimiento);*/
+						SetDlgItemInt(hwnd, IDC_EDIT8, edad, false);
 
-						SetDlgItemInt(hwnd, IDC_EDIT8, formatoEdad(auxPasajero3->dato->nacimiento), false);
-					}
-					else
-					{
-						MessageBox(NULL, "No se ha encontradó a este pasajero.", "AVISO", MB_OK | MB_ICONINFORMATION);
-					}
-
-					break;
-				}
-				case IDC_BUTTON2: //Número
-				{
-					break;
-				}
-				case IDC_BUTTON3: //Ejecutiva
-				{
-					SetDlgItemText(hwnd, IDC_EDIT10, "Ejecutiva");
-
-					break;
-				}
-				case IDC_BUTTON4: //Turista
-				{
-					SetDlgItemText(hwnd, IDC_EDIT10, "Turista");
-
-					break;
-				}
-				case IDC_BUTTON5: //Guardar
-				{
-					int numBuscar = GetDlgItemInt(hwnd, IDC_EDIT9, NULL, NULL);
-					auxBoleto2 = iniBoleto;
-
-					while (auxBoleto2/*->sig*/ != nullptr && numBuscar != auxBoleto2->dato->num)
-					{
-						auxBoleto2 = auxBoleto2->sig;
-					}
-
-					if (auxBoleto2/*->sig*/ == nullptr || numBuscar != auxBoleto2->dato->num)
-					{
-						NodoBoleto* temp = new NodoBoleto;
-						temp->dato = new DatoBoleto;
-
-						temp->dato->numVuelo = GetDlgItemInt(hwnd, IDC_EDIT2, NULL, NULL);
-						GetDlgItemText(hwnd, IDC_EDIT7, temp->dato->nombreCompPasajero, sizeof(temp->dato->nombreCompPasajero));
-						
-						temp->dato->num = GetDlgItemInt(hwnd, IDC_EDIT9, NULL, NULL);
-						char clase[20];
-						GetDlgItemText(hwnd, IDC_EDIT10, clase, sizeof(clase));
-						if (strcmp(clase, "Turista")) {
-							temp->dato->clase = 1;
+						if (edad <= 12) {
+							SetDlgItemText(hwnd, IDC_EDIT19, "Niño");
+							break;
+						}
+						if (edad <= 60) {
+							SetDlgItemText(hwnd, IDC_EDIT19, "Adulto");
+							break;
 						}
 						else {
-							temp->dato->clase = 0;
+							SetDlgItemText(hwnd, IDC_EDIT19, "Adulto Mayor");
+							break;
 						}
-						SYSTEMTIME fecha = { 0 };
-						GetLocalTime(&fecha);
-						SystemTimeToVariantTime(&fecha, &temp->dato->registroBoleto);
-						temp->dato->registroPase = 0;
-						temp->dato->pase = 0;
-						temp->dato->status = 0;
-						
-						strcpy_s(temp->dato->usuarioRegistro, miUsuario->dato->nick);
 
-						temp->sig = nullptr;
-						temp->ant = nullptr;
-						nuevoBoleto(temp);
+					}
+				}
+				else
+				{
+					MessageBox(NULL, "No se ha encontradó a este pasajero.", "AVISO", MB_OK | MB_ICONINFORMATION);
+				}
 
-						SetDlgItemText(hwnd, IDC_EDIT2, "");
-						SetDlgItemText(hwnd, IDC_EDIT3, "");
-						SetDlgItemText(hwnd, IDC_EDIT4, "");
-						SetDlgItemText(hwnd, IDC_EDIT5, "");
-						SetDlgItemText(hwnd, IDC_EDIT6, "");
-						SetDlgItemText(hwnd, IDC_EDIT7, "");
-						SetDlgItemText(hwnd, IDC_EDIT8, "");
-						SetDlgItemText(hwnd, IDC_EDIT9, "");
-						SetDlgItemText(hwnd, IDC_EDIT10, "");
-						SetDlgItemText(hwnd, IDC_EDIT11, "");
-						EndDialog(hwnd, 0);
+				break;
+			}
+			case IDC_BUTTON3: //Ejecutiva
+			{
+				if (auxVuelo2->dato->asientosE == 0)
+				{
+					MessageBox(NULL, "No hay asientos disponibles en la clase ejecutiva.", "AVISO", MB_OK | MB_ICONINFORMATION);
+				}
+				else
+				{
+					SetDlgItemText(hwnd, IDC_EDIT10, "Ejecutiva");
+				}
+				break;
+			}
+			case IDC_BUTTON4: //Turista
+			{
+				if (auxVuelo2->dato->asientosT == 0)
+				{
+					MessageBox(NULL, "No hay asientos disponibles en la clase turista.", "AVISO", MB_OK | MB_ICONINFORMATION);
+				}
+				else
+				{
+					SetDlgItemText(hwnd, IDC_EDIT10, "Turista");
+				}
+				break;
+			}
+			case IDC_BUTTON5: //Guardar
+			{
+				int numBoleto = GetDlgItemInt(hwnd, IDC_EDIT9, NULL, NULL);
 
-						HWND hDialog10 = CreateDialog(hInstanceGlobal, MAKEINTRESOURCE(IDD_DIALOG10), 0, cDialog10);
+				if (numBoleto <= auxVuelo2->dato->asientos)
+				{
+					auxBoleto2 = iniBoleto;
+					while (auxBoleto2->sig != nullptr)
+					{
+						if((auxBoleto2->dato->numVuelo != auxVuelo2->dato->num && auxBoleto2->dato->num != numBoleto))
+							auxBoleto2 = auxBoleto2->sig;
+					}
 
-						ShowWindow(hDialog10, SW_SHOW);
-						UpdateWindow(hDialog10);
+					if (auxBoleto2->dato->num == numBoleto)
+					{
+						MessageBox(NULL, "El número de asiento no esta disponible, seleccione otro.", "AVISO", MB_OK | MB_ICONINFORMATION);
+						SetDlgItemText(hwnd, IDC_EDIT19, "");
+					}
+
+					if (auxBoleto2->sig == nullptr && auxBoleto2->dato->numVuelo == auxVuelo2->dato->num) {
+						if (auxBoleto2->dato->num == numBoleto)
+						{
+							MessageBox(NULL, "El número de asiento no esta disponible, seleccione otro.", "AVISO", MB_OK | MB_ICONINFORMATION);
+							SetDlgItemText(hwnd, IDC_EDIT19, "");
+						}
+					}
+				}
+
+				if (auxBoleto2/*->sig*/ == nullptr || numBoleto != auxBoleto2->dato->num)
+				{
+					NodoBoleto* temp = new NodoBoleto;
+					temp->dato = new DatoBoleto;
+
+					temp->dato->numVuelo = GetDlgItemInt(hwnd, IDC_EDIT2, NULL, NULL);
+
+					//Asientos
+					/*auxVuelo2->dato->asientos - 1;*/
+
+					char claseTE[10];
+					GetDlgItemText(hwnd, IDC_EDIT10, claseTE, sizeof(claseTE));
+
+					if (strcmp(claseTE, "Ejecutiva") == 0)
+					{
+						auxVuelo2->dato->asientosE - 1;
 					}
 					else
 					{
-						MessageBox(NULL, "El boleto ya esta registrado.", "AVISO", MB_OK | MB_ICONINFORMATION);
+						auxVuelo2->dato->asientosT - 1;
 					}
 
-					break;
+					int edad = GetDlgItemInt(hwnd, IDC_EDIT8, NULL, NULL);
+
+					if (edad <= 12)
+					{
+						auxVuelo2->dato->asientosN - 1;
+					}
+					else if(edad <= 60)
+					{
+						auxVuelo2->dato->asientosA - 1;
+					}
+					else
+					{
+						auxVuelo2->dato->asientosM - 1;
+					}
+
+					GetDlgItemText(hwnd, IDC_EDIT7, temp->dato->nombreCompPasajero, sizeof(temp->dato->nombreCompPasajero));
+						
+					temp->dato->num = GetDlgItemInt(hwnd, IDC_EDIT9, NULL, NULL);
+					char clase[20];
+					GetDlgItemText(hwnd, IDC_EDIT10, clase, sizeof(clase));
+					if (strcmp(clase, "Turista")) {
+						temp->dato->clase = 1;
+					}
+					else {
+						temp->dato->clase = 0;
+					}
+					SYSTEMTIME fecha = { 0 };
+					GetLocalTime(&fecha);
+					SystemTimeToVariantTime(&fecha, &temp->dato->registroBoleto);
+					temp->dato->registroPase = 0;
+					temp->dato->pase = 0;
+					temp->dato->status = 0;
+						
+					strcpy_s(temp->dato->usuarioRegistro, miUsuario->dato->nick);
+
+					temp->sig = nullptr;
+					temp->ant = nullptr;
+
+					nuevoBoleto(temp);
+
+					SetDlgItemText(hwnd, IDC_EDIT2, "");
+					SetDlgItemText(hwnd, IDC_EDIT3, "");
+					SetDlgItemText(hwnd, IDC_EDIT4, "");
+					SetDlgItemText(hwnd, IDC_EDIT5, "");
+					SetDlgItemText(hwnd, IDC_EDIT6, "");
+					SetDlgItemText(hwnd, IDC_EDIT7, "");
+					SetDlgItemText(hwnd, IDC_EDIT8, "");
+					SetDlgItemText(hwnd, IDC_EDIT9, "");
+					SetDlgItemText(hwnd, IDC_EDIT10, "");
+					SetDlgItemText(hwnd, IDC_EDIT11, "");
+					EndDialog(hwnd, 0);
+
+					HWND hDialog10 = CreateDialog(hInstanceGlobal, MAKEINTRESOURCE(IDD_DIALOG10), 0, cDialog10);
+
+					ShowWindow(hDialog10, SW_SHOW);
+					UpdateWindow(hDialog10);
 				}
-				//case IDC_BUTTON6: //Editar
-				//{
+				else
+				{
+					MessageBox(NULL, "El boleto ya esta registrado.", "AVISO", MB_OK | MB_ICONINFORMATION);
+				}
+
+				break;
+			}
+			//case IDC_BUTTON6: //Editar
+			//{
 
 
-				//	break;
-				//}
+			//	break;
+			//}
 
-				default: break;
+			default: break;
 			}
 
 			break;
@@ -2986,6 +3065,11 @@ BOOL CALLBACK cDialog14(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 		case IDC_BUTTON1: // Buscar
 		{
+			char pasajeroBuscar[30];
+			GetDlgItemText(hwnd, IDC_EDIT2, pasajeroBuscar, sizeof(pasajeroBuscar));
+
+			auxPasajero3 = binarySearchNombrePasajero(iniPasajero, pasajeroBuscar);
+
 
 
 			break;
