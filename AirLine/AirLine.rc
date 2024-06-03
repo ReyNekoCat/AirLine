@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Spanish (Mexico) resources
+// Español (México) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESM)
 LANGUAGE LANG_SPANISH, SUBLANG_SPANISH_MEXICAN
@@ -361,8 +361,8 @@ CAPTION "Aerolínea UANL || Boletos"
 MENU IDR_MENU1
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    PUSHBUTTON      "Cancelar",IDC_BUTTON2,218,323,71,14
-    PUSHBUTTON      "Confirmar",IDC_BUTTON3,314,323,71,14
+    PUSHBUTTON      "Cancelar",IDC_BUTTON2,314,323,71,14
+    PUSHBUTTON      "Confirmar",IDC_BUTTON3,410,323,71,14
     CTEXT           "Sesión:",IDC_STATIC,56,20,64,20,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
     EDITTEXT        IDC_EDIT1,130,20,351,20,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY,WS_EX_CLIENTEDGE
     CTEXT           "Número de asiento:",IDC_STATIC,56,70,95,15,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
@@ -382,14 +382,13 @@ BEGIN
     EDITTEXT        IDC_EDIT7,161,195,320,15,ES_AUTOHSCROLL | ES_READONLY
     CONTROL         "",IDC_BMP,"Static",SS_BITMAP,490,20,15,13
     CTEXT           "Abordaje:",IDC_STATIC,56,295,95,14,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
-    EDITTEXT        IDC_EDIT9,161,246,320,15,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_EDIT9,161,246,320,15,ES_AUTOHSCROLL | ES_READONLY | ES_WANTRETURN
     CTEXT           "Edad:",IDC_STATIC,56,220,95,14,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
     EDITTEXT        IDC_EDIT8,161,220,320,15,ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER
     CTEXT           "Clase:",IDC_STATIC,56,246,95,14,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
     CTEXT           "Costo:",IDC_STATIC,56,270,95,14,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
     EDITTEXT        IDC_EDIT10,161,270,320,15,ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER
     EDITTEXT        IDC_EDIT11,161,295,320,15,ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER
-    PUSHBUTTON      "Editar",IDC_BUTTON4,410,323,71,14
 END
 
 IDD_DIALOG14 DIALOGEX 0, 0, 591, 334
@@ -1054,12 +1053,12 @@ BEGIN
     END
 END
 
-#endif    // Spanish (Mexico) resources
+#endif    // Español (México) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Spanish (Spain, International Sort) resources
+// Español (España, alfabetización internacional) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESN)
 LANGUAGE LANG_SPANISH, SUBLANG_SPANISH_MODERN
@@ -1090,7 +1089,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // Spanish (Spain, International Sort) resources
+#endif    // Español (España, alfabetización internacional) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
