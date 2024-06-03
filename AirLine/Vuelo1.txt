@@ -1,0 +1,3 @@
+No.1, Nombre: Jose Jose Jose, Edad: 23, Nacionalidad: Brasil
+No.2, Nombre: Maria Maria Maria, Edad: 25, Nacionalidad: Estados Unidos
+No.3, Nombre: Jesus Jesus Jesus, Edad: 4, Nacionalidad: Argentina

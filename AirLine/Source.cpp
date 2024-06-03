@@ -215,7 +215,8 @@ void escribirVuelo();
 void leerVuelos();
 void reporteVuelos(HWND, int);
 void printVuelosEnRango(HWND, int, NodoVuelo*, DATE, DATE);
-void generarManifiestoPasajeros(NodoBoleto*, int, const char*);
+void generarManifiestoPasajeros(HWND, int, const char*);
+void SetManifiestoPasajeros(HWND, int, int);
 NodoVuelo* binarySearchNumVuelo(NodoVuelo*, int);
 NodoVuelo* loopSearchNumVuelo(NodoVuelo*, int);
 void SetRegistroVuelos(HWND, int, int, int);
@@ -1918,35 +1919,37 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				bmp = (HBITMAP)LoadImage(NULL, miUsuario->dato->foto, IMAGE_BITMAP, 70, 70, LR_LOADFROMFILE); //2
 				SendDlgItemMessage(hwnd, IDC_BMP, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp); //3
 			}
-			auxBoleto2 = iniBoleto;
-			if (iniBoleto != nullptr)
-			{
-				// Ordenamiento QueckSort Boleto
-				//quickSortNum(iniBoleto);
+			//auxBoleto2 = iniBoleto;
+			//if (iniBoleto != nullptr)
+			//{
+			//	// Ordenamiento QueckSort Boleto
+			//	//quickSortNum(iniBoleto);
 
-				//Lista de Boletos
-				while (auxBoleto2->sig != nullptr)
-				{
-					if (auxBoleto2->dato->numVuelo == auxVuelo2->dato->num)
-					{
-						SendDlgItemMessage(hwnd, IDC_LIST9, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto2->dato->nombreCompPasajero);
-					}
-					auxBoleto2 = auxBoleto2->sig;
-				}
+			//	//Lista de Boletos
+			//	while (auxBoleto2->sig != nullptr)
+			//	{
+			//		if (auxBoleto2->dato->numVuelo == auxVuelo2->dato->num)
+			//		{
+			//			SendDlgItemMessage(hwnd, IDC_LIST9, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto2->dato->nombreCompPasajero);
+			//		}
+			//		auxBoleto2 = auxBoleto2->sig;
+			//	}
 
-				if (auxBoleto2->sig == nullptr/* || auxEsp2->ant == nullptr*/)
-				{
-					if (auxBoleto2->dato->numVuelo == auxVuelo2->dato->num)
-					{
-						SendDlgItemMessage(hwnd, IDC_LIST9, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto2->dato->nombreCompPasajero);
-					}
-					auxBoleto2 = auxBoleto2->sig;
-				}
-			}
-			else
-			{
-				MessageBox(NULL, "No hay boletos registrados.", "AVISO", MB_OK | MB_ICONINFORMATION);
-			}
+			//	if (auxBoleto2->sig == nullptr/* || auxEsp2->ant == nullptr*/)
+			//	{
+			//		if (auxBoleto2->dato->numVuelo == auxVuelo2->dato->num)
+			//		{
+			//			SendDlgItemMessage(hwnd, IDC_LIST9, LB_ADDSTRING, (WPARAM)0, (LPARAM)auxBoleto2->dato->nombreCompPasajero);
+			//		}
+			//		auxBoleto2 = auxBoleto2->sig;
+			//	}
+			//}
+			//else
+			//{
+			//	MessageBox(NULL, "No hay boletos registrados.", "AVISO", MB_OK | MB_ICONINFORMATION);
+			//}
+			SetManifiestoPasajeros(hwnd, IDC_LIST9, auxVuelo2->dato->num);
+
 			if (auxVuelo2 != nullptr)
 			{
 				SetDlgItemInt(hwnd, IDC_EDIT2, auxVuelo2->dato->num, false);
@@ -2000,8 +2003,14 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			
 			case IDC_BUTTON1: // Reporte
 			{
-				
-
+				//Se crea el nombre del archivo
+				char nomArchivo[20];
+				char numStr[3];
+				strcpy_s(nomArchivo, "Vuelo");
+				GetDlgItemText(hwnd, IDC_EDIT2, numStr, sizeof(numStr));
+				strcat_s(nomArchivo, numStr);
+				strcat_s(nomArchivo, ".txt");
+				generarManifiestoPasajeros(hwnd, IDC_LIST9, nomArchivo);
 				break;
 			}
 			case IDC_BUTTON2: // Asientos
@@ -2009,20 +2018,7 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				int numV = GetDlgItemInt(hwnd, IDC_EDIT2, NULL, NULL);
 				quickSortNumAsiento(iniBoleto);
 				SendMessage(GetDlgItem(hwnd, IDC_LIST9), LB_RESETCONTENT, 0, 0);
-
-				NodoBoleto* temp = new NodoBoleto;
-				temp->dato = new DatoBoleto;
-				temp = iniBoleto;
-
-				while (temp->sig != nullptr && temp->dato->numVuelo == numV)
-				{
-					SendDlgItemMessage(hwnd, IDC_LIST9, LB_ADDSTRING, (WPARAM)0, (LPARAM)temp->dato->nombreCompPasajero);
-					temp = temp->sig;
-				}
-				if (temp->sig == nullptr && temp->dato->numVuelo == numV)
-				{
-					SendDlgItemMessage(hwnd, IDC_LIST9, LB_ADDSTRING, (WPARAM)0, (LPARAM)temp->dato->nombreCompPasajero);
-				}
+				SetManifiestoPasajeros(hwnd, IDC_LIST9, auxVuelo2->dato->num);
 				break;
 			}
 			case IDC_BUTTON3: // Nombres
@@ -2030,20 +2026,7 @@ BOOL CALLBACK cDialog8(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				int numV = GetDlgItemInt(hwnd, IDC_EDIT2, NULL, NULL);
 				quickSortNomPasajero(iniBoleto);
 				SendMessage(GetDlgItem(hwnd, IDC_LIST9), LB_RESETCONTENT, 0, 0);
-
-				NodoBoleto* temp = new NodoBoleto;
-				temp->dato = new DatoBoleto;
-				temp = iniBoleto;
-
-				while (temp->sig != nullptr && temp->dato->numVuelo == numV)
-				{
-					SendDlgItemMessage(hwnd, IDC_LIST9, LB_ADDSTRING, (WPARAM)0, (LPARAM)temp->dato->nombreCompPasajero);
-					temp = temp->sig;
-				}
-				if (temp->sig == nullptr && temp->dato->numVuelo == numV)
-				{
-					SendDlgItemMessage(hwnd, IDC_LIST9, LB_ADDSTRING, (WPARAM)0, (LPARAM)temp->dato->nombreCompPasajero);
-				}
+				SetManifiestoPasajeros(hwnd, IDC_LIST9, auxVuelo2->dato->num);
 				break;
 			}
 			
@@ -2754,7 +2737,6 @@ BOOL CALLBACK cDialog12(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 							SetDlgItemText(hwnd, IDC_EDIT19, "Adulto Mayor");
 							break;
 						}
-
 					}
 				}
 				else
@@ -4176,30 +4158,70 @@ void printVuelosEnRango(HWND hwnd, int List, NodoVuelo* iniVuelos, DATE inicioDa
 		}
 	}
 }
-void generarManifiestoPasajeros(NodoBoleto* iniBoletos, int numVuelo, const char* nombreArchivo) {
-	// Abrir el archivo de texto para escritura
-	FILE* archivo;
-	errno_t err = fopen_s(&archivo, nombreArchivo, "w");
-	if (err != 0) {
-		printf("No se pudo abrir el archivo %s\n", nombreArchivo);
-		return;
-	}
-	for (NodoBoleto* nodo = iniBoletos; nodo != NULL; nodo = nodo->sig) {
-		if (nodo->dato->numVuelo == numVuelo && nodo->dato->status == 1) {
-			// Se encontró un boleto con el número de vuelo proporcionado y status 1
-			NodoPasajero* pasajero = binarySearchNombrePasajero(iniPasajero, nodo->dato->nombreCompPasajero);
-			if (pasajero != NULL) {
-				// Escribir los datos del pasajero en el archivo			
-				int edad = formatoEdad(pasajero->dato->nacimiento);
-				char edadStr[4];
-				sprintf_s(edadStr, sizeof(edadStr), "%d", edad);
-				fprintf(archivo, "Nombre: %s, Edad: %s, Nacionalidad: %s\n",
-					pasajero->dato->nombreComp, edadStr, pasajero->dato->nacionalidad);
+void SetManifiestoPasajeros(HWND hwnd, int ListBoxID, int numVuelo) {
+	auxBoleto3 = iniBoleto; // Vuelos
+	auxBoleto3->dato = iniBoleto->dato;
+
+	if (iniBoleto != nullptr)
+	{
+		while (auxBoleto3->sig != nullptr)
+		{
+			if (auxBoleto3->dato->numVuelo == numVuelo && auxBoleto3->dato->status != 2) {
+
+				NodoPasajero* tempPasajero = loopSearchNombrePasajero(iniPasajero, auxBoleto3->dato->nombreCompPasajero);
+				int intEdad = formatoEdad(tempPasajero->dato->nacimiento);
+
+				char pasajeroInfo[200];
+				sprintf_s(pasajeroInfo, sizeof(pasajeroInfo), "No.%d, Nombre: %s, Edad: %d, Nacionalidad: %s",
+					auxBoleto3->dato->num, tempPasajero->dato->nombreComp, intEdad, tempPasajero->dato->nacionalidad);
+
+				SendDlgItemMessage(hwnd, ListBoxID, LB_ADDSTRING, (WPARAM)0, (LPARAM)pasajeroInfo);
 			}
+			auxBoleto3 = auxBoleto3->sig;
+		}
+
+		if (auxBoleto3->sig == nullptr && auxBoleto3->dato->numVuelo == numVuelo && auxBoleto3->dato->status != 2)
+		{
+			if (auxBoleto3->dato->numVuelo == numVuelo && auxBoleto3->dato->status != 2) {
+
+				NodoPasajero* tempPasajero = loopSearchNombrePasajero(iniPasajero, auxBoleto3->dato->nombreCompPasajero);
+				int intEdad = formatoEdad(tempPasajero->dato->nacimiento);
+
+				char pasajeroInfo[200];
+				sprintf_s(pasajeroInfo, sizeof(pasajeroInfo), "No.%d, Nombre: %s, Edad: %d, Nacionalidad: %s",
+					auxBoleto3->dato->num, tempPasajero->dato->nombreComp, intEdad, tempPasajero->dato->nacionalidad);
+
+				SendDlgItemMessage(hwnd, ListBoxID, LB_ADDSTRING, (WPARAM)0, (LPARAM)pasajeroInfo);
+			}
+			auxBoleto3 = auxBoleto3->sig;
 		}
 	}
-	// Cerrar el archivo
-	fclose(archivo);
+	else
+	{
+		MessageBox(NULL, "No hay vuelos registrados.", "AVISO", MB_OK | MB_ICONINFORMATION);
+	}
+}
+void generarManifiestoPasajeros(HWND hwnd, int listBoxId, const char* nombreArchivo) {
+	ofstream escribir(nombreArchivo, ios::out | ios::trunc);
+	if (!escribir.is_open()) {
+		MessageBox(NULL, "No se pudo abrir el archivo", "Error", MB_OK | MB_ICONERROR);
+		return;
+	}
+	// Obtener el número de elementos en el ListBox
+	int count = SendMessage(GetDlgItem(hwnd, listBoxId), LB_GETCOUNT, 0, 0);
+	if (count == 0) {
+		MessageBox(NULL, "No hay pasajeros en el vuelo", "Error", MB_OK | MB_ICONERROR);
+		return;
+	}
+	for (int i = 0; i < count; i++) {
+		char text[256];
+		// Obtener el texto del elemento
+		SendMessage(GetDlgItem(hwnd, listBoxId), LB_GETTEXT, i, (LPARAM)text);
+		// Escribir el texto en el archivo
+		escribir << text << endl;
+	}
+	escribir.close();
+	MessageBox(NULL, "Se ha creado el reporte del manifiesto de forma exitosa.", "AVISO", MB_OK | MB_ICONINFORMATION);
 }
 //Función de búsqueda en la lista por numero de vuelo
 NodoVuelo* binarySearchNumVuelo(NodoVuelo* iniVuelos, int numVuelo) {
